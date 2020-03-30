@@ -1,0 +1,17 @@
+query getRoom($id: UUID!){
+  roomById(id: $id) {
+    id
+    name
+  }
+}
+
+query allRooms {
+  allRooms {
+    nodes {
+      id
+      name
+      createdAt
+      updatedAt
+    }
+  }
+}

@@ -1,0 +1,7 @@
+.now
+.next
+build
+dist
+node_modules
+src/generated/*
+.env
