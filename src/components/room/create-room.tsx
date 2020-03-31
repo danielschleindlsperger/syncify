@@ -28,8 +28,15 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
 
   return (
     <div {...props}>
-      <form onSubmit={handleSubmit}>
-        <input type="text" onChange={evt => setName(evt.target.value)} />
+      <form onSubmit={handleSubmit} className="flex max-w-xs">
+        <input
+          type="text"
+          onChange={evt => setName(evt.target.value)}
+          className="bg-gray-300 rounded-sm flex-grow"
+        />
+        <button type="submit" className="bg-blue-700 text-gray-100 px-3 py-1 rounded-sm">
+          Create room
+        </button>
       </form>
     </div>
   )

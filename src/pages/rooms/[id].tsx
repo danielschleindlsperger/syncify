@@ -3,17 +3,20 @@ import { GetServerSideProps } from 'next'
 import { GraphQLClient } from 'graphql-request'
 import { GraphQlUrl } from '../../config'
 import { getSdk } from '../../generated/graphql'
+import { Userlist } from '../../components/user-list'
 
 type RoomProps = {
   id: string
   name: string
+  users: { id: string; name: string; avatar?: string }[]
 }
 
 export default (props: RoomProps) => {
+  const { name, users } = props
   return (
     <div>
-      <h1>{props.name}</h1>
-      {JSON.stringify(props, null, 2)}
+      <h1 className="text-5xl font-bold">{name}</h1>
+      <Userlist users={users} />
     </div>
   )
 }
@@ -32,5 +35,7 @@ export const getServerSideProps: GetServerSideProps<RoomProps> = async ctx => {
 
   if (!roomById) throw new Error('Got nothing')
 
-  return { props: roomById }
+  const users = roomById.usersByRoomId.nodes
+
+  return { props: { id: roomById.id, name: roomById.name, users } }
 }

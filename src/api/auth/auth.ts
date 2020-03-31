@@ -1,9 +1,10 @@
 import Router from 'koa-router'
 import Spotify from 'spotify-web-api-node'
+import util from 'util'
 import { SpotifyConfig, SpotifyScopes, AppUrl } from '../config'
 import { writeAuthCookie, AuthCookieName } from './auth-cookie'
 import { signToken, verifyToken } from './jwt'
-import { getSdk } from '../../generated/graphql'
+import { getSdk, User } from '../../generated/graphql'
 import { GraphQLClient } from 'graphql-request'
 import { GraphQlUrl } from '../../config'
 import { db } from '../db-client'
@@ -44,9 +45,7 @@ router.get('/spotify-callback', async (ctx, next) => {
       avatar: getImage(images || []),
     }
 
-    // TODO
-    // await saveUser(user)
-    await db('users').insert(user)
+    await upsertUser(user)
 
     const token = signToken({ id, access_token, refresh_token })
     writeAuthCookie(ctx, token)
@@ -62,6 +61,25 @@ router.get('/spotify-callback', async (ctx, next) => {
     return
   }
 })
+
+// TODO: this might not be the best way to solve this...
+async function upsertUser({ id, name, avatar }: Pick<User, 'id' | 'name' | 'avatar'>) {
+  const insert = db('users')
+    .insert({ id, name, avatar })
+    .toString()
+
+  const update = db('users')
+    .update({ name, avatar })
+    .whereRaw('users.id = ?', [id])
+
+  const query = util.format(
+    '%s ON CONFLICT (id) DO UPDATE SET %s',
+    insert.toString(),
+    update.toString().replace(/^update\s.*\sset\s/i, ''),
+  )
+
+  await db.raw(query)
+}
 
 // this endpoint is called by a user to
 // a) refresh the session token

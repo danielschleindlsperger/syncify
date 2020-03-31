@@ -18,6 +18,7 @@
   "dependencies": {
     "@graphile/operation-hooks": "^0.2.4",
     "@koa/cors": "^3.0.0",
+    "classnames": "^2.2.6",
     "cookie": "^0.4.0",
     "easy-peasy": "^3.3.0",
     "graphql-request": "^1.8.2",
@@ -40,6 +41,7 @@
     "@graphql-codegen/typescript": "1.13.1",
     "@graphql-codegen/typescript-graphql-request": "1.13.2-alpha-8b7b00a7.73",
     "@graphql-codegen/typescript-operations": "1.13.1",
+    "@types/classnames": "^2.2.10",
     "@types/cookie": "^0.3.3",
     "@types/jsonwebtoken": "^8.3.8",
     "@types/koa": "^2.11.3",

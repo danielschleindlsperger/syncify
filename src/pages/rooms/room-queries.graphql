@@ -1,7 +1,14 @@
 query getRoom($id: UUID!){
   roomById(id: $id) {
-    id
+  	id
     name
+    usersByRoomId {
+      nodes {
+        id
+        name
+        avatar
+      }
+    }
   }
 }
 
