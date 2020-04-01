@@ -1,9 +1,10 @@
-import { createContextStore, action, Action, Thunk, thunk } from 'easy-peasy'
+import { createContextStore, action, Action, Thunk, thunk, Computed, computed } from 'easy-peasy'
 
 type PlayerStore = Readonly<{
   ready: boolean
   deviceId: string | null
   error: string | null
+  isPlaying: Computed<PlayerStore, boolean>
   handleReady: Action<PlayerStore, Spotify.WebPlaybackInstance>
   handleError: Action<PlayerStore, Spotify.Error>
   playbackState: Spotify.PlaybackState | null
@@ -16,6 +17,10 @@ const store = createContextStore<PlayerStore>(
     ready: false,
     deviceId: null,
     error: null,
+    isPlaying: computed(state => {
+      const { ready, playbackState } = state
+      return ready && !!playbackState && !playbackState.paused
+    }),
     handleReady: action((state, instance) => {
       if (instance.device_id) {
         return { ...state, ready: true, deviceId: instance.device_id }

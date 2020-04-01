@@ -6,6 +6,7 @@ import { VolumeSlider } from './volume-controls'
 // TODO: empty, skeleton state
 export const Player = (props: React.HTMLAttributes<HTMLElement>) => {
   const playbackState = usePlayerState(state => state.playbackState)
+  const isPlaying = usePlayerState(state => state.isPlaying)
 
   if (!playbackState) return null
 
@@ -16,12 +17,12 @@ export const Player = (props: React.HTMLAttributes<HTMLElement>) => {
   const byline = artists.map(a => a.name).join(', ')
 
   return (
-    <div className="absolute bottom-0 inset-x-auto max-w-3xl p-3 flex justify-start" {...props}>
+    <div className="absolute bottom-0 w-full max-w-3xl p-3 flex justify-start" {...props}>
       <img src={coverArt} alt={`album cover: ${name} by ${byline}`} className="w-64 h-64" />
-      <div className="flex flex-col justify-center ml-6">
+      <div className="flex-grow flex flex-col justify-center ml-6">
         <span className="text-3xl text-gray-800 font-bold leading-tight mt-3">{name}</span>
-        <span className="text-2xl text-gray-800 font-bold mt-2">{byline}</span>
-        <Progress className="w-full mt-2" duration={duration} position={position} />
+        <span className="text-2xl text-gray-800 font-semibold mt-2">{byline}</span>
+        {isPlaying && <Progress className="w-full mt-2" duration={duration} position={position} />}
         <VolumeSlider className="mt-2" />
       </div>
     </div>

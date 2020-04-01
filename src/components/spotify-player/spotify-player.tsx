@@ -32,6 +32,7 @@ export const SpotifyPlayerProvider: React.FC = ({ children }) => {
   const [player, setPlayer] = React.useState<Spotify.SpotifyPlayer | null>(null)
 
   const state = usePlayerState(state => state)
+  console.log(state)
 
   const play = React.useCallback(
     async (uris: string[], offsetMs = 0): Promise<void> => {
