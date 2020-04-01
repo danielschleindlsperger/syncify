@@ -4,6 +4,7 @@ import { GraphQLClient } from 'graphql-request'
 import { GraphQlUrl } from '../../config'
 import { getSdk } from '../../generated/graphql'
 import { Userlist } from '../../components/user-list'
+import { useSpotifyPlayer } from '../../components/spotify-player'
 
 type RoomProps = {
   id: string
@@ -13,6 +14,15 @@ type RoomProps = {
 
 export default (props: RoomProps) => {
   const { name, users } = props
+  const { play } = useSpotifyPlayer()
+
+  React.useEffect(() => {
+    console.log('reloaddiiiiin')
+    setTimeout(() => {
+      play && play(['spotify:track:6CWbnFaVAhWLacSZBbS3h8'])
+    }, 2000)
+  }, [])
+
   return (
     <div>
       <h1 className="text-5xl font-bold">{name}</h1>
