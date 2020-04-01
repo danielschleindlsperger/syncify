@@ -5,11 +5,11 @@ module.exports = {
     connection: process.env.DATABASE_URL,
     migrations: {
         tableName: 'knex_migrations',
-        directory: 'src/database/migrations',
+        directory: 'database/migrations',
         extension: 'ts',
     },
     seeds: {
-        directory: './src/database/seeds',
+        directory: 'database/seeds',
         extension: 'ts',
     }
 };
