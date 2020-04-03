@@ -1,10 +1,9 @@
 import React from 'react'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
-import { GraphQLClient } from 'graphql-request'
 import { CreateRoom } from '../../components/room/create-room'
-import { GraphQlUrl } from '../../config'
-import { getSdk } from '../../generated/graphql'
+import { createPool, sql } from 'slonik'
+import { DatabaseUrl } from '../../api/config'
 
 type RoomsProps = { rooms: { id: string; name: string }[] }
 
@@ -25,21 +24,16 @@ export default ({ rooms }: RoomsProps) => {
   )
 }
 
+const pool = createPool(DatabaseUrl)
+
 export const getServerSideProps: GetServerSideProps<RoomsProps> = async ctx => {
-  const { req } = ctx
-
-  const sdk = getSdk(
-    new GraphQLClient(GraphQlUrl, {
-      // pass client's cookies to api for authentication
-      headers: { cookie: req.headers.cookie! },
-    }),
-  )
-
-  const { allRooms } = await sdk.allRooms()
-
-  // TODO: Figure out how to render 404/401/500 page from this
-  const rooms = allRooms?.nodes
-  if (!rooms) throw new Error('Didnt get anythiinnnngggg')
+  // TODO: move this query to api which allows for better access control
+  const rooms = await pool.connect(async conn => {
+    return conn.many<{ id: string; name: string }>(
+      sql`SELECT r.id, r.name
+          FROM rooms r`,
+    )
+  })
 
   return { props: { rooms } }
 }

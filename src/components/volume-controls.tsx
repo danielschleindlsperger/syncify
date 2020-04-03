@@ -1,7 +1,7 @@
 import React from 'react'
 import { useSpotifyPlayer } from './spotify-player'
 
-type VolumeSliderProps = React.HTMLProps<HTMLInputElement>
+type VolumeSliderProps = React.HTMLAttributes<HTMLElement>
 
 export const VolumeSlider = (props: VolumeSliderProps) => {
   const { player } = useSpotifyPlayer()
@@ -15,18 +15,20 @@ export const VolumeSlider = (props: VolumeSliderProps) => {
   }, [player, volume])
 
   return (
-    <input
-      type="range"
-      disabled={!player}
-      aria-label="Player volume"
-      min="0"
-      max="1"
-      step="0.01"
-      value={volume}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-        setVolume(parseFloat(event.target.value))
-      }
-      {...props}
-    />
+    <div {...props}>
+      <input
+        className="w-full"
+        type="range"
+        disabled={!player}
+        aria-label="Player volume"
+        min="0"
+        max="1"
+        step="0.01"
+        value={volume}
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+          setVolume(parseFloat(event.target.value))
+        }
+      />
+    </div>
   )
 }

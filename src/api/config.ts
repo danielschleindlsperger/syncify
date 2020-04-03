@@ -11,4 +11,4 @@ export const SpotifyConfig = {
 }
 
 // the scopes requested from the user upon login
-export const SpotifyScopes = []
+export const SpotifyScopes = ['streaming', 'user-read-email', 'user-read-private']

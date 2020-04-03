@@ -1,7 +1,8 @@
 import React from 'react'
+import { User } from '../types'
 
 type UserlistProps = React.HTMLAttributes<HTMLElement> & {
-  users: { id: string; name: string; avatar?: string }[]
+  users: readonly User[]
 }
 
 export const Userlist = ({ users, ...props }: UserlistProps) => (

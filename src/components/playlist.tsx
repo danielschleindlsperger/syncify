@@ -53,8 +53,6 @@ export const Playlist = ({ playlist, ...props }: PlaylistProps) => {
 
   if (!tracks) return null
 
-  console.log({ currentTrackId })
-
   return (
     <div {...props}>
       <h2 className="text-3xl font-bold">Playlist</h2>

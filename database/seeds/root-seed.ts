@@ -1,12 +1,17 @@
 import * as Knex from 'knex'
-import crypto from 'crypto'
+import * as crypto from 'crypto'
+import { Playlist } from '../../src/types'
 
 export async function seed(knex: Knex): Promise<any> {
   // Deletes ALL existing entries
   await knex('users').del()
   await knex('rooms').del()
 
-  await knex('rooms').insert([{ name: 'Classics' }, { name: 'Rock Room' }, { name: 'HHHeads' }])
+  await knex('rooms').insert([
+    { name: 'Classics', playlist },
+    { name: 'Rock Room', playlist },
+    { name: 'HHHeads', playlist },
+  ])
 
   const rooms = await knex('rooms').select()
   for (const room of rooms) {
@@ -43,4 +48,15 @@ export async function seed(knex: Knex): Promise<any> {
       },
     ])
   }
+}
+
+const playlist: Playlist = {
+  created: new Date().toISOString(),
+  songs: [
+    { id: '5j6ZZwA9BnxZi5Bk0Ng4jB' },
+    {
+      id: '6CWbnFaVAhWLacSZBbS3h8',
+    },
+    { id: '7eMBDipvMwVnYiMe0yrS5x' },
+  ],
 }
