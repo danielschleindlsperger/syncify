@@ -1,18 +1,14 @@
 import React from 'react'
 import { GetServerSideProps } from 'next'
+import fetch from 'isomorphic-fetch'
 import { Userlist } from '../../components/user-list'
-import { useSpotifyPlayer } from '../../components/spotify-player'
 import { Playlist } from '../../components/playlist'
-import { createPool, sql } from 'slonik'
-import { DatabaseUrl } from '../../api/config'
 import { Room } from '../../types'
-
-type Playlist = import('../../types').Playlist
+import { ApiUrl } from '../../config'
 
 type RoomProps = { room: Room }
 export default ({ room }: RoomProps) => {
   const { name, users, playlist } = room
-  const { play } = useSpotifyPlayer()
 
   return (
     <div>
@@ -23,26 +19,24 @@ export default ({ room }: RoomProps) => {
   )
 }
 
-const pool = createPool(DatabaseUrl)
-
 export const getServerSideProps: GetServerSideProps<RoomProps> = async ctx => {
-  const { req, params } = ctx
+  const { params } = ctx
   const id = params && typeof params.id === 'string' ? params.id : undefined
 
   if (!id) throw new Error(`Could not find a room for id ${id}`)
 
-  // TODO: move this query to api which allows for better access control
-  const room = await pool.connect(async conn => {
-    return conn.one<Room>(
-      sql`SELECT
-            r.id, r.name, r.playlist,
-            json_agg(json_build_object('id', u.id, 'name', u.name, 'avatar', u.avatar)) users
-          FROM rooms r
-          INNER JOIN users u ON r.id = u.room_id
-          WHERE r.id = ${id}
-      GROUP BY r.id`,
-    )
-  })
+  // forward client's cookies for access control
+  const Cookie = ctx.req.headers.cookie
+  const res = await fetch(`${ApiUrl}/rooms/${id}`, { headers: { Cookie } })
 
-  return { props: { room } }
+  if (res.status >= 400) {
+    ctx.res.statusCode = res.status
+    throw new Error('an error occurred')
+  }
+
+  const body = await res.json()
+
+  console.log(body)
+
+  return { props: { room: body } }
 }

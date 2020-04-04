@@ -4,16 +4,14 @@ import util from 'util'
 import { SpotifyConfig, SpotifyScopes, AppUrl } from '../config'
 import { writeAuthCookie, AuthCookieName } from './auth-cookie'
 import { signToken, verifyToken } from './jwt'
-import { getSdk, User } from '../../generated/graphql'
-import { GraphQLClient } from 'graphql-request'
-import { GraphQlUrl } from '../../config'
+import { User } from '../../generated/graphql'
 import { db } from '../db-client'
 
 const spotifyApi = new Spotify(SpotifyConfig)
 
-const router = new Router({ prefix: '/auth', methods: ['GET'] })
+export const router = new Router({ methods: ['GET'] })
 
-router.get('/login', ctx => {
+router.get('/auth/login', ctx => {
   // state can be used to redirect to previous location after login or for more security (e.g. setting a nonce)
   const state = ''
   const authorizeURL = spotifyApi.createAuthorizeURL(SpotifyScopes, state)
@@ -21,7 +19,7 @@ router.get('/login', ctx => {
   ctx.res.statusCode = 307
 })
 
-router.get('/spotify-callback', async (ctx, next) => {
+router.get('/auth/spotify-callback', async (ctx, next) => {
   const { code } = ctx.query
 
   if (!code || typeof code !== 'string') {
@@ -84,7 +82,7 @@ async function upsertUser({ id, name, avatar }: Pick<User, 'id' | 'name' | 'avat
 // this endpoint is called by a user to
 // a) refresh the session token
 // b) get a fresh spotify access_token
-router.get('/refresh', async ctx => {
+router.get('/auth/refresh', async ctx => {
   const token = ctx.cookies.get(AuthCookieName)
 
   if (typeof token !== 'string') {
@@ -129,7 +127,5 @@ router.get('/refresh', async ctx => {
   const { refresh_token, ...response } = { ...dbUser, access_token: user.access_token }
   ctx.body = response
 })
-
-export const routes = router.routes()
 
 const getImage = (images: SpotifyApi.ImageObject[]) => images[0] && images[0].url

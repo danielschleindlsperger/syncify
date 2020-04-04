@@ -51,6 +51,8 @@ export const Playlist = ({ playlist, ...props }: PlaylistProps) => {
     }
   }, [tracks, play])
 
+  console.log({ tracks })
+
   if (!tracks) return null
 
   return (
@@ -70,7 +72,8 @@ export const Playlist = ({ playlist, ...props }: PlaylistProps) => {
 
 const fetchTracks = async (accessToken: string, ids: string[]): Promise<PlaylistTrack[]> => {
   spotify.setAccessToken(accessToken)
-  const tracks = await spotify.getTracks(ids).then(res => res.body.tracks)
+  // TODO: recursively fetch all tracks
+  const tracks = await spotify.getTracks(ids.slice(0, 50)).then(res => res.body.tracks)
 
   return tracks.map(track => {
     return {

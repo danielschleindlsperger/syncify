@@ -1,29 +1,40 @@
 import React from 'react'
 import { useRouter } from 'next/router'
-import { GraphQLClient } from 'graphql-request'
-import { getSdk } from '../../generated/graphql'
-import { GraphQlUrl } from '../../config'
+import { Playlist, Song } from '../../types'
+import { useAuth } from '../auth'
+import SpotifyWebApi from 'spotify-web-api-js'
+import { ApiUrl } from '../../config'
 
-const sdk = getSdk(new GraphQLClient(GraphQlUrl, { credentials: 'include' }))
+const spotify = new SpotifyWebApi()
 
+type SpotifyPlaylist = { name: string; id: string; image?: string }
+
+// TODO: input validation
 export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
+  const accessToken = useAuth()?.access_token
+  const id = useAuth()?.id
   const router = useRouter()
   const [name, setName] = React.useState('')
+  const [playlists, setPlaylists] = React.useState<SpotifyPlaylist[] | undefined>()
+  const [playlistId, setPlaylistId] = React.useState<string | null>(null)
+
+  React.useEffect(() => {
+    if (accessToken && id) {
+      getUserPlaylists(accessToken).then(setPlaylists)
+    }
+  }, [accessToken, id])
 
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault()
-    try {
-      const { createRoom } = await sdk.createRoom({ input: { room: { name } } })
-      const id = createRoom?.room?.id
+    const songs = await getPlaylistSongs(accessToken!, playlistId!)
+    const playlist: Playlist = { created: new Date().toISOString(), songs }
 
-      if (id) {
-        router.push(`/rooms/${id}`)
-      } else {
-        throw new Error('id not defined')
-      }
-    } catch (e) {
-      console.error(e)
-    }
+    const room = await createRoom({ name, playlist })
+    console.log({ room })
+    /* if (id) {router.push(`/rooms/${id}`)
+     * } else {
+     *   throw new Error('id not defined')
+     * } */
   }
 
   return (
@@ -34,10 +45,50 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
           onChange={evt => setName(evt.target.value)}
           className="bg-gray-300 rounded-sm flex-grow"
         />
+        {playlists && (
+          <select onChange={evt => setPlaylistId(evt.target.value)}>
+            {playlists.map(p => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+        )}
         <button type="submit" className="bg-blue-700 text-gray-100 px-3 py-1 rounded-sm">
           Create room
         </button>
       </form>
     </div>
   )
+}
+
+const createRoom = async (data: { name: string; playlist: Playlist }) => {
+  const room = await fetch(ApiUrl + '/rooms', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(data),
+  })
+
+  return room
+}
+
+const getUserPlaylists = async (accessToken: string) => {
+  spotify.setAccessToken(accessToken)
+  // TODO: recursively fetch all playlists
+  const { items } = await spotify.getUserPlaylists({ limit: 50 })
+  return items.map((playlist: SpotifyApi.PlaylistObjectSimplified) => ({
+    id: playlist.id,
+    name: playlist.name,
+    image: playlist.images[0]?.url,
+  }))
+}
+
+const getPlaylistSongs = async (accessToken: string, id: string): Promise<Song[]> => {
+  spotify.setAccessToken(accessToken)
+  // TODO: recursively fetch all tracks
+  const { items } = await spotify.getPlaylistTracks(id)
+  return items.map(item => ({ id: item.track.id }))
 }

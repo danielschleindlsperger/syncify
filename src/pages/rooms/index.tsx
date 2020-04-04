@@ -1,9 +1,9 @@
 import React from 'react'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
+import fetch from 'isomorphic-fetch'
 import { CreateRoom } from '../../components/room/create-room'
-import { createPool, sql } from 'slonik'
-import { DatabaseUrl } from '../../api/config'
+import { ApiUrl } from '../../config'
 
 type RoomsProps = { rooms: { id: string; name: string }[] }
 
@@ -24,16 +24,16 @@ export default ({ rooms }: RoomsProps) => {
   )
 }
 
-const pool = createPool(DatabaseUrl)
-
 export const getServerSideProps: GetServerSideProps<RoomsProps> = async ctx => {
-  // TODO: move this query to api which allows for better access control
-  const rooms = await pool.connect(async conn => {
-    return conn.many<{ id: string; name: string }>(
-      sql`SELECT r.id, r.name
-          FROM rooms r`,
-    )
-  })
+  // forward client's cookies for access control
+  const Cookie = ctx.req.headers.cookie
+  const res = await fetch(ApiUrl + '/rooms', { headers: { Cookie } })
+  const body = await res.json()
 
-  return { props: { rooms } }
+  if (res.status >= 400) {
+    ctx.res.statusCode = res.status
+    throw new Error(body.msg || 'an error occurred')
+  }
+
+  return { props: { rooms: body } }
 }

@@ -10,6 +10,8 @@ type AuthUser = {
 
   // spotify access token
   access_token: string
+  // spotify id
+  id: string
 }
 
 const AuthContext = React.createContext<AuthUser | undefined>(undefined)

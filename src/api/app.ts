@@ -1,37 +1,22 @@
 import Koa from 'koa'
-import mount from 'koa-mount'
 import cors from '@koa/cors'
-import { postgraphile } from 'postgraphile'
 import * as auth from './auth'
-
-const isProd = process.env.NODE_ENV === 'production'
+import * as rooms from './rooms'
 
 const app = new Koa()
 
+app.use(async (ctx, next) => {
+  await next()
+  console.info(`REQ - ${ctx.method} ${ctx.status} ${ctx.path} `)
+})
+
 // TODO: make this stricter before launch
 app.use(cors({ credentials: true }))
-app.use(auth.routes)
-// only protect /graphql routes, /auth does not need authentication
-app.use(mount('/graphql', auth.authentication))
 
-app.use(
-  postgraphile(
-    process.env.DATABASE_URL ?? 'postgres://postgres:postgres@localhost:5432/postgres',
-    'public',
-    {
-      // don't enable CORS here as it's already handled earlier
-      enableCors: false,
-      showErrorStack: true,
-      extendedErrors: ['hint', 'detail', 'errcode'],
-      // handleErrors: (errors, req, res) => {
-      //   console.log({ errors })
-      //   return errors
-      // },
-      watchPg: true,
-      graphiql: true,
-      enhanceGraphiql: true,
-    },
-  ),
-)
+app.use(auth.router.allowedMethods())
+app.use(auth.router.routes())
+
+app.use(rooms.router.allowedMethods())
+app.use(rooms.router.routes())
 
 export { app }

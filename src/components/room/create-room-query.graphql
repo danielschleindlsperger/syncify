@@ -1,8 +1,0 @@
-mutation createRoom($input: CreateRoomInput!) {
-  createRoom(input: $input) {
-    room {
-      id
-      name
-    }
-  }
-}
