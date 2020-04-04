@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "incremental": true,
     "target": "ES2016",
     "strict": true,
     "noFallthroughCasesInSwitch": true,

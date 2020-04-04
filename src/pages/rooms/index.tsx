@@ -1,7 +1,7 @@
 import React from 'react'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
-import fetch from 'isomorphic-fetch'
+import axios from 'axios'
 import { CreateRoom } from '../../components/room/create-room'
 import { ApiUrl } from '../../config'
 
@@ -27,13 +27,7 @@ export default ({ rooms }: RoomsProps) => {
 export const getServerSideProps: GetServerSideProps<RoomsProps> = async ctx => {
   // forward client's cookies for access control
   const Cookie = ctx.req.headers.cookie
-  const res = await fetch(ApiUrl + '/rooms', { headers: { Cookie } })
-  const body = await res.json()
+  const rooms = await axios.get(ApiUrl + '/rooms', { headers: { Cookie } }).then(x => x.data)
 
-  if (res.status >= 400) {
-    ctx.res.statusCode = res.status
-    throw new Error(body.msg || 'an error occurred')
-  }
-
-  return { props: { rooms: body } }
+  return { props: { rooms } }
 }

@@ -14,7 +14,7 @@ export const Progress = React.memo(({ duration, position, className, ...props }:
   const timings = useTimings({ duration, position })
 
   return (
-    <div className={cx(className, 'flex justify-between mt-2')} {...props}>
+    <div className={cx(className, 'flex justify-between mt-2 text-sm text-gray-600')} {...props}>
       <span>{timings.byGone}</span>
       <span>{timings.remaining}</span>
     </div>

@@ -7,15 +7,17 @@
   "scripts": {
     "dev": "next",
     "build": "next build",
+    "build:server": "webpack -p",
     "start": "concurrently \"npm:start:*\" --kill-others",
     "start:client": "now dev",
-    "start:server": "ts-node-dev -r dotenv/config  --interval 500 --no-notify --respawn --project ./tsconfig.server.json --transpileOnly src/server.ts",
+    "start:server": "node-hot-loader --logLevel errors-warnings",
     "knex": "ts-node --project ./tsconfig.server.json ./node_modules/.bin/knex "
   },
   "author": "Daniel Schleindlsperger",
   "license": "ISC",
   "dependencies": {
     "@koa/cors": "^3.0.0",
+    "axios": "^0.19.2",
     "classnames": "^2.2.6",
     "cookie": "^0.4.0",
     "easy-peasy": "^3.3.0",
@@ -27,6 +29,7 @@
     "koa-router": "^8.0.8",
     "next": "^9.3.1",
     "pg": "^8.0.0",
+    "pg-native": "^3.0.0",
     "ramda": "^0.27.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -36,6 +39,7 @@
   },
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^2.1.0",
+    "@types/axios": "^0.14.0",
     "@types/classnames": "^2.2.10",
     "@types/cookie": "^0.3.3",
     "@types/jsonwebtoken": "^8.3.8",
@@ -50,12 +54,15 @@
     "@types/slonik": "^22.1.2",
     "@types/spotify-web-api-node": "^4.0.1",
     "@types/spotify-web-playback-sdk": "^0.1.7",
+    "@types/webpack-env": "^1.15.1",
     "autoprefixer": "^9.7.5",
     "concurrently": "^5.1.0",
     "dotenv": "^8.2.0",
+    "node-hot-loader": "^1.17.8",
     "tailwindcss": "^1.2.0",
-    "ts-node": "^8.8.1",
-    "ts-node-dev": "^1.0.0-pre.44",
-    "typescript": "^3.8.3"
+    "ts-loader": "^6.2.2",
+    "typescript": "^3.8.3",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
   }
 }

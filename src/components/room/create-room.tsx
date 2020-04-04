@@ -85,7 +85,7 @@ const createRoom = async (data: { name: string; playlist: Playlist }): Promise<R
 const getUserPlaylists = async (accessToken: string) => {
   spotify.setAccessToken(accessToken)
   // TODO: recursively fetch all playlists
-  const { items } = await spotify.getUserPlaylists({ limit: 50 })
+  const { items } = await spotify.getUserPlaylists({ limit: 50 } as any)
   return items.map((playlist: SpotifyApi.PlaylistObjectSimplified) => ({
     id: playlist.id,
     name: playlist.name,
