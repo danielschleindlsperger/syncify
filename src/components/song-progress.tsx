@@ -1,5 +1,6 @@
 import React from 'react'
 import { pipe, clamp } from 'ramda'
+import cx from 'classnames'
 
 type TimeProps = {
   duration: number
@@ -9,30 +10,16 @@ type TimeProps = {
 type ProgressProps = React.HTMLAttributes<HTMLElement> & TimeProps
 
 // wrap in memo to prevent useless rerenders that imply recalculating animations, etc
-export const Progress = React.memo(({ duration, position, ...props }: ProgressProps) => {
+export const Progress = React.memo(({ duration, position, className, ...props }: ProgressProps) => {
   const timings = useTimings({ duration, position })
 
   return (
-    <div {...props}>
-      <div className="h-1">
-        <ProgressBar duration={duration} position={position} />
-      </div>
-      <div className="flex justify-between mt-2">
-        <span>{timings.byGone}</span>
-        <span>{timings.remaining}</span>
-      </div>
+    <div className={cx(className, 'flex justify-between mt-2')} {...props}>
+      <span>{timings.byGone}</span>
+      <span>{timings.remaining}</span>
     </div>
   )
 })
-
-const remaining = ({ position, duration }: TimeProps): string =>
-  pipe(
-    (remainingMs: number) => remainingMs / 1000,
-    Math.round,
-    remaining => `${remaining}s`,
-  )(duration - position)
-
-const ProgressBar = (props: TimeProps) => <div className="w-full h-full origin-left" />
 
 const useTimings = ({ position, duration }: TimeProps): { byGone: string; remaining: string } => {
   const [progressedPosition, setProgressedPosition] = React.useState(position)

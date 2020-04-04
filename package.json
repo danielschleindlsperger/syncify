@@ -10,7 +10,6 @@
     "start": "concurrently \"npm:start:*\" --kill-others",
     "start:client": "now dev",
     "start:server": "ts-node-dev -r dotenv/config  --interval 500 --no-notify --respawn --project ./tsconfig.server.json --transpileOnly src/server.ts",
-    "codegen": "graphql-codegen --config codegen.yml",
     "knex": "ts-node --project ./tsconfig.server.json ./node_modules/.bin/knex "
   },
   "author": "Daniel Schleindlsperger",

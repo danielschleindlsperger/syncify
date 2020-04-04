@@ -1,6 +1,6 @@
 import React from 'react'
 import { useRouter } from 'next/router'
-import { Playlist, Song } from '../../types'
+import { Playlist, Song, Room } from '../../types'
 import { useAuth } from '../auth'
 import SpotifyWebApi from 'spotify-web-api-js'
 import { ApiUrl } from '../../config'
@@ -20,7 +20,12 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
 
   React.useEffect(() => {
     if (accessToken && id) {
-      getUserPlaylists(accessToken).then(setPlaylists)
+      getUserPlaylists(accessToken).then(playlists => {
+        setPlaylists(playlists)
+        if (playlistId === null) {
+          setPlaylistId(playlists[0]?.id || null)
+        }
+      })
     }
   }, [accessToken, id])
 
@@ -29,12 +34,12 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
     const songs = await getPlaylistSongs(accessToken!, playlistId!)
     const playlist: Playlist = { created: new Date().toISOString(), songs }
 
-    const room = await createRoom({ name, playlist })
-    console.log({ room })
-    /* if (id) {router.push(`/rooms/${id}`)
-     * } else {
-     *   throw new Error('id not defined')
-     * } */
+    const { id } = await createRoom({ name, playlist })
+    if (id) {
+      router.push(`/rooms/${id}`)
+    } else {
+      throw new Error('id not defined')
+    }
   }
 
   return (
@@ -62,8 +67,8 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
   )
 }
 
-const createRoom = async (data: { name: string; playlist: Playlist }) => {
-  const room = await fetch(ApiUrl + '/rooms', {
+const createRoom = async (data: { name: string; playlist: Playlist }): Promise<Room> => {
+  const res = await fetch(ApiUrl + '/rooms', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -71,6 +76,8 @@ const createRoom = async (data: { name: string; playlist: Playlist }) => {
     credentials: 'include',
     body: JSON.stringify(data),
   })
+
+  const room: Room = await res.json()
 
   return room
 }

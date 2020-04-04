@@ -1,11 +1,11 @@
 import Router from 'koa-router'
 import Spotify from 'spotify-web-api-node'
-import util from 'util'
 import { SpotifyConfig, SpotifyScopes, AppUrl } from '../config'
 import { writeAuthCookie, AuthCookieName } from './auth-cookie'
 import { signToken, verifyToken } from './jwt'
-import { User } from '../../generated/graphql'
-import { db } from '../db-client'
+import { pool } from '../connection-pool'
+import { sql } from 'slonik'
+import { User } from '../../types'
 
 const spotifyApi = new Spotify(SpotifyConfig)
 
@@ -45,8 +45,7 @@ router.get('/auth/spotify-callback', async (ctx, next) => {
 
     await upsertUser(user)
 
-    const token = signToken({ id, access_token, refresh_token })
-    writeAuthCookie(ctx, token)
+    writeAuthCookie(ctx, signToken({ id, access_token, refresh_token }))
 
     ctx.res.setHeader('Location', `${AppUrl}/rooms`)
     ctx.status = 308
@@ -60,23 +59,15 @@ router.get('/auth/spotify-callback', async (ctx, next) => {
   }
 })
 
-// TODO: this might not be the best way to solve this...
-async function upsertUser({ id, name, avatar }: Pick<User, 'id' | 'name' | 'avatar'>) {
-  const insert = db('users')
-    .insert({ id, name, avatar })
-    .toString()
-
-  const update = db('users')
-    .update({ name, avatar })
-    .whereRaw('users.id = ?', [id])
-
-  const query = util.format(
-    '%s ON CONFLICT (id) DO UPDATE SET %s',
-    insert.toString(),
-    update.toString().replace(/^update\s.*\sset\s/i, ''),
-  )
-
-  await db.raw(query)
+async function upsertUser({ id, name, avatar: a }: Pick<User, 'id' | 'name' | 'avatar'>) {
+  const avatar = a ?? null
+  await pool.connect(async conn => {
+    return conn.query(sql`
+INSERT INTO users (id, name, avatar)
+VALUES (${sql.join([id, name, avatar], sql`, `)})
+ON CONFLICT (id) DO UPDATE SET name = ${name}, avatar = ${avatar}
+`)
+  })
 }
 
 // this endpoint is called by a user to
@@ -110,22 +101,32 @@ router.get('/auth/refresh', async ctx => {
 
   const { user } = result
 
-  // then fetch a new access token for the user to use
+  // fetch a new access token for the user to use
   spotifyApi.setRefreshToken(user.refresh_token)
   const { access_token } = await spotifyApi.refreshAccessToken().then(res => res.body)
 
-  // return the access token and append new token to cookie
-  const newAccessToken = signToken({ ...user, access_token })
-  writeAuthCookie(ctx, newAccessToken)
+  // create the access token and set as cookie
+  writeAuthCookie(ctx, signToken({ ...user, access_token }))
 
-  const dbUser = await db
-    .table('users')
-    .where({ id: user.id })
-    .first()
+  const dbUser = await findUser(user.id)
 
-  // remove refresh token from response because it will be readable from javascript
-  const { refresh_token, ...response } = { ...dbUser, access_token: user.access_token }
-  ctx.body = response
+  // exclude refresh token from response because it will be readable from javascript
+  ctx.body = {
+    id: dbUser.id,
+    name: dbUser.name,
+    avatar: dbUser.avatar,
+    access_token,
+  }
 })
+
+const findUser = async (id: string): Promise<User> => {
+  return await pool.connect(async conn => {
+    return conn.one(sql`
+SELECT id, name, avatar
+FROM users
+WHERE id = ${id}
+`)
+  })
+}
 
 const getImage = (images: SpotifyApi.ImageObject[]) => images[0] && images[0].url
