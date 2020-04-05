@@ -1,6 +1,7 @@
 const path = require('path')
 const webpack = require('webpack')
 
+// currently this has to be an exported object instead of a functions because "node-hot-loader" requires is
 module.exports = {
   mode: 'development',
   entry: './src/server.ts',
