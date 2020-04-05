@@ -1,6 +1,7 @@
 require('dotenv').config()
+import { createServer } from 'http'
+import process from 'process'
 import { app } from './api/app'
-import { createServer, Server } from 'http'
 const { PORT = 4000 } = process.env
 
 let currentHandler = app.callback()
@@ -30,3 +31,8 @@ if (module.hot) {
     }
   })
 }
+
+process.on('SIGINT', () => {
+  console.info('Received SIGINT. Exiting.')
+  process.exit(0)
+})
