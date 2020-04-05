@@ -14,6 +14,26 @@ npm run codegen
 npm run knex
 ```
 
+## Release (Deployment)
+
+The API is deployed to [Heroku](https://devcenter.heroku.com/articles/container-registry-and-runtime). The frontend to [zeit now](https://zeit.co/home).
+
+```bash
+# Add heroku remote to git
+heroku git:remote -a syncify-api
+
+# Login to Heroku container registry
+heroku container:login
+
+# Docker container to Heroku registry
+heroku container:push web
+
+# Release image to prod
+heroku container:release web
+```
+
+
+
 ## Authentication
 
 [Spotify authorization code flow](https://developer.spotify.com/documentation/general/guides/authorization-guide/#authorization-code-flow)

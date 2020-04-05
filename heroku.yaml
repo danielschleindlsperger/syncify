@@ -1,0 +1,9 @@
+build:
+  docker:
+    web: Dockerfile
+  config:
+    NODE_ENV: production
+release:
+  command:
+    - npm run knex migrate:up
+  image: web
