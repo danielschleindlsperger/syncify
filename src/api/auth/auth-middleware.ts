@@ -1,19 +1,8 @@
 import { Middleware } from 'koa'
-import { env } from '../../utils/env'
 import { verifyToken } from './jwt'
 import { AuthCookieName } from './auth-cookie'
 
-const isProd = process.env.NODE_ENV === 'production'
-const GRAPHIQL_SECRET = env('GRAPHIQL_SECRET')
-
 export const authentication: Middleware = async (ctx, next) => {
-  // allow graphiql requests for development
-  const { authorization } = ctx.headers
-  if (!isProd && authorization && authorization === GRAPHIQL_SECRET) {
-    console.info('Authorizing Graphiql')
-    return next()
-  }
-
   const token = ctx.cookies.get(AuthCookieName)
 
   if (typeof token !== 'string') {
