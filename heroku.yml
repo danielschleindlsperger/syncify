@@ -3,7 +3,7 @@ build:
     web: Dockerfile
   config:
     NODE_ENV: production
-release:
-  command:
-    - NODE_TLS_REJECT_UNAUTHORIZED=0 npm run knex migrate:latest
-  image: web
+# release:
+#   command:
+#     - NODE_TLS_REJECT_UNAUTHORIZED=0 npm run knex migrate:latest
+#   image: web
