@@ -5,5 +5,5 @@ build:
     NODE_ENV: production
 release:
   command:
-    - npm run knex migrate:up
+    - NODE_TLS_REJECT_UNAUTHORIZED=0 npm run knex migrate:latest
   image: web
