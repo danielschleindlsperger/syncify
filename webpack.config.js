@@ -27,6 +27,8 @@ module.exports = {
       },
     ],
   },
+  // slonik uses `require` to determine if native bindings are available. By declaring it as "external" we forbid webpack to resolve the require at compile time.
+  externals: /pg-native/,
   plugins: [
     // suppress warnings from webpack about not being able to statically analyze some dependencies
     // https://github.com/kevinbeaty/any-promise/issues/31#issuecomment-562901581
