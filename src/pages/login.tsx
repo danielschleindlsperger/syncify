@@ -1,7 +1,7 @@
 import React from 'react'
-import { ApiUrl } from '../config'
+import { AppUrl } from '../config'
 
-const LoginUrl = ApiUrl + '/auth/login'
+const LoginUrl = AppUrl + '/api/auth/login'
 
 export default () => (
   <main>

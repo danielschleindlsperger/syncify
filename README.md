@@ -10,26 +10,22 @@
 
 ```sh
 npm start
-npm run codegen
 npm run knex
 ```
 
 ## Release (Deployment)
 
-The API is deployed to [Heroku](https://devcenter.heroku.com/articles/container-registry-and-runtime). The frontend to [zeit now](https://zeit.co/home).
+The application is deployed to [zeit now](https://zeit.co)
 
 ```bash
-# Add heroku remote to git
-heroku git:remote -a syncify-api
+# start locally
+now dev
 
-# Login to Heroku container registry
-heroku container:login
+# deploy to stage
+now
 
-# Docker container to Heroku registry
-heroku container:push web
-
-# Release image to prod
-heroku container:release web
+# deploy to prod
+now --prod
 ```
 
 

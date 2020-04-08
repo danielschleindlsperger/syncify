@@ -1,0 +1,59 @@
+import { NowRequest, NowResponse } from '@now/node'
+import Spotify from 'spotify-web-api-node'
+import { createPool } from 'slonik'
+import { sql } from 'slonik'
+import { User } from '../../../types'
+import { AppUrl, SpotifyConfig } from '../../../config'
+import { authCookie } from './auth-cookie'
+import { signToken } from './jwt'
+
+const spotifyApi = new Spotify(SpotifyConfig)
+
+export const pool = createPool(process.env.DATABASE_URL!, { maximumPoolSize: 1 })
+
+export default async (req: NowRequest, res: NowResponse) => {
+  const { code } = req.query
+
+  if (!code || typeof code !== 'string') {
+    return res.status(500).send('Parameter `code` is missing.')
+  }
+
+  try {
+    // trade code for token, "initial" flow
+    const codeResponse = await spotifyApi.authorizationCodeGrant(code)
+
+    const { access_token, refresh_token } = codeResponse.body
+    spotifyApi.setAccessToken(access_token)
+
+    const { display_name, id, images } = await spotifyApi.getMe().then(res => res.body)
+
+    const user = {
+      id,
+      name: display_name || id,
+      avatar: getImage(images || []),
+    }
+
+    await upsertUser(user)
+
+    res.setHeader('Set-Cookie', authCookie(signToken({ id, access_token, refresh_token })))
+
+    res.status(308).setHeader('Location', `${AppUrl}/rooms`)
+    return res.end()
+  } catch (e) {
+    console.error(e)
+    return res.status(500).send('Error during authentication with Spotify.')
+  }
+}
+
+async function upsertUser({ id, name, avatar: a }: Pick<User, 'id' | 'name' | 'avatar'>) {
+  const avatar = a ?? null
+  await pool.connect(async conn => {
+    return conn.query(sql`
+INSERT INTO users (id, name, avatar)
+VALUES (${sql.join([id, name, avatar], sql`, `)})
+ON CONFLICT (id) DO UPDATE SET name = ${name}, avatar = ${avatar}
+`)
+  })
+}
+
+const getImage = (images: SpotifyApi.ImageObject[]) => images[0] && images[0].url

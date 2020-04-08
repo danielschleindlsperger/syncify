@@ -3,7 +3,7 @@ import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import axios from 'axios'
 import { CreateRoom } from '../../components/room/create-room'
-import { ApiUrl } from '../../config'
+import { AppUrl } from '../../config'
 
 type RoomsProps = { rooms: { id: string; name: string }[] }
 
@@ -27,7 +27,7 @@ export default ({ rooms }: RoomsProps) => {
 export const getServerSideProps: GetServerSideProps<RoomsProps> = async ctx => {
   // forward client's cookies for access control
   const Cookie = ctx.req.headers.cookie
-  const rooms = await axios.get(ApiUrl + '/rooms', { headers: { Cookie } }).then(x => x.data)
+  const rooms = await axios.get(AppUrl + '/api/rooms', { headers: { Cookie } }).then(x => x.data)
 
   return { props: { rooms } }
 }

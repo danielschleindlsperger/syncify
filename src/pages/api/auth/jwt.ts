@@ -1,7 +1,10 @@
 import jwt, { TokenExpiredError } from 'jsonwebtoken'
-import { env } from '../../../utils/env'
 
-const JWT_SECRET = env('JWT_SECRET')
+const JWT_SECRET = process.env.JWT_SECRET
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET is not defined')
+}
 
 type TokenUser = { id: string; access_token: string; refresh_token: string }
 

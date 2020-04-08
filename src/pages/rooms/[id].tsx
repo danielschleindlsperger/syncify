@@ -4,7 +4,7 @@ import axios from 'axios'
 import { Userlist } from '../../components/user-list'
 import { Playlist } from '../../components/playlist'
 import { Room } from '../../types'
-import { ApiUrl } from '../../config'
+import { AppUrl } from '../../config'
 
 type RoomProps = { room: Room }
 export default ({ room }: RoomProps) => {
@@ -29,7 +29,7 @@ export const getServerSideProps: GetServerSideProps<RoomProps> = async ctx => {
   const Cookie = ctx.req.headers.cookie
 
   const room = await axios
-    .get<Room>(`${ApiUrl}/rooms/${id}`, { headers: { Cookie } })
+    .get<Room>(`${AppUrl}/api/rooms/${id}`, { headers: { Cookie } })
     .then(x => x.data)
 
   return { props: { room } }

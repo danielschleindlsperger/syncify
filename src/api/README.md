@@ -1,5 +1,0 @@
-# API
-
-## Routes
-
-- auth

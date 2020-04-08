@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { Playlist, Song, Room } from '../../types'
 import { useAuth } from '../auth'
 import SpotifyWebApi from 'spotify-web-api-js'
-import { ApiUrl } from '../../config'
+import { AppUrl } from '../../config'
 
 const spotify = new SpotifyWebApi()
 
@@ -68,7 +68,7 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
 }
 
 const createRoom = async (data: { name: string; playlist: Playlist }): Promise<Room> => {
-  const res = await fetch(ApiUrl + '/rooms', {
+  const res = await fetch(AppUrl + '/rooms', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
