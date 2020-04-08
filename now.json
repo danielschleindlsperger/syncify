@@ -1,0 +1,8 @@
+{
+  "build": {
+    "env": {
+        "API_URL": "@syncify-api-url",
+        "APP_URL": "@syncify-app-url"
+    }
+  }
+}
