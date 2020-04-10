@@ -1,17 +1,19 @@
 import React from 'react'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 import { CreateRoom } from '../../components/room/create-room'
 import { AppUrl } from '../../config'
 import { isAxiosError } from '../../utils/errors'
 import { ServerResponse } from 'http'
+import { Navbar } from '../../components/nav-bar'
 
 type RoomsProps = { rooms: { id: string; name: string }[] }
 
 export default ({ rooms }: RoomsProps) => {
   return (
     <div>
+      <Navbar />
       <CreateRoom />
       <ul>
         {rooms.map((room: any) => (

@@ -9,6 +9,8 @@ import { ServerResponse } from 'http'
 import { Chat } from '../../components/chat'
 import { Player } from '../../components/player'
 import { SpotifyPlayerProvider, withPlayerStore } from '../../components/spotify-player'
+import { Navbar } from '../../components/nav-bar'
+import Link from 'next/link'
 
 type RoomProps = { room: Room }
 
@@ -17,6 +19,13 @@ export default withPlayerStore(({ room }: RoomProps) => {
 
   return (
     <SpotifyPlayerProvider>
+      <Navbar>
+        <Link href="/rooms">
+          <a className="inline-block bg-gray-100 text-gray-600 px-3 py-1 rounded-sm">
+            {'< Join a different room'}
+          </a>
+        </Link>
+      </Navbar>
       <div className="px-8">
         <h1 className="text-5xl mt-16 font-bold">{name}</h1>
         <Chat roomId={room.id} className="mt-8" />

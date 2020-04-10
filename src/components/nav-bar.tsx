@@ -1,25 +1,20 @@
 import React from 'react'
-import { useRouter } from 'next/router'
-import Link from 'next/link'
 import cx from 'classnames'
 import { useAuth } from './auth'
 
-export const Navbar = () => {
-  const user = useAuth()
-  const router = useRouter()
+type NavbarProps = React.HTMLAttributes<HTMLElement> & {
+  children?: React.ReactNode
+}
 
-  const toRoomsPageText = router.route === '/rooms/[id]' ? '< Join a different room' : 'Join a room'
-  const isRoomsPage = router.route === '/rooms'
+export const Navbar = ({ children, className, ...props }: NavbarProps) => {
+  const user = useAuth()
 
   return (
-    <nav className="flex justify-end items-center border-b-2 border-gray-100 p-3">
-      {!isRoomsPage && (
-        <Link href="/rooms">
-          <a className="mr-auto inline-block bg-gray-100 text-gray-600 px-3 py-1 rounded-sm">
-            {toRoomsPageText}
-          </a>
-        </Link>
-      )}
+    <nav
+      className={cx(className, 'flex justify-end items-center border-b-2 border-gray-100 p-3')}
+      {...props}
+    >
+      {children && <div className="mr-auto">{children}</div>}
       {user && (
         <>
           {user.name && <span>Hello, {user.name}</span>}
