@@ -4,7 +4,7 @@ import { useAuth } from '../auth'
 import { usePlayerActions, usePlayerState } from './player-store'
 
 const initSpotify = (options: Spotify.PlayerInit): Promise<Spotify.SpotifyPlayer> => {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     window.onSpotifyWebPlaybackSDKReady = () => {
       const player = new Spotify.Player(options)
       resolve(player)
@@ -31,8 +31,7 @@ export const SpotifyPlayerProvider: React.FC = ({ children }) => {
   const accessToken = useAuth()?.access_token
   const [player, setPlayer] = React.useState<Spotify.SpotifyPlayer | null>(null)
 
-  const state = usePlayerState(state => state)
-  console.log(state)
+  const state = usePlayerState((state) => state)
 
   const play = React.useCallback(
     async (uris: string[], offsetMs = 0): Promise<void> => {
@@ -49,17 +48,17 @@ export const SpotifyPlayerProvider: React.FC = ({ children }) => {
     [player, accessToken, state.deviceId],
   )
 
-  const subscribe = usePlayerActions(actions => actions.subscribe)
-  const unsubscribe = usePlayerActions(actions => actions.unsubscribe)
+  const subscribe = usePlayerActions((actions) => actions.subscribe)
+  const unsubscribe = usePlayerActions((actions) => actions.unsubscribe)
 
   React.useEffect(() => {
     if (accessToken && !player) {
       initSpotify({
         name: 'Syncify Web Player',
-        getOAuthToken: cb => {
+        getOAuthToken: (cb) => {
           cb(accessToken)
         },
-      }).then(p => {
+      }).then((p) => {
         setPlayer(p)
       })
     }
@@ -69,7 +68,6 @@ export const SpotifyPlayerProvider: React.FC = ({ children }) => {
     if (player) {
       subscribe(player)
       return () => {
-        console.log('cleaning up player')
         unsubscribe(player)
       }
     }

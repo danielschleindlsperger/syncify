@@ -2,9 +2,9 @@
 
 ## Requirements
 
-- Install [now CLI](https://zeit.co/download)
-- Install Docker
-
+- [now CLI](https://zeit.co/download) for deployment
+- Docker for the development environment with `docker-compose`
+- [Ultrahook](http://www.ultrahook.com/) for proxying webhooks to localhost
 
 ## Commands
 
@@ -25,8 +25,6 @@ now dev
 now --prod
 ```
 
-
-
 ## Authentication
 
 [Spotify authorization code flow](https://developer.spotify.com/documentation/general/guides/authorization-guide/#authorization-code-flow)
@@ -34,6 +32,7 @@ now --prod
 ### Login Flow
 
 TODO: out of date
+
 - Frontend redirects to Spotify OAuth login mask (`window.location = '...'`)
 - Spotify redirects to frontend with `code` query parameter
 - Frontend sends `code` to API `/auth/trade-token` route

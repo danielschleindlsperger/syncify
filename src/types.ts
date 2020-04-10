@@ -1,9 +1,9 @@
 export type Room = Readonly<{
   id: string
   name: string
-  users: readonly User[]
   playlist: Playlist
 }>
+
 export type Playlist = Readonly<{
   songs: readonly Song[]
   // ISO-8601 date string

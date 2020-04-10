@@ -1,22 +1,23 @@
 import React from 'react'
 import { GetServerSideProps } from 'next'
 import axios from 'axios'
-import { Userlist } from '../../components/user-list'
 import { Playlist } from '../../components/playlist'
 import { Room } from '../../types'
 import { AppUrl } from '../../config'
 import { isAxiosError } from '../../utils/errors'
 import { ServerResponse } from 'http'
+import { Chat } from '../../components/chat'
 
 type RoomProps = { room: Room }
+
 export default ({ room }: RoomProps) => {
-  const { name, users, playlist } = room
+  const { name, playlist } = room
 
   return (
-    <div>
-      <h1 className="text-5xl font-bold">{name}</h1>
-      <Userlist users={users} />
-      <Playlist playlist={playlist} className="mt-5" />
+    <div className="px-8">
+      <h1 className="text-5xl mt-16 font-bold">{name}</h1>
+      <Chat roomId={room.id} className="mt-8" />
+      <Playlist playlist={playlist} className="mt-8" />
     </div>
   )
 }
