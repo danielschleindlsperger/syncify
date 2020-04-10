@@ -20,7 +20,7 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
 
   React.useEffect(() => {
     if (accessToken && id) {
-      getUserPlaylists(accessToken).then(playlists => {
+      getUserPlaylists(accessToken).then((playlists) => {
         setPlaylists(playlists)
         if (playlistId === null) {
           setPlaylistId(playlists[0]?.id || null)
@@ -48,19 +48,22 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
       <form onSubmit={handleSubmit} className="flex max-w-xs">
         <input
           type="text"
-          onChange={evt => setName(evt.target.value)}
+          onChange={(evt) => setName(evt.target.value)}
           className="bg-gray-300 rounded-sm flex-grow"
         />
         {playlists && (
-          <select onChange={evt => setPlaylistId(evt.target.value)}>
-            {playlists.map(p => (
+          <select onChange={(evt) => setPlaylistId(evt.target.value)}>
+            {playlists.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.name}
               </option>
             ))}
           </select>
         )}
-        <button type="submit" className="bg-blue-700 text-gray-100 px-3 py-1 rounded-sm">
+        <button
+          type="submit"
+          className="bg-blue-700 text-gray-100 px-3 py-1 rounded-sm whitespace-no-wrap"
+        >
           Create room
         </button>
       </form>
@@ -99,5 +102,5 @@ const getPlaylistSongs = async (accessToken: string, id: string): Promise<Song[]
   spotify.setAccessToken(accessToken)
   // TODO: recursively fetch all tracks
   const { items } = await spotify.getPlaylistTracks(id)
-  return items.map(item => ({ id: item.track.id }))
+  return items.map((item) => ({ id: item.track.id }))
 }
