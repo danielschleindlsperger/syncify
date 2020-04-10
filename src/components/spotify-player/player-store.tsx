@@ -1,3 +1,4 @@
+import React from 'react'
 import { createContextStore, action, Action, Thunk, thunk, Computed, computed } from 'easy-peasy'
 
 type PlayerStore = Readonly<{
@@ -12,12 +13,13 @@ type PlayerStore = Readonly<{
   subscribe: Thunk<PlayerStore, Spotify.SpotifyPlayer>
   unsubscribe: Thunk<PlayerStore, Spotify.SpotifyPlayer>
 }>
+
 const store = createContextStore<PlayerStore>(
   {
     ready: false,
     deviceId: null,
     error: null,
-    isPlaying: computed(state => {
+    isPlaying: computed((state) => {
       const { ready, playbackState } = state
       return ready && !!playbackState && !playbackState.paused
     }),
@@ -63,3 +65,9 @@ const store = createContextStore<PlayerStore>(
 export const PlayerStoreProvider = store.Provider
 export const usePlayerActions = store.useStoreActions
 export const usePlayerState = store.useStoreState
+
+export const withPlayerStore = <P extends {}>(Component: React.ComponentType<P>) => (props: P) => (
+  <PlayerStoreProvider>
+    <Component {...props} />
+  </PlayerStoreProvider>
+)

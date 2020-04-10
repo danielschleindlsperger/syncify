@@ -7,20 +7,25 @@ import { AppUrl } from '../../config'
 import { isAxiosError } from '../../utils/errors'
 import { ServerResponse } from 'http'
 import { Chat } from '../../components/chat'
+import { Player } from '../../components/player'
+import { SpotifyPlayerProvider, withPlayerStore } from '../../components/spotify-player'
 
 type RoomProps = { room: Room }
 
-export default ({ room }: RoomProps) => {
+export default withPlayerStore(({ room }: RoomProps) => {
   const { name, playlist } = room
 
   return (
-    <div className="px-8">
-      <h1 className="text-5xl mt-16 font-bold">{name}</h1>
-      <Chat roomId={room.id} className="mt-8" />
-      <Playlist playlist={playlist} className="mt-8" />
-    </div>
+    <SpotifyPlayerProvider>
+      <div className="px-8">
+        <h1 className="text-5xl mt-16 font-bold">{name}</h1>
+        <Chat roomId={room.id} className="mt-8" />
+        <Playlist playlist={playlist} className="mt-8" />
+        <Player />
+      </div>
+    </SpotifyPlayerProvider>
   )
-}
+})
 
 export const getServerSideProps: GetServerSideProps<RoomProps> = async (ctx) => {
   const { params } = ctx
