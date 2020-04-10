@@ -21,11 +21,13 @@ export const Playlist = ({ playlist, ...props }: PlaylistProps) => {
   const accessToken = useAuth()?.access_token
   const { play } = useSpotifyPlayer()
   const [tracks, setTracks] = React.useState<PlaylistTrack[] | undefined>()
-  const currentTrackId = usePlayerState(state => state.playbackState?.track_window.current_track.id)
+  const currentTrackId = usePlayerState(
+    (state) => state.playbackState?.track_window.current_track.id,
+  )
 
   React.useEffect(() => {
     if (accessToken) {
-      const ids = playlist.songs.map(t => t.id)
+      const ids = playlist.songs.map((t) => t.id)
       fetchTracks(accessToken, ids).then(setTracks)
     }
   }, [accessToken])
@@ -35,7 +37,7 @@ export const Playlist = ({ playlist, ...props }: PlaylistProps) => {
     // This should only run each time the playlist changes (almost never).
     if (tracks && tracks.length > 0 && play) {
       let offset = Date.now() - Date.parse(playlist.created)
-      const ids = dropWhile(t => {
+      const ids = dropWhile((t) => {
         const songIsOver = offset > t.duration_ms
         if (songIsOver) {
           offset = offset - t.duration_ms
@@ -45,21 +47,18 @@ export const Playlist = ({ playlist, ...props }: PlaylistProps) => {
       }, tracks)
 
       play(
-        ids.map(t => `spotify:track:${t.id}`),
+        ids.map((t) => `spotify:track:${t.id}`),
         offset,
       )
     }
   }, [tracks, play])
 
-  console.log({ tracks })
-
   if (!tracks) return null
 
   return (
     <div {...props}>
-      <h2 className="text-3xl font-bold">Playlist</h2>
       <ul>
-        {tracks.map(t => (
+        {tracks.map((t) => (
           // This "isActive" check will sometimes fail because some tracks can have multiple ids on Spotify :|
           <li key={t.id} className={currentTrackId && currentTrackId === t.id ? 'font-bold' : ''}>
             <span>{t.artists.join(', ')}</span> - <span>{t.name}</span>
@@ -73,14 +72,14 @@ export const Playlist = ({ playlist, ...props }: PlaylistProps) => {
 const fetchTracks = async (accessToken: string, ids: string[]): Promise<PlaylistTrack[]> => {
   spotify.setAccessToken(accessToken)
   // TODO: recursively fetch all tracks
-  const tracks = await spotify.getTracks(ids.slice(0, 50)).then(res => res.body.tracks)
+  const tracks = await spotify.getTracks(ids.slice(0, 50)).then((res) => res.body.tracks)
 
-  return tracks.map(track => {
+  return tracks.map((track) => {
     return {
       id: track.id,
       name: track.name,
       duration_ms: track.duration_ms,
-      artists: track.artists.map(a => a.name),
+      artists: track.artists.map((a) => a.name),
     }
   })
 }
