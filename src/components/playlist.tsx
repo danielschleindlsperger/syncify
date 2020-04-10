@@ -21,9 +21,7 @@ export const Playlist = ({ playlist, ...props }: PlaylistProps) => {
   const accessToken = useAuth()?.access_token
   const { play } = useSpotifyPlayer()
   const [tracks, setTracks] = React.useState<PlaylistTrack[] | undefined>()
-  const currentTrackId = usePlayerState(
-    (state) => state.playbackState?.track_window.current_track.id,
-  )
+  const currentTrack = usePlayerState((state) => state.playbackState?.track_window.current_track)
 
   React.useEffect(() => {
     if (accessToken) {
@@ -59,9 +57,14 @@ export const Playlist = ({ playlist, ...props }: PlaylistProps) => {
     <div {...props}>
       <ul>
         {tracks.map((t) => (
-          // This "isActive" check will sometimes fail because some tracks can have multiple ids on Spotify :|
-          <li key={t.id} className={currentTrackId && currentTrackId === t.id ? 'font-bold' : ''}>
-            <span>{t.artists.join(', ')}</span> - <span>{t.name}</span>
+          <li
+            key={t.id}
+            // For the "isActive" check we can't use the id, because a single song can have multiple ids on Spotify.
+            // Using the name is a workaround and will not work every time.
+            // TODO: fix this by comparing the artists as well
+            className={currentTrack && currentTrack.name === t.name ? 'font-bold' : ''}
+          >
+            <span>{t.name}</span>
           </li>
         ))}
       </ul>
