@@ -3,7 +3,7 @@ import Pusher, { Members } from 'pusher-js'
 import { User } from '../../types'
 import { Userlist } from './user-list'
 
-const PusherAppKey = '4aa723b4451c6dbf124f'
+const PusherAppKey = process.env.PUSHER_APP_KEY!
 
 type PusherMember = {
   id: string
