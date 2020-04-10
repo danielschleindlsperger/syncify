@@ -5,6 +5,8 @@ import { Userlist } from '../../components/user-list'
 import { Playlist } from '../../components/playlist'
 import { Room } from '../../types'
 import { AppUrl } from '../../config'
+import { isAxiosError } from '../../utils/errors'
+import { ServerResponse } from 'http'
 
 type RoomProps = { room: Room }
 export default ({ room }: RoomProps) => {
@@ -19,18 +21,39 @@ export default ({ room }: RoomProps) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<RoomProps> = async ctx => {
+export const getServerSideProps: GetServerSideProps<RoomProps> = async (ctx) => {
   const { params } = ctx
   const id = params && typeof params.id === 'string' ? params.id : undefined
 
   if (!id) throw new Error(`Could not find a room for id ${id}`)
-
   // forward client's cookies for access control
   const Cookie = ctx.req.headers.cookie
 
-  const room = await axios
-    .get<Room>(`${AppUrl}/api/rooms/${id}`, { headers: { Cookie } })
-    .then(x => x.data)
+  if (!Cookie) {
+    redirectToLogin(ctx.res)
+    return (null as unknown) as { props: RoomProps }
+  }
 
-  return { props: { room } }
+  try {
+    const room = await axios
+      .get<Room>(`${AppUrl}/api/rooms/${id}`, { headers: { Cookie } })
+      .then((x) => x.data)
+
+    return { props: { room } }
+  } catch (e) {
+    if (isAxiosError(e)) {
+      if (e.response?.status === 401) {
+        redirectToLogin(ctx.res)
+        return (null as unknown) as { props: RoomProps }
+      }
+      throw e
+    }
+    throw e
+  }
+}
+
+const redirectToLogin = (res: ServerResponse) => {
+  res.statusCode = 307
+  res.setHeader('Location', '/api/auth/login')
+  res.end()
 }

@@ -1,9 +1,11 @@
 import React from 'react'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { CreateRoom } from '../../components/room/create-room'
 import { AppUrl } from '../../config'
+import { isAxiosError } from '../../utils/errors'
+import { ServerResponse } from 'http'
 
 type RoomsProps = { rooms: { id: string; name: string }[] }
 
@@ -24,10 +26,34 @@ export default ({ rooms }: RoomsProps) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<RoomsProps> = async ctx => {
+export const getServerSideProps: GetServerSideProps<RoomsProps> = async (ctx) => {
   // forward client's cookies for access control
   const Cookie = ctx.req.headers.cookie
-  const rooms = await axios.get(AppUrl + '/api/rooms', { headers: { Cookie } }).then(x => x.data)
 
-  return { props: { rooms } }
+  if (!Cookie) {
+    redirectToLogin(ctx.res)
+    return (null as unknown) as { props: RoomsProps }
+  }
+
+  try {
+    const rooms = await axios
+      .get(AppUrl + '/api/rooms', { headers: { Cookie } })
+      .then((x) => x.data)
+    return { props: { rooms } }
+  } catch (e) {
+    if (isAxiosError(e)) {
+      if (e.response?.status === 401) {
+        redirectToLogin(ctx.res)
+        return (null as unknown) as { props: RoomsProps }
+      }
+      throw e
+    }
+    throw e
+  }
+}
+
+const redirectToLogin = (res: ServerResponse) => {
+  res.statusCode = 307
+  res.setHeader('Location', '/api/auth/login')
+  res.end()
 }

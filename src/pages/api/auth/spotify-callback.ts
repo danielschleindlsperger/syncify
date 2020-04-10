@@ -11,7 +11,7 @@ export const pool = createPool(process.env.DATABASE_URL!, { maximumPoolSize: 1 }
 const spotifyApi = new Spotify(SpotifyConfig)
 
 export default async (req: NowRequest, res: NowResponse) => {
-  const { code } = req.query
+  const { code, state } = req.query
 
   if (!code || typeof code !== 'string') {
     return res.status(500).send('Parameter `code` is missing.')
@@ -24,7 +24,7 @@ export default async (req: NowRequest, res: NowResponse) => {
     const { access_token, refresh_token } = codeResponse.body
     spotifyApi.setAccessToken(access_token)
 
-    const { display_name, id, images } = await spotifyApi.getMe().then(res => res.body)
+    const { display_name, id, images } = await spotifyApi.getMe().then((res) => res.body)
 
     const user = {
       id,
@@ -36,7 +36,10 @@ export default async (req: NowRequest, res: NowResponse) => {
 
     res.setHeader('Set-Cookie', authCookie(signToken({ id, access_token, refresh_token })))
 
-    res.status(308).setHeader('Location', `${AppUrl}/rooms`)
+    // Send back to previous location or /rooms as a fallback
+    // TODO: for some reason this does not work. The client seems to send old referer values after client-side navigation
+    const Location = state ?? `${AppUrl}/rooms`
+    res.status(308).setHeader('Location', Location)
     return res.end()
   } catch (e) {
     console.error(e)
@@ -46,7 +49,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 
 async function upsertUser({ id, name, avatar: a }: Pick<User, 'id' | 'name' | 'avatar'>) {
   const avatar = a ?? null
-  await pool.connect(async conn => {
+  await pool.connect(async (conn) => {
     return conn.query(sql`
 INSERT INTO users (id, name, avatar)
 VALUES (${sql.join([id, name, avatar], sql`, `)})
