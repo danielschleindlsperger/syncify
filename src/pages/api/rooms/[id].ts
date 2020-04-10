@@ -1,37 +1,12 @@
 import { NowRequest, NowResponse } from '@now/node'
 import { createPool, sql } from 'slonik'
 import { Room } from '../../../types'
-import { withAuth } from '../auth/with-auth'
+import { withAuth } from '../../../auth'
 
 export const pool = createPool(process.env.DATABASE_URL!, { maximumPoolSize: 1 })
 
 export default withAuth(async (req: NowRequest, res: NowResponse) => {
-  if (req.method === 'POST') {
-    return handleCreateRoom(req, res)
-  }
-  if (req.method === 'GET') {
-    return handleGetRoom(req, res)
-  }
-
-  return res.status(405).send('method not allowed')
-})
-
-async function handleCreateRoom(req: NowRequest, res: NowResponse) {
-  // TODO: validation
-  const { name, playlist } = req.body
-
-  const room = await pool.connect(async conn => {
-    return conn.one(sql`
-INSERT INTO rooms (name, playlist)
-VALUES (${sql.join([name, sql.json(playlist)], sql`, `)})
-RETURNING *
-`)
-  })
-
-  return res.json(room)
-}
-
-async function handleGetRoom(req: NowRequest, res: NowResponse) {
+  if (req.method !== 'GET') return res.status(405).send('Method not allowed.')
   const { id } = req.query
 
   if (typeof id !== 'string') {
@@ -55,4 +30,4 @@ GROUP BY r.id`,
   }
 
   return res.json(room)
-}
+})

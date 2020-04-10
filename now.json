@@ -1,8 +1,12 @@
 {
   "build": {
     "env": {
-        "API_URL": "@syncify-api-url",
-        "APP_URL": "@syncify-app-url"
+        "JWT_SECRET": "@syncify-jwt-secret",
+        "APP_URL": "https://syncify-now.now.sh",
+        "DATABASE_URL": "@syncify-database-url",
+        "SPOTIFY_CLIENT_ID": "@syncify-spotify-client-id",
+        "SPOTIFY_CLIENT_SECRET": "@syncify-spotify-client-secret",
+        "SPOTIFY_REDIRECT_URL": "https://syncify-now.now.sh/api/auth/spotify-callback"
     }
   }
 }

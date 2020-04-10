@@ -2,10 +2,9 @@ import { NowRequest, NowResponse } from '@now/node'
 import Spotify from 'spotify-web-api-node'
 import { createPool } from 'slonik'
 import { sql } from 'slonik'
-import { authCookie, AuthCookieName } from './auth-cookie'
-import { verifyToken, signToken } from './jwt'
 import { SpotifyConfig } from '../../../config'
 import { User } from '../../../types'
+import { AuthCookieName, verifyToken, authCookie, signToken } from '../../../auth'
 
 const spotifyApi = new Spotify(SpotifyConfig)
 

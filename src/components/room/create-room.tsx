@@ -36,6 +36,7 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
 
     const { id } = await createRoom({ name, playlist })
     if (id) {
+      console.log({ id })
       router.push(`/rooms/${id}`)
     } else {
       throw new Error('id not defined')
@@ -68,7 +69,7 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
 }
 
 const createRoom = async (data: { name: string; playlist: Playlist }): Promise<Room> => {
-  const res = await fetch(AppUrl + '/rooms', {
+  const res = await fetch(AppUrl + '/api/rooms', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -79,6 +80,7 @@ const createRoom = async (data: { name: string; playlist: Playlist }): Promise<R
 
   const room: Room = await res.json()
 
+  console.log({ room })
   return room
 }
 

@@ -4,12 +4,11 @@ import { createPool } from 'slonik'
 import { sql } from 'slonik'
 import { User } from '../../../types'
 import { AppUrl, SpotifyConfig } from '../../../config'
-import { authCookie } from './auth-cookie'
-import { signToken } from './jwt'
-
-const spotifyApi = new Spotify(SpotifyConfig)
+import { authCookie, signToken } from '../../../auth'
 
 export const pool = createPool(process.env.DATABASE_URL!, { maximumPoolSize: 1 })
+
+const spotifyApi = new Spotify(SpotifyConfig)
 
 export default async (req: NowRequest, res: NowResponse) => {
   const { code } = req.query

@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- Install now CLI
+- Install [now CLI](https://zeit.co/download)
 - Install Docker
 
 
@@ -20,9 +20,6 @@ The application is deployed to [zeit now](https://zeit.co)
 ```bash
 # start locally
 now dev
-
-# deploy to stage
-now
 
 # deploy to prod
 now --prod
