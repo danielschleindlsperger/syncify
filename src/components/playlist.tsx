@@ -2,7 +2,7 @@ import React from 'react'
 import { useSpotifyPlayer } from './spotify-player'
 import { useAuth } from './auth'
 import SpotifyWebApi from 'spotify-web-api-node'
-import { dropWhile } from 'ramda'
+import { dropWhile, splitEvery } from 'ramda'
 import { usePlayerState } from './spotify-player/player-store'
 
 type Playlist = import('../types').Playlist
@@ -72,17 +72,21 @@ export const Playlist = ({ playlist, ...props }: PlaylistProps) => {
   )
 }
 
+const limit = 50
+
 const fetchTracks = async (accessToken: string, ids: string[]): Promise<PlaylistTrack[]> => {
   spotify.setAccessToken(accessToken)
-  // TODO: recursively fetch all tracks
-  const tracks = await spotify.getTracks(ids.slice(0, 50)).then((res) => res.body.tracks)
 
-  return tracks.map((track) => {
-    return {
+  const trackPartitions = await Promise.all(
+    splitEvery(limit, ids).map((chunk) => spotify.getTracks(chunk).then((res) => res.body.tracks)),
+  )
+
+  return trackPartitions.flatMap((partition) =>
+    partition.map((track) => ({
       id: track.id,
       name: track.name,
       duration_ms: track.duration_ms,
       artists: track.artists.map((a) => a.name),
-    }
-  })
+    })),
+  )
 }

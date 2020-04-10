@@ -36,7 +36,6 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
 
     const { id } = await createRoom({ name, playlist })
     if (id) {
-      console.log({ id })
       router.push(`/rooms/${id}`)
     } else {
       throw new Error('id not defined')
@@ -83,24 +82,35 @@ const createRoom = async (data: { name: string; playlist: Playlist }): Promise<R
 
   const room: Room = await res.json()
 
-  console.log({ room })
   return room
 }
 
-const getUserPlaylists = async (accessToken: string) => {
+const limit = 50
+
+const getUserPlaylists = async (
+  accessToken: string,
+  offset = 0,
+): Promise<{ id: string; name: string; image?: string }[]> => {
   spotify.setAccessToken(accessToken)
-  // TODO: recursively fetch all playlists
-  const { items } = await spotify.getUserPlaylists({ limit: 50 } as any)
-  return items.map((playlist: SpotifyApi.PlaylistObjectSimplified) => ({
+  const { items, next, offset: oldOffset } = await spotify.getUserPlaylists({
+    limit,
+    offset,
+  } as any)
+
+  const playlists = items.map((playlist: SpotifyApi.PlaylistObjectSimplified) => ({
     id: playlist.id,
     name: playlist.name,
     image: playlist.images[0]?.url,
   }))
+
+  return next
+    ? playlists.concat((await getUserPlaylists(accessToken, oldOffset + limit)) as any)
+    : playlists
 }
 
-const getPlaylistSongs = async (accessToken: string, id: string): Promise<Song[]> => {
+const getPlaylistSongs = async (accessToken: string, id: string, offset = 0): Promise<Song[]> => {
   spotify.setAccessToken(accessToken)
-  // TODO: recursively fetch all tracks
-  const { items } = await spotify.getPlaylistTracks(id)
-  return items.map((item) => ({ id: item.track.id }))
+  const { items, next, offset: oldOffset } = await spotify.getPlaylistTracks(id, { offset, limit })
+  const tracks = items.map((item) => ({ id: item.track.id }))
+  return next ? tracks.concat(await getPlaylistSongs(accessToken, id, oldOffset + limit)) : tracks
 }
