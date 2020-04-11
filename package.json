@@ -8,7 +8,9 @@
     "build": "next build",
     "start": "now dev",
     "knex": "ts-node --project ./tsconfig.server.json ./node_modules/.bin/knex",
-    "test": "jest"
+    "test": "jest",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "author": "Daniel Schleindlsperger",
   "husky": {
@@ -36,8 +38,11 @@
     "spotify-web-api-node": "^4.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.9.0",
     "@fullhuman/postcss-purgecss": "^2.1.0",
     "@now/node": "^1.5.0",
+    "@storybook/addons": "^5.3.18",
+    "@storybook/react": "^5.3.18",
     "@testing-library/jest-dom": "^5.5.0",
     "@testing-library/react": "^10.0.2",
     "@types/axios": "^0.14.0",
@@ -53,6 +58,7 @@
     "@types/spotify-web-api-node": "^4.0.1",
     "@types/spotify-web-playback-sdk": "^0.1.7",
     "autoprefixer": "^9.7.5",
+    "babel-loader": "^8.1.0",
     "dotenv": "^8.2.0",
     "husky": "^4.2.5",
     "jest": "^25.3.0",
