@@ -5,9 +5,9 @@ type UserlistProps = React.HTMLAttributes<HTMLElement> & {
   users: readonly User[]
 }
 
-export const Userlist = ({ users, ...props }: UserlistProps) => (
-  <div {...props}>
-    {users.length > 0 && (
+export const Userlist = ({ users, ...props }: UserlistProps) =>
+  users.length > 0 ? (
+    <div {...props}>
       <ul className="mt-4">
         {users.map((u) => (
           <li className="flex items-center mt-2" key={u.id}>
@@ -16,6 +16,5 @@ export const Userlist = ({ users, ...props }: UserlistProps) => (
           </li>
         ))}
       </ul>
-    )}
-  </div>
-)
+    </div>
+  ) : null
