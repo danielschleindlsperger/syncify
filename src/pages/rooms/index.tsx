@@ -1,6 +1,7 @@
 import React from 'react'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
+import Head from 'next/head'
 import axios from 'axios'
 import { CreateRoom } from '../../components/room/create-room'
 import { AppUrl } from '../../config'
@@ -13,6 +14,9 @@ type RoomsProps = { rooms: { id: string; name: string }[] }
 export default ({ rooms }: RoomsProps) => {
   return (
     <div>
+      <Head>
+        <title key="title">Find a Room - Syncify</title>
+      </Head>
       <Navbar />
       <CreateRoom />
       <ul>

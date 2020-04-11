@@ -1,5 +1,7 @@
 import React from 'react'
 import { GetServerSideProps } from 'next'
+import Link from 'next/link'
+import Head from 'next/head'
 import axios from 'axios'
 import { Playlist } from '../../components/playlist'
 import { Room } from '../../types'
@@ -10,7 +12,6 @@ import { Chat } from '../../components/chat'
 import { Player } from '../../components/player'
 import { SpotifyPlayerProvider, withPlayerStore } from '../../components/spotify-player'
 import { Navbar } from '../../components/nav-bar'
-import Link from 'next/link'
 
 type RoomProps = { room: Room }
 
@@ -19,6 +20,9 @@ export default withPlayerStore(({ room }: RoomProps) => {
 
   return (
     <SpotifyPlayerProvider>
+      <Head>
+        <title key="title">{room.name} - Syncify</title>
+      </Head>
       <Navbar>
         <Link href="/rooms">
           <a className="inline-block bg-gray-100 text-gray-600 px-3 py-1 rounded-sm">
