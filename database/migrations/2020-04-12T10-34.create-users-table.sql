@@ -1,0 +1,8 @@
+--create-users-table (up)
+CREATE TABLE users(
+  id VARCHAR(255) PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  avatar TEXT,
+  created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now(),
+  updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now()
+);

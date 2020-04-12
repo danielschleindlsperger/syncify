@@ -16,10 +16,14 @@ export default withAuth(async (req: NowRequest, res: NowResponse) => {
 })
 
 async function handleGetRoom(req: NowRequest, res: NowResponse) {
-  const rooms = await pool.connect(async conn => {
-    return conn.many<{ id: string; name: string }>(
-      sql`SELECT r.id, r.name
-FROM rooms r`,
+  const rooms = await pool.connect(async (conn) => {
+    // TODO: Change to .many
+    return conn.any<{ id: string; name: string }>(
+      sql`
+SELECT id, name
+FROM rooms
+ORDER BY created_at DESC
+`,
     )
   })
 
@@ -30,7 +34,7 @@ async function handleCreateRoom(req: NowRequest, res: NowResponse) {
   // TODO: validation
   const { name, playlist } = req.body
 
-  const room = await pool.connect(async conn => {
+  const room = await pool.connect(async (conn) => {
     return conn.one(sql`
 INSERT INTO rooms (name, playlist)
 VALUES (${sql.join([name, sql.json(playlist)], sql`, `)})
