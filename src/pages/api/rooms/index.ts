@@ -20,7 +20,7 @@ async function handleGetRoom(req: NowRequest, res: NowResponse) {
     // TODO: Change to .many
     return conn.any<{ id: string; name: string }>(
       sql`
-SELECT id, name
+SELECT id, name, cover_image
 FROM rooms
 ORDER BY created_at DESC
 `,
@@ -32,12 +32,12 @@ ORDER BY created_at DESC
 
 async function handleCreateRoom(req: NowRequest, res: NowResponse) {
   // TODO: validation
-  const { name, playlist } = req.body
+  const { name, cover_image, playlist } = req.body
 
   const room = await pool.connect(async (conn) => {
     return conn.one(sql`
-INSERT INTO rooms (name, playlist)
-VALUES (${sql.join([name, sql.json(playlist)], sql`, `)})
+INSERT INTO rooms (name, cover_image, playlist)
+VALUES (${sql.join([name, cover_image, sql.json(playlist)], sql`, `)})
 RETURNING *
 `)
   })

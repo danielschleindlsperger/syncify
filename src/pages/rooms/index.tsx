@@ -8,26 +8,20 @@ import { AppUrl } from '../../config'
 import { isAxiosError } from '../../utils/errors'
 import { ServerResponse } from 'http'
 import { Navbar } from '../../components/nav-bar'
+import { Roomlist } from '../../components/room'
+import { Room } from '../../types'
 
-type RoomsProps = { rooms: { id: string; name: string }[] }
+type RoomsProps = { rooms: Omit<Room, 'playlist'>[] }
 
 export default ({ rooms }: RoomsProps) => {
   return (
-    <div>
+    <div className="px-8">
       <Head>
         <title key="title">Find a Room - Syncify</title>
       </Head>
       <Navbar />
-      <CreateRoom />
-      <ul>
-        {rooms.map((room: any) => (
-          <li key={room.id}>
-            <Link href="/rooms/[id]" as={`/rooms/${room.id}`}>
-              <a>{room.name}</a>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <CreateRoom className="mt-8" />
+      <Roomlist className="mt-8" rooms={rooms} />
     </div>
   )
 }

@@ -32,9 +32,10 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault()
     const songs = await getPlaylistSongs(accessToken!, playlistId!)
+    const image = playlists?.find((p) => p.id === playlistId)?.image
     const playlist: Playlist = { created: new Date().toISOString(), songs }
 
-    const { id } = await createRoom({ name, playlist })
+    const { id } = await createRoom({ name, playlist, cover_image: image })
     if (id) {
       router.push(`/rooms/${id}`)
     } else {
@@ -70,7 +71,11 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
   )
 }
 
-const createRoom = async (data: { name: string; playlist: Playlist }): Promise<Room> => {
+const createRoom = async (data: {
+  name: string
+  cover_image: string | undefined
+  playlist: Playlist
+}): Promise<Room> => {
   const res = await fetch(AppUrl + '/api/rooms', {
     method: 'POST',
     headers: {

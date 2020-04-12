@@ -1,6 +1,7 @@
 export type Room = Readonly<{
   id: string
   name: string
+  cover_image: string | undefined
   playlist: Playlist
 }>
 
