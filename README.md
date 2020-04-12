@@ -10,7 +10,9 @@
 
 ```sh
 npm start
-npm run knex
+npm run migrate up
+npm run migrate down
+npm run migrate create my-new-migration
 ```
 
 ## Release (Deployment)
