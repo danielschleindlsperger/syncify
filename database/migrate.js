@@ -1,6 +1,5 @@
 const { resolve } = require('path')
 require('dotenv').config({ path: resolve(__dirname, '../.env.build') })
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 const { createPool } = require('slonik')
 const { setupSlonikMigrator } = require('@slonik/migrator')
