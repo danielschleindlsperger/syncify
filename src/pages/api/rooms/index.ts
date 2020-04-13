@@ -41,7 +41,7 @@ async function handleCreateRoom(req: NowRequest, res: NowResponse) {
   const { name, cover_image, trackIds } = req.body
 
   const { access_token } = await spotify.clientCredentialsGrant().then((x) => x.body)
-  const tracks = await fetchTracks(access_token, trackIds)
+  const tracks = await fetchTracks(access_token, uniqueNonNull(trackIds))
 
   const playlist: Playlist = {
     createdAt: new Date().toISOString(),
@@ -74,4 +74,8 @@ const fetchTracks = async (accessToken: string, ids: string[]): Promise<Playlist
       artists: track.artists.map((a) => a.name),
     })),
   )
+}
+
+const uniqueNonNull = <A extends any>(xs: A[]): A[] => {
+  return Array.from(new Set(xs)).filter((x) => x !== undefined && x !== null)
 }
