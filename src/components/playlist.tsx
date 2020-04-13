@@ -3,7 +3,6 @@ import { useSpotifyPlayer } from './spotify-player'
 import { useAuth } from './auth'
 import SpotifyWebApi from 'spotify-web-api-node'
 import { dropWhile, splitEvery } from 'ramda'
-import { usePlayerState } from './spotify-player/player-store'
 
 type Playlist = import('../types').Playlist
 
@@ -20,8 +19,7 @@ type PlaylistProps = React.HTMLAttributes<HTMLElement> & { playlist: Playlist }
 export const Playlist = ({ playlist, ...props }: PlaylistProps) => {
   const accessToken = useAuth()?.access_token
   const { play } = useSpotifyPlayer()
-  const [tracks, setTracks] = React.useState<PlaylistTrack[] | undefined>()
-  const currentTrack = usePlayerState((state) => state.playbackState?.track_window.current_track)
+  const [tracks, setTracks] = React.useState<PlaylistTrack[]>([])
 
   React.useEffect(() => {
     if (accessToken) {
@@ -51,19 +49,19 @@ export const Playlist = ({ playlist, ...props }: PlaylistProps) => {
     }
   }, [tracks, play])
 
-  if (!tracks) return null
+  const upcomingTracks = dropPlayedTracks(playlist, tracks)
+
+  // TODO: This will flash every time until we fetch the songs from Spotify.
+  // We will need to store the duration_ms of the song in the database so it is available at this point
+  // TODO: We can also move this higher and don't trigger the Spotify Player or Pusher connection.
+  if (upcomingTracks.length === 0)
+    return <div className="mt-8">The show is over! Join another room or create one!</div>
 
   return (
     <div {...props}>
       <ul>
-        {tracks.map((t) => (
-          <li
-            key={t.id}
-            // For the "isActive" check we can't use the id, because a single song can have multiple ids on Spotify.
-            // Using the name is a workaround and will not work every time.
-            // TODO: fix this by comparing the artists as well
-            className={currentTrack && currentTrack.name === t.name ? 'font-bold' : ''}
-          >
+        {upcomingTracks.map((t, i) => (
+          <li key={t.id} className={i === 0 ? 'font-bold' : undefined}>
             <span>{t.name}</span>
           </li>
         ))}
@@ -89,4 +87,16 @@ const fetchTracks = async (accessToken: string, ids: string[]): Promise<Playlist
       artists: track.artists.map((a) => a.name),
     })),
   )
+}
+
+const dropPlayedTracks = (playlist: Playlist, tracks: PlaylistTrack[]): PlaylistTrack[] => {
+  let offset = Date.now() - Date.parse(playlist.created)
+  return dropWhile((t) => {
+    const songIsOver = offset > t.duration_ms
+    if (songIsOver) {
+      offset = offset - t.duration_ms
+      return true
+    }
+    return false
+  }, tracks)
 }
