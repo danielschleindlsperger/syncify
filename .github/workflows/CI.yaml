@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    name: Test, build and deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v1
+      - name: Setting up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+      - name: Test
+        run: npm t
+      - name: Migrate database
+        run: npm run migrate up
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - uses: amondnet/now-deployment@v2
+        with:
+          zeit-token: ${{ secrets.ZEIT_TOKEN }}
+          now-args: '--prod'
+          now-org-id: ${{ secrets.ORG_ID}}
+          now-project-id: ${{ secrets.PROJECT_ID}}
