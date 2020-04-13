@@ -3,15 +3,16 @@ import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import Head from 'next/head'
 import axios from 'axios'
+import { ServerResponse } from 'http'
 import { Playlist } from '../../components/playlist'
 import { Room } from '../../types'
 import { AppUrl } from '../../config'
 import { isAxiosError } from '../../utils/errors'
-import { ServerResponse } from 'http'
 import { Chat } from '../../components/chat'
 import { Player } from '../../components/player'
 import { SpotifyPlayerProvider, withPlayerStore } from '../../components/spotify-player'
 import { Navbar } from '../../components/nav-bar'
+import { AuthenticatedOnly } from '../../components/auth'
 
 type RoomProps = { room: Room }
 
@@ -23,19 +24,21 @@ export default withPlayerStore(({ room }: RoomProps) => {
       <Head>
         <title key="title">{room.name} - Syncify</title>
       </Head>
-      <Navbar>
-        <Link href="/rooms">
-          <a className="inline-block bg-gray-100 text-gray-600 px-3 py-1 rounded-sm">
-            {'< Join a different room'}
-          </a>
-        </Link>
-      </Navbar>
-      <div className="px-8">
-        <h1 className="text-5xl mt-16 font-bold">{name}</h1>
-        <Chat roomId={room.id} className="mt-8" />
-        <Playlist playlist={playlist} className="mt-8" />
-        <Player />
-      </div>
+      <AuthenticatedOnly>
+        <Navbar>
+          <Link href="/rooms">
+            <a className="inline-block bg-gray-100 text-gray-600 px-3 py-1 rounded-sm">
+              {'< Join a different room'}
+            </a>
+          </Link>
+        </Navbar>
+        <div className="px-8">
+          <h1 className="text-5xl mt-16 font-bold">{name}</h1>
+          <Chat roomId={room.id} className="mt-8" />
+          <Playlist playlist={playlist} className="mt-8" />
+          <Player />
+        </div>
+      </AuthenticatedOnly>
     </SpotifyPlayerProvider>
   )
 })

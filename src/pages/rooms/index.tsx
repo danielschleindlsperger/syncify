@@ -9,6 +9,7 @@ import { Navbar } from '../../components/nav-bar'
 import { Roomlist } from '../../components/room'
 import { Room } from '../../types'
 import Link from 'next/link'
+import { AuthenticatedOnly } from '../../components/auth'
 
 type RoomsProps = { rooms: Omit<Room, 'playlist'>[] }
 
@@ -18,14 +19,16 @@ export default ({ rooms }: RoomsProps) => {
       <Head>
         <title key="title">Find a Room - Syncify</title>
       </Head>
-      <Navbar>
-        <Link href="/rooms/create">
-          <a className="inline-block bg-gray-100 text-gray-600 px-3 py-1 rounded-sm">
-            Create a new Room
-          </a>
-        </Link>
-      </Navbar>
-      <Roomlist className="mt-16 px-8 max-w-5xl mx-auto" rooms={rooms} />
+      <AuthenticatedOnly>
+        <Navbar>
+          <Link href="/rooms/create">
+            <a className="inline-block bg-gray-100 text-gray-600 px-3 py-1 rounded-sm">
+              Create a new Room
+            </a>
+          </Link>
+        </Navbar>
+        <Roomlist className="mt-16 px-8 max-w-5xl mx-auto" rooms={rooms} />
+      </AuthenticatedOnly>
     </>
   )
 }

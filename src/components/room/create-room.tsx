@@ -1,6 +1,6 @@
 import React from 'react'
 import { useRouter } from 'next/router'
-import { Playlist, Song, Room } from '../../types'
+import { Room } from '../../types'
 import { useAuth } from '../auth'
 import SpotifyWebApi from 'spotify-web-api-js'
 import { AppUrl } from '../../config'
@@ -11,8 +11,8 @@ type SpotifyPlaylist = { name: string; id: string; image?: string }
 
 // TODO: input validation
 export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
-  const accessToken = useAuth()?.access_token
-  const id = useAuth()?.id
+  const accessToken = useAuth().user?.access_token
+  const id = useAuth().user?.id
   const router = useRouter()
   const [name, setName] = React.useState('')
   const [playlists, setPlaylists] = React.useState<SpotifyPlaylist[] | undefined>()

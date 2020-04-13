@@ -28,7 +28,7 @@ export const SpotifyPlayerContext = React.createContext<SpotifyPlayerState>({
 })
 
 export const SpotifyPlayerProvider: React.FC = ({ children }) => {
-  const accessToken = useAuth()?.access_token
+  const accessToken = useAuth().user?.access_token
   const [player, setPlayer] = React.useState<Spotify.SpotifyPlayer | null>(null)
 
   const state = usePlayerState((state) => state)

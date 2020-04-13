@@ -7,7 +7,7 @@ type NavbarProps = React.HTMLAttributes<HTMLElement> & {
 }
 
 export const Navbar = ({ children, className, ...props }: NavbarProps) => {
-  const user = useAuth()
+  const { user } = useAuth()
 
   return (
     <nav
