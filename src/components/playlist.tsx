@@ -27,8 +27,6 @@ export const Playlist = ({ playlist, ...props }: PlaylistProps) => {
         return false
       }, playlist.tracks)
 
-      console.log(tracksToPlay)
-
       play(
         tracksToPlay.map((t) => `spotify:track:${t.id}`),
         offset,
