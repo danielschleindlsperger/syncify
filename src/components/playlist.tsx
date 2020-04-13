@@ -1,58 +1,43 @@
 import React from 'react'
 import { useSpotifyPlayer } from './spotify-player'
-import { useAuth } from './auth'
 import SpotifyWebApi from 'spotify-web-api-node'
 import { dropWhile, splitEvery } from 'ramda'
+import { PlaylistTrack } from '../types'
 
 type Playlist = import('../types').Playlist
 
-type PlaylistTrack = Readonly<{
-  id: string
-  name: string
-  duration_ms: number
-  artists: string[]
-}>
 const spotify = new SpotifyWebApi()
 
 type PlaylistProps = React.HTMLAttributes<HTMLElement> & { playlist: Playlist }
 
 export const Playlist = ({ playlist, ...props }: PlaylistProps) => {
-  const accessToken = useAuth()?.access_token
   const { play } = useSpotifyPlayer()
-  const [tracks, setTracks] = React.useState<PlaylistTrack[]>([])
-
-  React.useEffect(() => {
-    if (accessToken) {
-      const ids = playlist.songs.map((t) => t.id)
-      fetchTracks(accessToken, ids).then(setTracks)
-    }
-  }, [accessToken])
 
   React.useEffect(() => {
     // Find current offset and start playlist playback.
     // This should only run each time the playlist changes (almost never).
-    if (tracks && tracks.length > 0 && play) {
-      let offset = Date.now() - Date.parse(playlist.created)
-      const ids = dropWhile((t) => {
-        const songIsOver = offset > t.duration_ms
-        if (songIsOver) {
+    if (playlist.tracks && playlist.tracks.length > 0 && play) {
+      let offset = Date.now() - Date.parse(playlist.createdAt)
+      const tracksToPlay = dropWhile((t) => {
+        const trackIsOver = offset > t.duration_ms
+        if (trackIsOver) {
           offset = offset - t.duration_ms
           return true
         }
         return false
-      }, tracks)
+      }, playlist.tracks)
+
+      console.log(tracksToPlay)
 
       play(
-        ids.map((t) => `spotify:track:${t.id}`),
+        tracksToPlay.map((t) => `spotify:track:${t.id}`),
         offset,
       )
     }
-  }, [tracks, play])
+  }, [playlist.tracks, play])
 
-  const upcomingTracks = dropPlayedTracks(playlist, tracks)
+  const upcomingTracks = dropPlayedTracks(playlist)
 
-  // TODO: This will flash every time until we fetch the songs from Spotify.
-  // We will need to store the duration_ms of the song in the database so it is available at this point
   // TODO: We can also move this higher and don't trigger the Spotify Player or Pusher connection.
   if (upcomingTracks.length === 0)
     return <div className="mt-8">The show is over! Join another room or create one!</div>
@@ -89,14 +74,14 @@ const fetchTracks = async (accessToken: string, ids: string[]): Promise<Playlist
   )
 }
 
-const dropPlayedTracks = (playlist: Playlist, tracks: PlaylistTrack[]): PlaylistTrack[] => {
-  let offset = Date.now() - Date.parse(playlist.created)
+const dropPlayedTracks = (playlist: Playlist): PlaylistTrack[] => {
+  let offset = Date.now() - Date.parse(playlist.createdAt)
   return dropWhile((t) => {
-    const songIsOver = offset > t.duration_ms
-    if (songIsOver) {
+    const trackIsOver = offset > t.duration_ms
+    if (trackIsOver) {
       offset = offset - t.duration_ms
       return true
     }
     return false
-  }, tracks)
+  }, playlist.tracks)
 }

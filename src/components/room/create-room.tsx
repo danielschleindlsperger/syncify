@@ -31,11 +31,10 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
 
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault()
-    const songs = await getPlaylistSongs(accessToken!, playlistId!)
+    const trackIds = await getPlaylistTrackIds(accessToken!, playlistId!)
     const image = playlists?.find((p) => p.id === playlistId)?.image
-    const playlist: Playlist = { created: new Date().toISOString(), songs }
 
-    const { id } = await createRoom({ name, playlist, cover_image: image })
+    const { id } = await createRoom({ name, trackIds, cover_image: image })
     if (id) {
       router.push(`/rooms/${id}`)
     } else {
@@ -74,7 +73,7 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
 const createRoom = async (data: {
   name: string
   cover_image: string | undefined
-  playlist: Playlist
+  trackIds: string[]
 }): Promise<Room> => {
   const res = await fetch(AppUrl + '/api/rooms', {
     method: 'POST',
@@ -113,9 +112,15 @@ const getUserPlaylists = async (
     : playlists
 }
 
-const getPlaylistSongs = async (accessToken: string, id: string, offset = 0): Promise<Song[]> => {
+const getPlaylistTrackIds = async (
+  accessToken: string,
+  id: string,
+  offset = 0,
+): Promise<string[]> => {
   spotify.setAccessToken(accessToken)
   const { items, next, offset: oldOffset } = await spotify.getPlaylistTracks(id, { offset, limit })
-  const tracks = items.map((item) => ({ id: item.track.id }))
-  return next ? tracks.concat(await getPlaylistSongs(accessToken, id, oldOffset + limit)) : tracks
+  const tracks = items.map((item) => item.track.id)
+  return next
+    ? tracks.concat(await getPlaylistTrackIds(accessToken, id, oldOffset + limit))
+    : tracks
 }
