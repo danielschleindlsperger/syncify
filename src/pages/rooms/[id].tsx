@@ -3,9 +3,10 @@ import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import Head from 'next/head'
 import axios from 'axios'
+import cx from 'classnames'
 import { ServerResponse } from 'http'
 import { Playlist } from '../../components/playlist'
-import { Room } from '../../types'
+import { Room, PlaylistTrack } from '../../types'
 import { AppUrl } from '../../config'
 import { isAxiosError } from '../../utils/errors'
 import { Chat } from '../../components/chat'
@@ -13,11 +14,16 @@ import { Player } from '../../components/player'
 import { SpotifyPlayerProvider, withPlayerStore } from '../../components/spotify-player'
 import { Navbar } from '../../components/nav-bar'
 import { AuthenticatedOnly } from '../../components/auth'
+import { dropWhile } from 'ramda'
+
+type Playlist = import('../../types').Playlist
 
 type RoomProps = { room: Room }
 
 export default withPlayerStore(({ room }: RoomProps) => {
   const { name, playlist } = room
+
+  const remainingTracks = dropPlayedTracks(playlist)
 
   return (
     <SpotifyPlayerProvider>
@@ -33,15 +39,56 @@ export default withPlayerStore(({ room }: RoomProps) => {
           </Link>
         </Navbar>
         <div className="px-8">
-          <h1 className="text-5xl mt-16 font-bold">{name}</h1>
-          <Chat roomId={room.id} className="mt-8" />
-          <Playlist playlist={playlist} className="mt-8" />
-          <Player />
+          {remainingTracks.length > 0 ? (
+            <>
+              <h1 className="text-4xl mt-16 font-bold">{name}</h1>
+              <Chat roomId={room.id} className="mt-8" />
+              <Playlist playlist={playlist} className="mt-8" />
+              <Player />
+            </>
+          ) : (
+            <PlaylistIsOver className="mt-8" />
+          )}
         </div>
       </AuthenticatedOnly>
     </SpotifyPlayerProvider>
   )
 })
+
+const PlaylistIsOver = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
+  <div className={cx(className, 'mt-8')} {...props}>
+    <h1 className="text-4xl mt-4 font-bold">The party's over!</h1>
+    <p className="mt-4">
+      The guests are gone and the music stopped playing. <br />
+      But don't fret, there's still hope!
+    </p>
+    <p className="mt-4">
+      <Link href="/rooms/create">
+        <a className="inline-block bg-gray-700 text-gray-100 px-3 py-1 rounded-sm">
+          Create a new room
+        </a>
+      </Link>
+
+      <Link href="/rooms">
+        <a className="ml-4 inline-block bg-gray-700 text-gray-100 px-3 py-1 rounded-sm">
+          Join a different room
+        </a>
+      </Link>
+    </p>
+  </div>
+)
+
+const dropPlayedTracks = (playlist: Playlist): PlaylistTrack[] => {
+  let offset = Date.now() - Date.parse(playlist.createdAt)
+  return dropWhile((t) => {
+    const trackIsOver = offset > t.duration_ms
+    if (trackIsOver) {
+      offset = offset - t.duration_ms
+      return true
+    }
+    return false
+  }, playlist.tracks)
+}
 
 export const getServerSideProps: GetServerSideProps<RoomProps> = async (ctx) => {
   const { params } = ctx

@@ -1,16 +1,13 @@
 import React from 'react'
 import { useSpotifyPlayer } from './spotify-player'
-import SpotifyWebApi from 'spotify-web-api-node'
-import { dropWhile, splitEvery } from 'ramda'
+import { dropWhile } from 'ramda'
 import { PlaylistTrack } from '../types'
 
 type Playlist = import('../types').Playlist
 
-const spotify = new SpotifyWebApi()
-
 type PlaylistProps = React.HTMLAttributes<HTMLElement> & { playlist: Playlist }
 
-export const Playlist = ({ playlist, ...props }: PlaylistProps) => {
+export const Playlist = React.memo(({ playlist, ...props }: PlaylistProps) => {
   const { play } = useSpotifyPlayer()
 
   React.useEffect(() => {
@@ -51,26 +48,7 @@ export const Playlist = ({ playlist, ...props }: PlaylistProps) => {
       </ul>
     </div>
   )
-}
-
-const limit = 50
-
-const fetchTracks = async (accessToken: string, ids: string[]): Promise<PlaylistTrack[]> => {
-  spotify.setAccessToken(accessToken)
-
-  const trackPartitions = await Promise.all(
-    splitEvery(limit, ids).map((chunk) => spotify.getTracks(chunk).then((res) => res.body.tracks)),
-  )
-
-  return trackPartitions.flatMap((partition) =>
-    partition.map((track) => ({
-      id: track.id,
-      name: track.name,
-      duration_ms: track.duration_ms,
-      artists: track.artists.map((a) => a.name),
-    })),
-  )
-}
+})
 
 const dropPlayedTracks = (playlist: Playlist): PlaylistTrack[] => {
   let offset = Date.now() - Date.parse(playlist.createdAt)
