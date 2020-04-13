@@ -4,12 +4,16 @@
 
 - [now CLI](https://zeit.co/download) for deployment
 - Docker for the development environment with `docker-compose`
-- [Ultrahook](http://www.ultrahook.com/) for proxying webhooks to localhost
 
 ## Commands
 
 ```sh
 npm start
+
+# start a proxy to receive pusher webhooks on localhost
+npm run webhook-proxy
+
+# database migrations
 npm run migrate up
 npm run migrate down
 npm run migrate create my-new-migration

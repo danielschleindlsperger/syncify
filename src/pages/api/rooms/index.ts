@@ -14,21 +14,28 @@ export default withAuth(async (req: NowRequest, res: NowResponse) => {
     return handleCreateRoom(req, res)
   }
   if (req.method === 'GET') {
-    return handleGetRoom(req, res)
+    return handleGetRooms(req, res)
   }
 
   return res.status(405).send('Method not allowed.')
 })
 
-async function handleGetRoom(req: NowRequest, res: NowResponse) {
+export type GetRoomsResponse = {
+  id: string
+  name: string
+  cover_image?: string
+  listeners_count: number
+}[]
+
+async function handleGetRooms(req: NowRequest, res: NowResponse) {
   const rooms = await pool.connect(async (conn) => {
-    // TODO: Change to .many
-    return conn.any<{ id: string; name: string }>(
+    return conn.many<{ id: string; name: string }>(
       sql`
-SELECT id, name, cover_image
-FROM rooms
-ORDER BY created_at DESC
-`,
+SELECT r.id, r.name, r.cover_image, COUNT(u) AS listeners_count
+FROM rooms r
+LEFT JOIN users u ON u.room_id = r.id
+GROUP BY r.id
+ORDER BY listeners_count DESC`,
     )
   })
 

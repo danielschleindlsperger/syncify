@@ -1,10 +1,9 @@
 import React from 'react'
 import Link from 'next/link'
 import cx from 'classnames'
-import { Room } from '../../types'
 
 type RoomlistProps = React.HTMLAttributes<HTMLElement> & {
-  rooms: Omit<Room, 'playlist'>[]
+  rooms: { id: string; name: string; cover_image?: string; listeners_count: number }[]
 }
 
 export const Roomlist = ({ rooms, className, ...props }: RoomlistProps) => {
@@ -31,7 +30,7 @@ export const Roomlist = ({ rooms, className, ...props }: RoomlistProps) => {
               <h2 className="mt-2 font-bold text-gray-700 truncate whitespace-normal">
                 {room.name}
               </h2>
-              <span className="font-semibold text-sm text-gray-500">123 Listeners</span>
+              <ActiveListeners count={room.listeners_count} />
             </a>
           </Link>
         </li>
@@ -48,5 +47,16 @@ const NoActiveRooms = (props: React.HTMLAttributes<HTMLElement>) => {
       <div>No active rooms are available to join!</div>
       <button>Create the first room!</button>
     </div>
+  )
+}
+
+type ActiveListenersProps = { count: number } & React.HTMLAttributes<HTMLElement>
+const ActiveListeners = ({ count, className, ...props }: ActiveListenersProps) => {
+  const text = count === 1 ? '1 listener' : `${count} listeners`
+
+  return (
+    <span className={cx(className, 'font-semibold text-sm text-gray-500')} {...props}>
+      {text}
+    </span>
   )
 }

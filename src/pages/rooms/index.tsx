@@ -7,11 +7,11 @@ import { isAxiosError } from '../../utils/errors'
 import { ServerResponse } from 'http'
 import { Navbar } from '../../components/nav-bar'
 import { Roomlist } from '../../components/room'
-import { Room } from '../../types'
 import Link from 'next/link'
 import { AuthenticatedOnly } from '../../components/auth'
+import { GetRoomsResponse } from '../api/rooms'
 
-type RoomsProps = { rooms: Omit<Room, 'playlist'>[] }
+type RoomsProps = { rooms: GetRoomsResponse }
 
 export default ({ rooms }: RoomsProps) => {
   return (

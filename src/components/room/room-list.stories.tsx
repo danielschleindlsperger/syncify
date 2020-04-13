@@ -1,7 +1,6 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { Roomlist } from './room-list'
-import { Room } from '../../types'
 
 storiesOf('Room list', module)
   .add('Five active rooms', () => <Roomlist rooms={rooms.slice(0, 5)} />)
@@ -16,7 +15,7 @@ storiesOf('Room list', module)
   })
   .add('No active rooms', () => <Roomlist rooms={[]} />)
 
-const rooms: Omit<Room, 'playlist'>[] = [
+const rooms = [
   {
     id: '37i9dQZF1DX8bHrtXvaJhx',
     name: 'Das Beste des Jahrzehnts für dich',
@@ -121,4 +120,4 @@ const rooms: Omit<Room, 'playlist'>[] = [
     cover_image:
       'https://mosaic.scdn.co/640/ab67616d0000b2735fcd513bb80440d503614f59ab67616d0000b273a97f35441b94ebc72d608e7aab67616d0000b273cbcff3421aff2297cc536bfcab67616d0000b273f552daab2bc3dc64d2c4c649',
   },
-]
+].map((r, i, rs) => ({ ...r, listeners_count: rs.length - (i + 1) }))

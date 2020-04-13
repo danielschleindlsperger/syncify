@@ -10,7 +10,8 @@
     "migrate": "node database/migrate",
     "test": "jest",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "webhook-proxy": "lt -h 'http://serverless.social' --print-requests --port 3000 --subdomain syncify-pusher"
   },
   "author": "Daniel Schleindlsperger",
   "husky": {
@@ -64,6 +65,7 @@
     "dotenv": "^8.2.0",
     "husky": "^4.2.5",
     "jest": "^25.3.0",
+    "localtunnel": "^2.0.0",
     "prettier": "^2.0.4",
     "pretty-quick": "^2.0.1",
     "tailwindcss": "^1.2.0",
