@@ -1,28 +1,32 @@
 import React from 'react'
 import { GetServerSideProps } from 'next'
-import Link from 'next/link'
 import Head from 'next/head'
 import axios from 'axios'
-import { CreateRoom } from '../../components/room/create-room'
 import { AppUrl } from '../../config'
 import { isAxiosError } from '../../utils/errors'
 import { ServerResponse } from 'http'
 import { Navbar } from '../../components/nav-bar'
 import { Roomlist } from '../../components/room'
 import { Room } from '../../types'
+import Link from 'next/link'
 
 type RoomsProps = { rooms: Omit<Room, 'playlist'>[] }
 
 export default ({ rooms }: RoomsProps) => {
   return (
-    <div className="px-8">
+    <>
       <Head>
         <title key="title">Find a Room - Syncify</title>
       </Head>
-      <Navbar />
-      <CreateRoom className="mt-8" />
-      <Roomlist className="mt-8" rooms={rooms} />
-    </div>
+      <Navbar>
+        <Link href="/rooms/create">
+          <a className="inline-block bg-gray-100 text-gray-600 px-3 py-1 rounded-sm">
+            Create a new Room
+          </a>
+        </Link>
+      </Navbar>
+      <Roomlist className="mt-16 px-8 max-w-5xl mx-auto" rooms={rooms} />
+    </>
   )
 }
 
