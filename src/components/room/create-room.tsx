@@ -4,19 +4,23 @@ import { Room } from '../../types'
 import { useAuth } from '../auth'
 import SpotifyWebApi from 'spotify-web-api-js'
 import { AppUrl } from '../../config'
+import { CreateRoomPayload } from '../../pages/api/rooms'
 
 const spotify = new SpotifyWebApi()
 
 type SpotifyPlaylist = { name: string; id: string; image?: string }
 
-// TODO: input validation
 export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
   const accessToken = useAuth().user?.access_token
   const id = useAuth().user?.id
   const router = useRouter()
   const [name, setName] = React.useState('')
-  const [playlists, setPlaylists] = React.useState<SpotifyPlaylist[] | undefined>()
+  const [playlists, setPlaylists] = React.useState<SpotifyPlaylist[]>([])
   const [playlistId, setPlaylistId] = React.useState<string | null>(null)
+  // TODO: actually validate in the form
+  // We can do this when we actually implement a real wizard for creating a room with multiple choices for
+  // playlist sources.
+  const [error, setError] = React.useState<string | null>(null)
 
   React.useEffect(() => {
     if (accessToken && id) {
@@ -32,49 +36,71 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault()
     const trackIds = await getPlaylistTrackIds(accessToken!, playlistId!)
-    const image = playlists?.find((p) => p.id === playlistId)?.image
+    const image = playlists.find((p) => p.id === playlistId)?.image
 
-    const { id } = await createRoom({ name, trackIds, cover_image: image })
-    if (id) {
-      router.push(`/rooms/${id}`)
-    } else {
-      throw new Error('id not defined')
+    try {
+      const { id } = await createRoom({ name, trackIds, cover_image: image })
+      if (id) {
+        router.push(`/rooms/${id}`)
+      } else {
+        throw new Error('id not defined')
+      }
+    } catch (e) {
+      setError(e.message)
     }
   }
 
   return (
     <div {...props}>
-      <form onSubmit={handleSubmit} className="flex max-w-xs">
-        <input
-          type="text"
-          onChange={(evt) => setName(evt.target.value)}
-          className="bg-gray-300 rounded-sm flex-grow"
-        />
-        {playlists && (
-          <select onChange={(evt) => setPlaylistId(evt.target.value)}>
-            {playlists.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
-        )}
-        <button
-          type="submit"
-          className="bg-blue-700 text-gray-100 px-3 py-1 rounded-sm whitespace-no-wrap"
-        >
-          Create room
-        </button>
+      <form onSubmit={handleSubmit} className="">
+        <div className="mt-8">
+          <label>
+            <span className="block text-gray-700 font-bold mb-1">Name</span>
+            <input
+              type="text"
+              onChange={(evt) => setName(evt.target.value)}
+              className="block w-full max-w-xs p-2 bg-gray-300 rounded-sm"
+            />
+          </label>
+        </div>
+
+        <div className="mt-8">
+          {playlists.length > 0 ? (
+            <label>
+              <span className="block text-gray-700 font-bold mb-1">Select a playlist</span>
+              <select onChange={(evt) => setPlaylistId(evt.target.value)} className="text-xl">
+                {playlists.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : (
+            'Loading your Spotify playlists...'
+          )}
+        </div>
+        <div className="mt-8">
+          <button
+            type="submit"
+            className="bg-gray-700 text-gray-100 px-3 py-1 rounded-sm whitespace-no-wrap"
+            disabled={playlists.length === 0}
+          >
+            Create room
+          </button>
+        </div>
       </form>
+      {error && (
+        <div className="mt-8 text-red-500">
+          <p>An Error occurred:</p>
+          <p>{error}</p>
+        </div>
+      )}
     </div>
   )
 }
 
-const createRoom = async (data: {
-  name: string
-  cover_image: string | undefined
-  trackIds: string[]
-}): Promise<Room> => {
+const createRoom = async (data: CreateRoomPayload): Promise<Room> => {
   const res = await fetch(AppUrl + '/api/rooms', {
     method: 'POST',
     headers: {
@@ -83,6 +109,10 @@ const createRoom = async (data: {
     credentials: 'include',
     body: JSON.stringify(data),
   })
+
+  if (res.status === 422) {
+    throw new Error(JSON.stringify(await res.json(), null, 2))
+  }
 
   const room: Room = await res.json()
 

@@ -1,6 +1,7 @@
 import { NowRequest, NowResponse } from '@now/node'
 import { createPool, sql } from 'slonik'
 import Spotify from 'spotify-web-api-node'
+import { object, string, array, InferType, ValidationError } from 'yup'
 import { withAuth } from '../../../auth'
 import { SpotifyConfig } from '../../../config'
 import { splitEvery } from 'ramda'
@@ -37,27 +38,45 @@ ORDER BY created_at DESC
 const spotify = new Spotify(SpotifyConfig)
 
 async function handleCreateRoom(req: NowRequest, res: NowResponse) {
-  // TODO: validation
-  const { name, cover_image, trackIds } = req.body
+  try {
+    const { name, cover_image = null, trackIds } = await createRoomSchema.validate(req.body, {
+      stripUnknown: true,
+    })
 
-  const { access_token } = await spotify.clientCredentialsGrant().then((x) => x.body)
-  const tracks = await fetchTracks(access_token, uniqueNonNull(trackIds))
+    const { access_token } = await spotify.clientCredentialsGrant().then((x) => x.body)
+    const tracks = await fetchTracks(access_token, uniqueNonNull(trackIds))
 
-  const playlist: Playlist = {
-    createdAt: new Date().toISOString(),
-    tracks,
-  }
+    const playlist: Playlist = {
+      createdAt: new Date().toISOString(),
+      tracks,
+    }
 
-  const room = await pool.connect(async (conn) => {
-    return conn.one(sql`
+    const room = await pool.connect(async (conn) => {
+      return conn.one(sql`
 INSERT INTO rooms (name, cover_image, playlist)
 VALUES (${sql.join([name, cover_image, sql.json(playlist)], sql`, `)})
 RETURNING *
 `)
-  })
+    })
 
-  return res.json(room)
+    return res.json(room)
+  } catch (e) {
+    if (e instanceof ValidationError) {
+      console.warn('validation error', e.errors)
+      return res.status(422).json({ msg: 'Invalid payload.', errors: e.errors })
+    }
+    throw e
+  }
 }
+
+const createRoomSchema = object().shape({
+  name: string().min(3).required(),
+  // TODO: Can we make this required?
+  cover_image: string().notRequired(),
+  trackIds: array().of(string().required()).required(),
+})
+
+export type CreateRoomPayload = InferType<typeof createRoomSchema>
 
 const limit = 50
 const fetchTracks = async (accessToken: string, ids: string[]): Promise<PlaylistTrack[]> => {
