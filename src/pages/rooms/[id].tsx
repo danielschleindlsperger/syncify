@@ -38,7 +38,7 @@ export default withPlayerStore(({ room }: RoomProps) => {
             </a>
           </Link>
         </Navbar>
-        <div className="px-8">
+        <div className="px-8 pb-64">
           {remainingTracks.length > 0 ? (
             <>
               <h1 className="text-4xl mt-16 font-bold">{name}</h1>
