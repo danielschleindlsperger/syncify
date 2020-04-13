@@ -38,7 +38,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 
     // Send back to previous location or /rooms as a fallback
     // TODO: for some reason this does not work. The client seems to send old referer values after client-side navigation
-    const Location = state ?? `${AppUrl}/rooms`
+    const Location = state || `${AppUrl}/rooms`
     res.status(307).setHeader('Location', Location)
     return res.end()
   } catch (e) {
