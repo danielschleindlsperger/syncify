@@ -15,12 +15,12 @@ export const Roomlist = ({ rooms, className, ...props }: RoomlistProps) => {
       {...props}
     >
       {rooms.map((room) => (
-        <li key={room.id}>
+        <li title={room.name} key={room.id}>
           <Link href="/rooms/[id]" as={`/rooms/${room.id}`}>
             <a>
               <div className="relative">
                 <div className="w-full bg-gray-200" style={{ paddingBottom: '100%' }} />
-                {/* TODO: chekc if spotify even has rooms that have no image... */}
+                {/* TODO: check if spotify even has playlists that have no image... */}
                 {room.cover_image && (
                   <img
                     src={room.cover_image}
@@ -28,7 +28,9 @@ export const Roomlist = ({ rooms, className, ...props }: RoomlistProps) => {
                   />
                 )}
               </div>
-              <h2 className="mt-2 font-bold text-gray-700">{room.name}</h2>
+              <h2 className="mt-2 font-bold text-gray-700 truncate whitespace-normal">
+                {room.name}
+              </h2>
               <span className="font-semibold text-sm text-gray-500">123 Listeners</span>
             </a>
           </Link>
