@@ -38,10 +38,10 @@ export default withPlayerStore(({ room }: RoomProps) => {
             </a>
           </Link>
         </Navbar>
-        <div className="px-8 pb-64">
+        <div className="mt-16 px-8 max-w-5xl mx-auto">
           {remainingTracks.length > 0 ? (
             <>
-              <h1 className="text-4xl mt-16 font-bold">{name}</h1>
+              <h1 className="text-4xl font-bold">{name}</h1>
               <Chat roomId={room.id} className="mt-8" />
               <Playlist playlist={playlist} className="mt-8" />
               <Player />
@@ -57,7 +57,7 @@ export default withPlayerStore(({ room }: RoomProps) => {
 
 const PlaylistIsOver = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
   <div className={cx(className, 'mt-8')} {...props}>
-    <h1 className="text-4xl mt-4 font-bold">The party's over!</h1>
+    <h1 className="text-4xl font-bold">The party's over!</h1>
     <p className="mt-4">
       The guests are gone and the music stopped playing. <br />
       But don't fret, there's still hope!
