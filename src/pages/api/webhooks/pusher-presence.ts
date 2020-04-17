@@ -47,22 +47,18 @@ const parseRoomId = (s: string) => s.replace(/^presence-/, '')
 
 const addMember = async (ids: { userId: string; roomId: string }) => {
   const { userId, roomId } = ids
-  return pool.connect((conn) => {
-    return conn.any(sql`
+  return pool.any(sql`
 UPDATE users
 SET room_id = ${roomId}
 WHERE id = ${userId}
 `)
-  })
 }
 
 const removeMember = async (ids: { userId: string; roomId: string }) => {
   const { userId, roomId } = ids
-  return pool.connect((conn) => {
-    return conn.any(sql`
+  return pool.any(sql`
 UPDATE users
 SET room_id = NULL
 WHERE id = ${userId} AND room_id = ${roomId}
 `)
-  })
 }

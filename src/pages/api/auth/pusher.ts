@@ -55,11 +55,9 @@ export default async (req: NowRequest, res: NowResponse) => {
 }
 
 const findUser = async (id: string): Promise<User> => {
-  return await pool.connect(async (conn) => {
-    return conn.one(sql`
+  return await pool.one(sql`
 SELECT id, name, avatar
 FROM users
 WHERE id = ${id}
 `)
-  })
 }

@@ -37,7 +37,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 
   // fetch a new access token for the user to use
   spotifyApi.setRefreshToken(user.refresh_token)
-  const { access_token } = await spotifyApi.refreshAccessToken().then(res => res.body)
+  const { access_token } = await spotifyApi.refreshAccessToken().then((res) => res.body)
 
   // create the access token and set as cookie
   res.setHeader('Set-Cookie', authCookie(signToken({ ...user, access_token })))
@@ -54,11 +54,9 @@ export default async (req: NowRequest, res: NowResponse) => {
 }
 
 const findUser = async (id: string): Promise<User> => {
-  return await pool.connect(async conn => {
-    return conn.one(sql`
+  return await pool.one(sql`
 SELECT id, name, avatar
 FROM users
 WHERE id = ${id}
 `)
-  })
 }

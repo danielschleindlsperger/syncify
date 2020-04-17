@@ -57,13 +57,11 @@ async function handleCreateRoom(req: NowRequest, res: NowResponse) {
       tracks,
     }
 
-    const room = await pool.connect(async (conn) => {
-      return conn.one(sql`
+    const room = await pool.one(sql`
 INSERT INTO rooms (name, cover_image, playlist)
 VALUES (${sql.join([name, cover_image, sql.json(playlist)], sql`, `)})
 RETURNING *
 `)
-    })
 
     return res.json(room)
   } catch (e) {

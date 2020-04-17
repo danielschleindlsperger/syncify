@@ -49,13 +49,11 @@ export default async (req: NowRequest, res: NowResponse) => {
 
 async function upsertUser({ id, name, avatar: a }: Pick<User, 'id' | 'name' | 'avatar'>) {
   const avatar = a ?? null
-  await pool.connect(async (conn) => {
-    return conn.query(sql`
+  await pool.query(sql`
 INSERT INTO users (id, name, avatar)
 VALUES (${sql.join([id, name, avatar], sql`, `)})
 ON CONFLICT (id) DO UPDATE SET name = ${name}, avatar = ${avatar}
 `)
-  })
 }
 
 const getImage = (images: SpotifyApi.ImageObject[]) => images[0] && images[0].url

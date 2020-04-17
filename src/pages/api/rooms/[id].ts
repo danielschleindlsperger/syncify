@@ -13,15 +13,11 @@ export default withAuth(async (req: NowRequest, res: NowResponse) => {
     return res.status(400).json({ msg: 'No found in url' })
   }
 
-  const room = await pool.connect(async (conn) => {
-    return conn.one<Room>(
-      sql`
+  const room = await pool.one<Room>(sql`
 SELECT id, name, playlist
 FROM rooms r
 WHERE id = ${id}
-`,
-    )
-  })
+`)
 
   if (!room) {
     return res.status(404).json({ msg: `No room found for id "${id}"` })
