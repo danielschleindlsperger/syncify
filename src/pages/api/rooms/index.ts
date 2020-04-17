@@ -28,17 +28,15 @@ export type GetRoomsResponse = {
 }[]
 
 async function handleGetRooms(req: NowRequest, res: NowResponse) {
-  const rooms = await pool.connect(async (conn) => {
-    return conn.many<{ id: string; name: string }>(
-      sql`
+  const rooms = await pool.many<{ id: string; name: string }>(
+    sql`
 SELECT r.id, r.name, r.cover_image, COUNT(u) AS listeners_count
 FROM rooms r
 LEFT JOIN users u ON u.room_id = r.id
 GROUP BY r.id
 ORDER BY listeners_count DESC, r.created_at DESC
 `,
-    )
-  })
+  )
 
   return res.json(rooms)
 }
