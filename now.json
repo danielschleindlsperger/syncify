@@ -2,11 +2,11 @@
   "build": {
     "env": {
       "JWT_SECRET": "@syncify-jwt-secret",
-      "APP_URL": "https://syncify-now.now.sh",
+      "APP_URL": "https://syncify.co",
       "DATABASE_URL": "@syncify-database-url",
       "SPOTIFY_CLIENT_ID": "@syncify-spotify-client-id",
       "SPOTIFY_CLIENT_SECRET": "@syncify-spotify-client-secret",
-      "SPOTIFY_REDIRECT_URL": "https://syncify-now.now.sh/api/auth/spotify-callback",
+      "SPOTIFY_REDIRECT_URL": "https://syncify.co/api/auth/spotify-callback",
       "PUSHER_APP_ID": "767601",
       "PUSHER_APP_KEY": "@syncify-pusher-app-key",
       "PUSHER_SECRET": "@syncify-pusher-secret"

@@ -1,5 +1,7 @@
 # Syncify
 
+[https://syncify.co](https://syncify.co)
+
 ## Requirements
 
 - [now CLI](https://zeit.co/download) for deployment
