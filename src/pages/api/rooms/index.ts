@@ -35,7 +35,8 @@ SELECT r.id, r.name, r.cover_image, COUNT(u) AS listeners_count
 FROM rooms r
 LEFT JOIN users u ON u.room_id = r.id
 GROUP BY r.id
-ORDER BY listeners_count DESC`,
+ORDER BY listeners_count DESC, r.created_at DESC
+`,
     )
   })
 
