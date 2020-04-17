@@ -1,14 +1,12 @@
 import { NowRequest, NowResponse } from '@now/node'
 import Spotify from 'spotify-web-api-node'
-import { createPool } from 'slonik'
-import { sql } from 'slonik'
+import { createPool, sql } from 'slonik'
 import { SpotifyConfig } from '../../../config'
 import { User } from '../../../types'
 import { AuthCookieName, verifyToken, authCookie, signToken } from '../../../auth'
+import { pool } from '../../../database-pool'
 
 const spotifyApi = new Spotify(SpotifyConfig)
-
-export const pool = createPool(process.env.DATABASE_URL!, { maximumPoolSize: 1 })
 
 // this endpoint is called by a user to
 // a) refresh the session token

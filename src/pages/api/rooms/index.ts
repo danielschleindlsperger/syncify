@@ -2,12 +2,11 @@ import { NowRequest, NowResponse } from '@now/node'
 import { createPool, sql } from 'slonik'
 import Spotify from 'spotify-web-api-node'
 import { object, string, array, InferType, ValidationError } from 'yup'
+import { splitEvery } from 'ramda'
 import { withAuth } from '../../../auth'
 import { SpotifyConfig } from '../../../config'
-import { splitEvery } from 'ramda'
 import { PlaylistTrack, Playlist } from '../../../types'
-
-export const pool = createPool(process.env.DATABASE_URL!, { maximumPoolSize: 1 })
+import { pool } from '../../../database-pool'
 
 export default withAuth(async (req: NowRequest, res: NowResponse) => {
   if (req.method === 'POST') {

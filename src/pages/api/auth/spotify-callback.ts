@@ -5,8 +5,7 @@ import { sql } from 'slonik'
 import { User } from '../../../types'
 import { AppUrl, SpotifyConfig } from '../../../config'
 import { authCookie, signToken } from '../../../auth'
-
-export const pool = createPool(process.env.DATABASE_URL!, { maximumPoolSize: 1 })
+import { pool } from '../../../database-pool'
 
 const spotifyApi = new Spotify(SpotifyConfig)
 

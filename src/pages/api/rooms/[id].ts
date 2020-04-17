@@ -2,8 +2,7 @@ import { NowRequest, NowResponse } from '@now/node'
 import { createPool, sql } from 'slonik'
 import { Room } from '../../../types'
 import { withAuth } from '../../../auth'
-
-export const pool = createPool(process.env.DATABASE_URL!, { maximumPoolSize: 1 })
+import { pool } from '../../../database-pool'
 
 export default withAuth(async (req: NowRequest, res: NowResponse) => {
   if (req.method !== 'GET') return res.status(405).send('Method not allowed.')

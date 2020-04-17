@@ -1,10 +1,9 @@
 import { NowRequest, NowResponse } from '@now/node'
+import { createPool, sql } from 'slonik'
 import Pusher from 'pusher'
 import { AuthCookieName, verifyToken } from '../../../auth'
-import { createPool, sql } from 'slonik'
 import { User } from '../../../types'
-
-export const pool = createPool(process.env.DATABASE_URL!, { maximumPoolSize: 1 })
+import { pool } from '../../../database-pool'
 
 const pusher = new Pusher({
   appId: process.env.PUSHER_APP_ID!,
