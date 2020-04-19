@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Head from 'next/head'
 import axios from 'axios'
 import cx from 'classnames'
+import { dropWhile } from 'ramda'
 import { ServerResponse } from 'http'
 import { Playlist } from '../../components/playlist'
 import { Room, PlaylistTrack } from '../../types'
@@ -14,7 +15,7 @@ import { Player } from '../../components/player'
 import { SpotifyPlayerProvider, withPlayerStore } from '../../components/spotify-player'
 import { Navbar } from '../../components/nav-bar'
 import { AuthenticatedOnly } from '../../components/auth'
-import { dropWhile } from 'ramda'
+import { ShareButton } from '../../components/share-button'
 
 type Playlist = import('../../types').Playlist
 
@@ -41,7 +42,11 @@ export default withPlayerStore(({ room }: RoomProps) => {
         <div className="mt-16 px-8 max-w-5xl mx-auto">
           {remainingTracks.length > 0 ? (
             <>
-              <h1 className="text-4xl font-bold">{name}</h1>
+              <div className="flex items-end">
+                <h1 className="text-4xl font-bold">{name}</h1>
+                <ShareButton className="flex-grow-0 ml-auto" />
+              </div>
+
               <Chat roomId={room.id} className="mt-8" />
               <Playlist playlist={playlist} className="mt-8" />
               <Player />
