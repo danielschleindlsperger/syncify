@@ -73,7 +73,7 @@ RETURNING *
 }
 
 const createRoomSchema = object().shape({
-  name: string().min(3).max(255).required(),
+  name: string().trim().min(3).max(255).required(),
   // TODO: Can we make this required?
   cover_image: string().notRequired(),
   trackIds: array().of(string().required()).max(1000).required(),
