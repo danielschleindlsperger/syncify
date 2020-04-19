@@ -2,6 +2,7 @@ import React from 'react'
 import Pusher, { Members } from 'pusher-js'
 import { User } from '../../types'
 import { Userlist } from './user-list'
+import { ChatLogEntry, Chatlog } from './chat-log'
 
 const PusherAppKey = process.env.PUSHER_APP_KEY!
 
@@ -19,6 +20,7 @@ type ChatProps = React.HTMLAttributes<HTMLElement> & {
 
 export const Chat = ({ roomId, ...props }: ChatProps) => {
   const [members, setMembers] = React.useState<User[]>([])
+  const [log, setLog] = React.useState<ChatLogEntry[]>([])
 
   React.useEffect(() => {
     const pusher = new Pusher(PusherAppKey, {
@@ -48,10 +50,28 @@ export const Chat = ({ roomId, ...props }: ChatProps) => {
     channel.bind('pusher:member_added', (member: PusherMember) => {
       const newMember: User = { id: member.id, ...member.info }
       setMembers((ms) => [...ms, newMember])
+      setLog((log) => [
+        ...log,
+        {
+          id: Date.now().toString(),
+          type: 'USER_JOINED',
+          timestamp: Date.now(),
+          message: `${member.info.name} joined!`,
+        },
+      ])
     })
 
     channel.bind('pusher:member_removed', (member: PusherMember) => {
       setMembers((ms) => ms.filter((m) => m.id !== member.id))
+      setLog((log) => [
+        ...log,
+        {
+          id: Date.now().toString(),
+          type: 'USER_LEFT',
+          timestamp: Date.now(),
+          message: `${member.info.name} left.`,
+        },
+      ])
     })
 
     return () => {
@@ -60,5 +80,10 @@ export const Chat = ({ roomId, ...props }: ChatProps) => {
     }
   }, [])
 
-  return <Userlist users={members} {...props} />
+  return (
+    <div {...props}>
+      <Chatlog log={log} />
+      <Userlist users={members} className="mt-8" />
+    </div>
+  )
 }
