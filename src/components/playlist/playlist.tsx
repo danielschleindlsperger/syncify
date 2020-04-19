@@ -1,9 +1,10 @@
 import React from 'react'
-import { useSpotifyPlayer } from './spotify-player'
 import { dropWhile } from 'ramda'
-import { PlaylistTrack } from '../types'
+import { useSpotifyPlayer } from '../spotify-player'
+import { PlaylistTrack } from '../../types'
+import { UpcomingTracks } from './upcoming-tracks'
 
-type Playlist = import('../types').Playlist
+type Playlist = import('../../types').Playlist
 
 type PlaylistProps = React.HTMLAttributes<HTMLElement> & { playlist: Playlist }
 
@@ -39,13 +40,7 @@ export const Playlist = React.memo(({ playlist, ...props }: PlaylistProps) => {
 
   return (
     <div {...props}>
-      <ul>
-        {upcomingTracks.map((t, i) => (
-          <li key={t.id} className={i === 0 ? 'font-bold' : undefined}>
-            <span>{t.name}</span>
-          </li>
-        ))}
-      </ul>
+      <UpcomingTracks upcomingTracks={upcomingTracks} />
     </div>
   )
 })
