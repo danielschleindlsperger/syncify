@@ -11,6 +11,7 @@ export type ChatLogEntry = {
 type ChatlogProps = React.HTMLAttributes<HTMLElement> & { log: ChatLogEntry[] }
 
 export const Chatlog = ({ log, className, style, ...props }: ChatlogProps) => {
+  if (log.length === 0) return null
   return (
     <ul
       className={cx(className, 'overflow-scroll')}
