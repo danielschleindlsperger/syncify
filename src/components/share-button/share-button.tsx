@@ -39,7 +39,7 @@ export const ShareButton = ({ className, ...props }: React.HTMLAttributes<HTMLEl
     >
       {icon}
       <span className="ml-1 text-sm font-semibold">
-        {copyState === 'error' ? "Couldn't copy URL" : 'Share Room URL'}
+        {copyState === 'error' ? "Couldn't copy URL" : 'Share Room'}
       </span>
     </button>
   )
