@@ -36,6 +36,7 @@
     "slonik": "^22.4.4",
     "spotify-web-api-js": "^1.2.0",
     "spotify-web-api-node": "^4.0.0",
+    "swr": "^0.2.0",
     "yup": "^0.28.3"
   },
   "devDependencies": {

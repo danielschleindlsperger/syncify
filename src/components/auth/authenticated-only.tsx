@@ -1,5 +1,6 @@
 import React from 'react'
 import { useAuth } from './auth'
+import { LoginRequired } from './login-required'
 
 type AuthenticatedOnlyProps = React.HTMLAttributes<HTMLElement> & {
   children: React.ReactNode
@@ -14,7 +15,7 @@ export const AuthenticatedOnly = ({ children, ...props }: AuthenticatedOnlyProps
   if (state === 'logged-out')
     return (
       <div {...props}>
-        You are not authenticated. <a href="/api/auth/login">Login</a>
+        <LoginRequired />
       </div>
     )
   if (state === 'error')

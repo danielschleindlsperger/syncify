@@ -1,14 +1,16 @@
 import React from 'react'
-import '../styles.css'
 import { AppProps } from 'next/app'
+import '../styles.css'
 import { AuthProvider } from '../components/auth'
-import { Navbar } from '../components/nav-bar'
+import { AppErrorBoundary } from '../components/app-error-boundary'
 
 function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <AuthProvider>
-        <Component {...pageProps} />
+        <AppErrorBoundary>
+          <Component {...pageProps} />
+        </AppErrorBoundary>
       </AuthProvider>
       <ArnoldAnalytics />
     </>

@@ -11,7 +11,7 @@ import { SpotifyPlayerProvider, withPlayerStore } from '../../components/spotify
 import { Navbar } from '../../components/nav-bar'
 import { ShareButton } from '../../components/share-button'
 import { Button } from '../../components/button'
-import { LoginRequired } from '../../components/auth'
+import { useApiRequest } from '../../hooks/use-api-request'
 
 type Room = import('../../types').Room
 type PlaylistTrack = import('../../types').PlaylistTrack
@@ -24,23 +24,17 @@ export default withPlayerStore(() => {
   const router = useRouter()
   const { id } = router.query
   if (Array.isArray(id)) throw new Error('id must be a string!')
-  const req = useRoom(id)
 
-  if (req.state === 'loading') {
-    return <div>Loading room data...</div>
-  }
+  const { data, error } = useApiRequest<Room>(id ? `/api/rooms/${id}` : null, {
+    shouldRetryOnError: false,
+  })
 
-  if (req.state === 'error') {
-    if (req.errorType === 'unauthenticated') {
-      return <LoginRequired />
-    }
-    // TODO: Error page
-    return <div>Whoopps, something bad happened!</div>
-  }
-
-  return <Room room={req.data} />
+  if (error) return <div>Whoopps, something bad happened!</div>
+  if (!data) return <div>Loading room data...</div>
+  return <Room room={data} />
 })
 
+// actual "dumb" room component
 const Room = ({ room }: RoomProps) => {
   const { name, playlist } = room
 
@@ -100,39 +94,6 @@ const PlaylistIsOver = ({ className, ...props }: React.HTMLAttributes<HTMLElemen
     </p>
   </div>
 )
-
-// example implementation, maybe we could make a wrapper that handles all cases generically
-type ApiErrorType = 'unauthenticated' | 'server-error' | 'not-found'
-
-type RoomLoadingState =
-  | {
-      state: 'loading'
-      data: undefined
-    }
-  | { state: 'error'; errorType: ApiErrorType; message?: string; data: undefined }
-  | { state: 'loaded'; data: Room }
-
-const useRoom = (id: string | undefined): RoomLoadingState => {
-  const [state, setState] = React.useState<RoomLoadingState>({ state: 'loading', data: undefined })
-  React.useEffect(() => {
-    if (!id) return
-    window.fetch(`/api/rooms/${id}`, { credentials: 'include' }).then((res) => {
-      const { status } = res
-      if (status === 401) {
-        return setState({ state: 'error', errorType: 'unauthenticated', data: undefined })
-      }
-      if (status >= 500) {
-        return setState({ state: 'error', errorType: 'server-error', data: undefined })
-      }
-      if (status === 200) {
-        return res.json().then((data) => setState({ state: 'loaded', data }))
-      }
-      throw new Error(`Unexpected response status code: ${status}`)
-    })
-  }, [id])
-
-  return state
-}
 
 const dropPlayedTracks = (playlist: Playlist): PlaylistTrack[] => {
   let offset = Date.now() - Date.parse(playlist.createdAt)
