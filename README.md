@@ -16,6 +16,9 @@ npm start
 # start a proxy to receive pusher webhooks on localhost
 npm run webhook-proxy
 
+# run development environment
+docker-compose up -d
+
 # database migrations
 npm run migrate up
 npm run migrate down
@@ -38,7 +41,7 @@ now --prod
 
 ### Pusher
 
-### Digitalocean hosted postgres
+### DigitalOcean Managed Postgres
 
 ### Spotify Web Playback SDK
 
