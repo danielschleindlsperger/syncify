@@ -10,6 +10,7 @@ import { Player } from '../../components/player'
 import { SpotifyPlayerProvider, withPlayerStore } from '../../components/spotify-player'
 import { Navbar } from '../../components/nav-bar'
 import { ShareButton } from '../../components/share-button'
+import { Button } from '../../components/button'
 
 type Room = import('../../types').Room
 type PlaylistTrack = import('../../types').PlaylistTrack
@@ -51,10 +52,10 @@ const Room = ({ room }: RoomProps) => {
         <title key="title">{room.name} - Syncify</title>
       </Head>
       <Navbar>
-        <Link href="/rooms">
-          <a className="inline-block bg-gray-100 text-gray-600 px-3 py-1 rounded-sm">
+        <Link href="/rooms" passHref>
+          <Button as="a" variant="secondary">
             {'< Join a different room'}
-          </a>
+          </Button>
         </Link>
       </Navbar>
       <div className="mt-16 px-8 max-w-5xl mx-auto">

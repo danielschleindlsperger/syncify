@@ -10,6 +10,7 @@ import { Roomlist } from '../../components/room'
 import Link from 'next/link'
 import { AuthenticatedOnly } from '../../components/auth'
 import { GetRoomsResponse } from '../api/rooms'
+import { Button } from '../../components/button'
 
 type RoomsProps = { rooms: GetRoomsResponse }
 
@@ -21,10 +22,10 @@ export default ({ rooms }: RoomsProps) => {
       </Head>
       <AuthenticatedOnly>
         <Navbar>
-          <Link href="/rooms/create">
-            <a className="inline-block bg-gray-100 text-gray-600 px-3 py-1 rounded-sm">
+          <Link href="/rooms/create" passHref>
+            <Button as="a" variant="secondary">
               Create a new Room
-            </a>
+            </Button>
           </Link>
         </Navbar>
         <Roomlist className="mt-16 px-8 max-w-5xl mx-auto" rooms={rooms} />

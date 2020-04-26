@@ -5,6 +5,7 @@ import { useAuth } from '../auth'
 import SpotifyWebApi from 'spotify-web-api-js'
 import { AppUrl } from '../../config'
 import { CreateRoomPayload } from '../../pages/api/rooms'
+import { Button } from '../button'
 
 const spotify = new SpotifyWebApi()
 
@@ -81,13 +82,9 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
           )}
         </div>
         <div className="mt-8">
-          <button
-            type="submit"
-            className="bg-gray-700 text-gray-100 px-3 py-1 rounded-sm whitespace-no-wrap"
-            disabled={playlists.length === 0}
-          >
+          <Button variant="primary" type="submit" disabled={playlists.length === 0}>
             Create room
-          </button>
+          </Button>
         </div>
       </form>
       {error && (

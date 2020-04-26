@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Navbar } from '../../components/nav-bar'
 import { CreateRoom } from '../../components/room'
 import { AuthenticatedOnly } from '../../components/auth'
+import { Button } from '../../components/button'
 
 export default () => {
   return (
@@ -13,10 +14,10 @@ export default () => {
       </Head>
       <AuthenticatedOnly>
         <Navbar>
-          <Link href="/rooms">
-            <a className="inline-block bg-gray-100 text-gray-600 px-3 py-1 rounded-sm">
+          <Link href="/rooms" passHref>
+            <Button as="a" variant="secondary">
               Join an existing room
-            </a>
+            </Button>
           </Link>
         </Navbar>
         <div className="px-8">
