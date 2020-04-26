@@ -11,6 +11,7 @@ import { SpotifyPlayerProvider, withPlayerStore } from '../../components/spotify
 import { Navbar } from '../../components/nav-bar'
 import { ShareButton } from '../../components/share-button'
 import { Button } from '../../components/button'
+import { LoginRequired } from '../../components/auth'
 
 type Room = import('../../types').Room
 type PlaylistTrack = import('../../types').PlaylistTrack
@@ -31,8 +32,7 @@ export default withPlayerStore(() => {
 
   if (req.state === 'error') {
     if (req.errorType === 'unauthenticated') {
-      // TODO: Login modal
-      return <div>You are unauthenticated</div>
+      return <LoginRequired />
     }
     // TODO: Error page
     return <div>Whoopps, something bad happened!</div>
