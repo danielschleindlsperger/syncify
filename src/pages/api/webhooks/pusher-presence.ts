@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import Pusher, { Event } from 'pusher'
-import { createPool, sql } from 'slonik'
+import { createConnection } from '../../../database-connection'
 
 declare module 'pusher' {
   interface Event {
@@ -8,7 +8,8 @@ declare module 'pusher' {
   }
 }
 
-const pool = createPool(process.env.DATABASE_URL!, { maximumPoolSize: 1 })
+const conn = createConnection()
+conn.connect()
 
 const pusher = new Pusher({
   appId: process.env.PUSHER_APP_ID!,
@@ -45,20 +46,26 @@ const handleEvents = (events: Event[]): Promise<any> => {
 
 const parseRoomId = (s: string) => s.replace(/^presence-/, '')
 
-const addMember = async (ids: { userId: string; roomId: string }) => {
+const addMember = async (ids: { userId: string; roomId: string }): Promise<void> => {
   const { userId, roomId } = ids
-  return pool.any(sql`
+  await conn.query(
+    `
 UPDATE users
-SET room_id = ${roomId}
-WHERE id = ${userId}
-`)
+SET room_id = $1
+WHERE id = $2
+`,
+    [roomId, userId],
+  )
 }
 
-const removeMember = async (ids: { userId: string; roomId: string }) => {
+const removeMember = async (ids: { userId: string; roomId: string }): Promise<void> => {
   const { userId, roomId } = ids
-  return pool.any(sql`
+  await conn.query(
+    `
 UPDATE users
 SET room_id = NULL
-WHERE id = ${userId} AND room_id = ${roomId}
-`)
+WHERE id = $2 AND room_id = $1
+`,
+    [roomId, userId],
+  )
 }

@@ -1,12 +1,14 @@
 import { NowRequest, NowResponse } from '@now/node'
 import Spotify from 'spotify-web-api-node'
-import { createPool, sql } from 'slonik'
 import { SpotifyConfig } from '../../../config'
 import { User } from '../../../types'
 import { AuthCookieName, verifyToken, authCookie, signToken } from '../../../auth'
-import { pool } from '../../../database-pool'
+import { createConnection } from '../../../database-connection'
 
 const spotifyApi = new Spotify(SpotifyConfig)
+
+const conn = createConnection()
+conn.connect()
 
 // this endpoint is called by a user to
 // a) refresh the session token
@@ -42,6 +44,12 @@ export default async (req: NowRequest, res: NowResponse) => {
 
   const dbUser = await findUser(user.id)
 
+  if (!dbUser) {
+    return res.status(400).json({
+      msg: 'User does not yet exist. Login for the first time before calling this endpoint.',
+    })
+  }
+
   // exclude refresh token from response because it will be readable from javascript
   res.json({
     id: dbUser.id,
@@ -51,10 +59,14 @@ export default async (req: NowRequest, res: NowResponse) => {
   })
 }
 
-const findUser = async (id: string): Promise<User> => {
-  return await pool.one(sql`
+const findUser = async (id: string): Promise<User | undefined> => {
+  const { rows } = await conn.query(
+    `
 SELECT id, name, avatar
 FROM users
-WHERE id = ${id}
-`)
+WHERE id = $1
+`,
+    [id],
+  )
+  return rows[0]
 }

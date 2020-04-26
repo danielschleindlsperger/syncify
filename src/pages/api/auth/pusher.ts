@@ -1,9 +1,8 @@
 import { NowRequest, NowResponse } from '@now/node'
-import { createPool, sql } from 'slonik'
 import Pusher from 'pusher'
 import { AuthCookieName, verifyToken } from '../../../auth'
 import { User } from '../../../types'
-import { pool } from '../../../database-pool'
+import { createConnection } from '../../../database-connection'
 
 const pusher = new Pusher({
   appId: process.env.PUSHER_APP_ID!,
@@ -12,6 +11,9 @@ const pusher = new Pusher({
   cluster: 'eu',
   useTLS: true,
 })
+
+const conn = createConnection()
+conn.connect()
 
 export default async (req: NowRequest, res: NowResponse) => {
   if (req.method !== 'POST') return res.status(405).send('Method not allowed.')
@@ -42,6 +44,10 @@ export default async (req: NowRequest, res: NowResponse) => {
 
   const user = await findUser(result.user.id)
 
+  if (!user) {
+    return res.status(400).json({ msg: 'user does not exist.' })
+  }
+
   const presenceData = {
     user_id: user.id,
     user_info: {
@@ -53,10 +59,14 @@ export default async (req: NowRequest, res: NowResponse) => {
   return res.json(pusher.authenticate(socket_id, channel_name, presenceData))
 }
 
-const findUser = async (id: string): Promise<User> => {
-  return await pool.one(sql`
+const findUser = async (id: string): Promise<User | undefined> => {
+  const { rows } = await conn.query(
+    `
 SELECT id, name, avatar
 FROM users
-WHERE id = ${id}
-`)
+WHERE id = $1
+`,
+    [id],
+  )
+  return rows[0]
 }

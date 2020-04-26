@@ -1,8 +1,10 @@
 import { NowRequest, NowResponse } from '@now/node'
-import { createPool, sql } from 'slonik'
 import { Room } from '../../../types'
 import { withAuth } from '../../../auth'
-import { pool } from '../../../database-pool'
+import { createConnection } from '../../../database-connection'
+
+const conn = createConnection()
+conn.connect()
 
 export default withAuth(async (req: NowRequest, res: NowResponse) => {
   if (req.method !== 'GET') return res.status(405).send('Method not allowed.')
@@ -12,11 +14,7 @@ export default withAuth(async (req: NowRequest, res: NowResponse) => {
     return res.status(400).json({ msg: 'No found in url' })
   }
 
-  const room = await pool.one<Room>(sql`
-SELECT id, name, playlist
-FROM rooms r
-WHERE id = ${id}
-`)
+  const room = await findRoom(id)
 
   if (!room) {
     return res.status(404).json({ msg: `No room found for id "${id}"` })
@@ -24,3 +22,15 @@ WHERE id = ${id}
 
   return res.json(room)
 })
+
+const findRoom = async (id: string): Promise<Room | undefined> => {
+  const { rows } = await conn.query(
+    `SELECT id, name, playlist
+        FROM rooms r
+        WHERE id = $1
+`,
+    [id],
+  )
+
+  return rows[0]
+}

@@ -1,13 +1,14 @@
 import { NowRequest, NowResponse } from '@now/node'
 import Spotify from 'spotify-web-api-node'
-import { createPool } from 'slonik'
-import { sql } from 'slonik'
 import { User } from '../../../types'
 import { AppUrl, SpotifyConfig } from '../../../config'
 import { authCookie, signToken } from '../../../auth'
-import { pool } from '../../../database-pool'
+import { createConnection } from '../../../database-connection'
 
 const spotifyApi = new Spotify(SpotifyConfig)
+
+const conn = createConnection()
+conn.connect()
 
 export default async (req: NowRequest, res: NowResponse) => {
   const { code, state } = req.query
@@ -46,13 +47,14 @@ export default async (req: NowRequest, res: NowResponse) => {
   }
 }
 
-async function upsertUser({ id, name, avatar: a }: Pick<User, 'id' | 'name' | 'avatar'>) {
-  const avatar = a ?? null
-  await pool.query(sql`
+async function upsertUser({ id, name, avatar }: Pick<User, 'id' | 'name' | 'avatar'>) {
+  await conn.query(
+    `
 INSERT INTO users (id, name, avatar)
-VALUES (${sql.join([id, name, avatar], sql`, `)})
-ON CONFLICT (id) DO UPDATE SET name = ${name}, avatar = ${avatar}
-`)
+VALUES ($1, $2, $3)
+ON CONFLICT (id) DO UPDATE SET name = $2, avatar = $3
+`,
+    [id, name, avatar],
+  )
 }
-
 const getImage = (images: SpotifyApi.ImageObject[]) => images[0] && images[0].url

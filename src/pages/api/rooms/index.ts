@@ -1,12 +1,14 @@
 import { NowRequest, NowResponse } from '@now/node'
-import { createPool, sql } from 'slonik'
 import Spotify from 'spotify-web-api-node'
 import { object, string, array, InferType, ValidationError } from 'yup'
 import { splitEvery } from 'ramda'
 import { withAuth } from '../../../auth'
 import { SpotifyConfig } from '../../../config'
 import { PlaylistTrack, Playlist } from '../../../types'
-import { pool } from '../../../database-pool'
+import { createConnection } from '../../../database-connection'
+
+const conn = createConnection()
+conn.connect()
 
 export default withAuth(async (req: NowRequest, res: NowResponse) => {
   if (req.method === 'POST') {
@@ -27,15 +29,13 @@ export type GetRoomsResponse = {
 }[]
 
 async function handleGetRooms(req: NowRequest, res: NowResponse) {
-  const rooms = await pool.many<{ id: string; name: string }>(
-    sql`
+  const { rows: rooms } = await conn.query(`
 SELECT r.id, r.name, r.cover_image, COUNT(u) AS listeners_count
 FROM rooms r
 LEFT JOIN users u ON u.room_id = r.id
 GROUP BY r.id
 ORDER BY listeners_count DESC, r.created_at DESC
-`,
-  )
+`)
 
   return res.json(rooms)
 }
@@ -56,11 +56,16 @@ async function handleCreateRoom(req: NowRequest, res: NowResponse) {
       tracks,
     }
 
-    const room = await pool.one(sql`
+    const { rows } = await conn.query(
+      `
 INSERT INTO rooms (name, cover_image, playlist)
-VALUES (${sql.join([name, cover_image, sql.json(playlist)], sql`, `)})
+VALUES ($1, $2, $3)
 RETURNING *
-`)
+`,
+      [name, cover_image, playlist],
+    )
+
+    const room = rows[0]
 
     return res.json(room)
   } catch (e) {
