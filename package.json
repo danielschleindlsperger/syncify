@@ -68,6 +68,7 @@
     "husky": "^4.2.5",
     "jest": "^25.3.0",
     "localtunnel": "^2.0.0",
+    "now": "^18.0.0",
     "prettier": "^2.0.4",
     "pretty-quick": "^2.0.1",
     "tailwindcss": "^1.2.0",

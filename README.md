@@ -2,10 +2,11 @@
 
 [https://syncify.co](https://syncify.co)
 
+Syncify is a web application that lets users listen to the same music in synchrony, via Spotify.
+
 ## Requirements
 
 - [Node 12](https://nodejs.org/en/)
-- [now CLI](https://zeit.co/download) for deployment
 - [Docker](https://www.docker.com/) with `docker-compose` for the development environment
 
 ## Commands
@@ -27,15 +28,8 @@ npm run migrate create my-new-migration
 
 ## Release (Deployment)
 
-The application is deployed to [zeit now](https://zeit.co)
-
-```bash
-# start locally
-now dev
-
-# deploy to prod
-now --prod
-```
+The application is continuously deployed on every master push to [zeit now](https://zeit.co) via Github Actions.
+In the future we might want to take advantage of the now Github Integration and have staging environments for each pull request.
 
 ## Services used
 
