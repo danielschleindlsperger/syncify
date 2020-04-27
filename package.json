@@ -9,6 +9,7 @@
     "start": "now dev",
     "migrate": "node database/migrate",
     "test": "jest",
+    "typecheck": "tsc",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "webhook-proxy": "lt -h 'http://serverless.social' --print-requests --port 3000 --subdomain syncify-pusher"
