@@ -68,6 +68,7 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
             <span className="block text-gray-700 font-bold mb-1">Name</span>
             <input
               type="text"
+              value={name}
               onChange={(evt) => setName(evt.target.value)}
               className="block w-full max-w-xs p-2 bg-gray-300 rounded-sm"
             />
