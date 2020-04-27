@@ -6,6 +6,7 @@ import { Roomlist } from '../../components/room'
 import { GetRoomsResponse } from '../api/rooms'
 import { Button } from '../../components/button'
 import { useApiRequest } from '../../hooks/use-api-request'
+import { LoadingSpinner } from '../../components/loading'
 
 export default () => {
   const { data: rooms, error } = useApiRequest<GetRoomsResponse>('/api/rooms')
@@ -26,7 +27,7 @@ export default () => {
       ) : rooms ? (
         <Roomlist className="mt-16 px-8 max-w-5xl mx-auto" rooms={rooms} />
       ) : (
-        'Loading rooms...'
+        <LoadingSpinner absoluteCentered />
       )}
     </>
   )

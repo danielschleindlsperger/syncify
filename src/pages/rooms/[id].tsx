@@ -12,6 +12,7 @@ import { Navbar } from '../../components/nav-bar'
 import { ShareButton } from '../../components/share-button'
 import { Button } from '../../components/button'
 import { useApiRequest } from '../../hooks/use-api-request'
+import { LoadingSpinner } from '../../components/loading'
 
 type Room = import('../../types').Room
 type PlaylistTrack = import('../../types').PlaylistTrack
@@ -30,7 +31,7 @@ export default withPlayerStore(() => {
   })
 
   if (error) return <div>Whoopps, something bad happened!</div>
-  if (!data) return <div>Loading room data...</div>
+  if (!data) return <LoadingSpinner absoluteCentered />
   return <Room room={data} />
 })
 

@@ -3,3 +3,49 @@
 @import 'tailwindcss/components';
 /* purgecss end ignore */
 @import 'tailwindcss/utilities';
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+}
+
+.loading-spinner {
+  --spinner-offset: 187px;
+  --spinner-duration: 1.4s;
+  --spinner-color: #4a5568; /* matches gray-700 from tailwind */
+  animation: loading-spinner-rotator var(--spinner-duration) linear infinite;
+}
+
+@keyframes loading-spinner-rotator {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(270deg);
+  }
+}
+
+.loading-spinner__path {
+  stroke: var(--spinner-color);
+  stroke-dasharray: var(--spinner-offset);
+  stroke-dashoffset: 0;
+  transform-origin: center;
+  animation: loading-spinner-dash var(--spinner-duration) ease-in-out infinite;
+}
+
+@keyframes loading-spinner-dash {
+  0% {
+    stroke-dashoffset: var(--spinner-offset);
+  }
+  50% {
+    stroke-dashoffset: calc(var(--spinner-offset) / 4);
+    transform: rotate(135deg);
+  }
+  100% {
+    stroke-dashoffset: var(--spinner-offset);
+    transform: rotate(450deg);
+  }
+}
