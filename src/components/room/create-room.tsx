@@ -34,6 +34,15 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
     }
   }, [accessToken, id])
 
+  React.useEffect(() => {
+    if (playlistId !== null) {
+      const selectedPlaylist = playlists.find((el) => el.id === playlistId)
+      if (selectedPlaylist) {
+        setName(selectedPlaylist.name)
+      }
+    }
+  }, [playlistId])
+
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault()
     const trackIds = await getPlaylistTrackIds(accessToken!, playlistId!)
