@@ -93,14 +93,20 @@ const fetchTracks = async (accessToken: string, ids: string[]): Promise<Playlist
     splitEvery(limit, ids).map((chunk) => spotify.getTracks(chunk).then((res) => res.body.tracks)),
   )
 
-  return trackPartitions.flatMap((partition) =>
-    partition.map((track) => ({
-      id: track.id,
-      name: track.name,
-      duration_ms: track.duration_ms,
-      artists: track.artists.map((a) => a.name),
-    })),
-  )
+  // Tracks returned from Spotify can actually be `null` here (e.g. podcasts) so we have to filter them out
+  return trackPartitions
+    .flatMap((partition) =>
+      partition.map(
+        (track) =>
+          track && {
+            id: track.id,
+            name: track.name,
+            duration_ms: track.duration_ms,
+            artists: track.artists.map((a) => a.name),
+          },
+      ),
+    )
+    .filter(Boolean)
 }
 
 const uniqueNonNull = <A extends any>(xs: A[]): A[] => {
