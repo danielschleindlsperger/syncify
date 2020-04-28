@@ -6,6 +6,7 @@ import SpotifyWebApi from 'spotify-web-api-js'
 import { AppUrl } from '../../config'
 import { CreateRoomPayload } from '../../pages/api/rooms'
 import { Button } from '../button'
+import { LoadingSpinner } from '../loading'
 
 const spotify = new SpotifyWebApi()
 
@@ -22,6 +23,7 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
   // We can do this when we actually implement a real wizard for creating a room with multiple choices for
   // playlist sources.
   const [error, setError] = React.useState<string | null>(null)
+  const [isLoading, setIsLoading] = React.useState(false)
 
   React.useEffect(() => {
     if (accessToken && id) {
@@ -36,11 +38,12 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
 
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault()
-    const trackIds = await getPlaylistTrackIds(accessToken!, playlistId!)
-    const image = playlists.find((p) => p.id === playlistId)?.image
-
+    setIsLoading(true)
     try {
+      const trackIds = await getPlaylistTrackIds(accessToken!, playlistId!)
+      const image = playlists.find((p) => p.id === playlistId)?.image
       const { id } = await createRoom({ name, trackIds, cover_image: image })
+      setIsLoading(false)
       if (id) {
         router.push(`/rooms/${id}`)
       } else {
@@ -78,11 +81,20 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
               </select>
             </label>
           ) : (
-            'Loading your Spotify playlists...'
+            <LoadingSpinner />
           )}
         </div>
+        {isLoading && (
+          <div className="mt-8">
+            <LoadingSpinner />
+          </div>
+        )}
         <div className="mt-8">
-          <Button variant="primary" type="submit" disabled={playlists.length === 0}>
+          <Button
+            variant="primary"
+            type="submit"
+            disabled={playlists.length === 0 || name.length < 4 || isLoading}
+          >
             Create room
           </Button>
         </div>
