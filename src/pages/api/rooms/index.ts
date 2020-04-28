@@ -1,6 +1,6 @@
 import { NowRequest, NowResponse } from '@now/node'
 import Spotify from 'spotify-web-api-node'
-import { object, string, array, InferType, ValidationError } from 'yup'
+import { object, string, number, array, InferType, ValidationError } from 'yup'
 import { splitEvery } from 'ramda'
 import { withAuth } from '../../../auth'
 import { SpotifyConfig } from '../../../config'
@@ -21,23 +21,55 @@ export default withAuth(async (req: NowRequest, res: NowResponse) => {
   return res.status(405).send('Method not allowed.')
 })
 
-export type GetRoomsResponse = {
+type Rooms = {
   id: string
   name: string
   cover_image?: string
   listeners_count: number
 }[]
 
+export type GetRoomsResponse = {
+  nextOffset: number
+  hasMore: boolean
+  data: Rooms
+}
+
+const getRoomsSchema = object()
+  .shape({
+    offset: number().min(0).max(10000).notRequired(),
+  })
+  .default({})
+
 async function handleGetRooms(req: NowRequest, res: NowResponse) {
-  const { rows: rooms } = await conn.query(`
+  const limit = 24
+  try {
+    const { offset = 0 } = await getRoomsSchema.validate(req.query, {
+      stripUnknown: true,
+    })
+    const { rows: rooms } = await conn.query(
+      `
 SELECT r.id, r.name, r.cover_image, COUNT(u) AS listeners_count
 FROM rooms r
 LEFT JOIN users u ON u.room_id = r.id
 GROUP BY r.id
 ORDER BY listeners_count DESC, r.created_at DESC
-`)
-
-  return res.json(rooms)
+OFFSET $1
+LIMIT $2
+`,
+      [offset, limit + 1],
+    )
+    return res.json({
+      nextOffset: offset + limit,
+      hasMore: rooms.length === limit + 1,
+      data: rooms.slice(0, limit),
+    })
+  } catch (e) {
+    if (e instanceof ValidationError) {
+      console.warn('validation error', e.errors)
+      return res.status(422).json({ msg: 'Invalid payload.', errors: e.errors })
+    }
+    throw e
+  }
 }
 
 const spotify = new Spotify(SpotifyConfig)

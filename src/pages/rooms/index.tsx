@@ -5,11 +5,12 @@ import { Navbar } from '../../components/nav-bar'
 import { Roomlist } from '../../components/room'
 import { GetRoomsResponse } from '../api/rooms'
 import { Button } from '../../components/button'
-import { useApiRequest } from '../../hooks/use-api-request'
+import { useApiRequest, fetcher } from '../../hooks/use-api-request'
 import { LoadingSpinner } from '../../components/loading'
 
 export default () => {
-  const { data: rooms, error } = useApiRequest<GetRoomsResponse>('/api/rooms')
+  const { rooms, loadMore, error } = useRoomData()
+
   return (
     <>
       <Head>
@@ -22,13 +23,48 @@ export default () => {
           </Button>
         </Link>
       </Navbar>
-      {error ? (
-        <div>Error fetching the rooms</div>
-      ) : rooms ? (
-        <Roomlist className="mt-16 px-8 max-w-5xl mx-auto" rooms={rooms} />
-      ) : (
-        <LoadingSpinner size="lg" absoluteCentered />
-      )}
+      <main className="mt-16 px-8 pb-16 max-w-5xl mx-auto">
+        {rooms && <Roomlist rooms={rooms} />}
+        {/* TODO: this "loading state" does not work for loading more rooms, as rooms will be defined */}
+        {!rooms && <LoadingSpinner size="md" absoluteCentered />}
+        {error && <div>Error fetching the rooms</div>}
+        {loadMore && (
+          <div className="mt-8 flex justify-center">
+            <Button variant="secondary" onClick={loadMore}>
+              Load more
+            </Button>
+          </div>
+        )}
+      </main>
     </>
   )
+}
+
+type UseRoomData = {
+  rooms?: GetRoomsResponse['data']
+  loadMore?: () => void
+  error: any
+}
+
+const useRoomData = (): UseRoomData => {
+  const { data, error, mutate } = useApiRequest<GetRoomsResponse>('/api/rooms')
+
+  const loadMore = async () => {
+    if (data) {
+      const nextPage = await fetcher<GetRoomsResponse>(`/api/rooms?offset=${data.nextOffset}`)
+      mutate((prevData) => {
+        return {
+          nextOffset: nextPage.nextOffset,
+          hasMore: nextPage.hasMore,
+          data: [...prevData.data, ...nextPage.data],
+        }
+      }, false)
+    }
+  }
+
+  return {
+    rooms: data?.data,
+    error,
+    loadMore: data?.hasMore ? loadMore : undefined,
+  }
 }

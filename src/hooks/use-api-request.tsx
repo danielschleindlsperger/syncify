@@ -2,11 +2,11 @@ import React from 'react'
 import useSWR, { keyInterface, ConfigInterface } from 'swr'
 import { UnauthenticatedError } from '../components/app-error-boundary'
 
-const fetcher = async (url: string) => {
+export async function fetcher<T extends unknown>(url: string) {
   const res = await window.fetch(url, { credentials: 'include' })
   if (res.status === 401) throw new UnauthenticatedError()
   const json = await res.json()
-  return json
+  return json as T
 }
 
 export function useApiRequest<Data>(key: keyInterface, options?: ConfigInterface) {
@@ -16,5 +16,6 @@ export function useApiRequest<Data>(key: keyInterface, options?: ConfigInterface
     if (result.error instanceof UnauthenticatedError) throw result.error
   }, [result.error])
 
+  // It would be nice to return the fetcher here as well but some some reason it doesn't work
   return result
 }
