@@ -12,7 +12,8 @@ Syncify is a web application that lets users listen to the same music in synchro
 ## Commands
 
 ```sh
-npm start
+npm start # with Vercel account
+npm run dev # with vanilla Next.js: Some functionality might not work as expected
 
 # start a proxy to receive pusher webhooks on localhost
 npm run webhook-proxy
