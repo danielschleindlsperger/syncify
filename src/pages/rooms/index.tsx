@@ -27,7 +27,7 @@ export default () => {
       ) : rooms ? (
         <Roomlist className="mt-16 px-8 max-w-5xl mx-auto" rooms={rooms} />
       ) : (
-        <LoadingSpinner absoluteCentered />
+        <LoadingSpinner size="lg" absoluteCentered />
       )}
     </>
   )

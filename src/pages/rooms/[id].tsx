@@ -31,7 +31,7 @@ export default withPlayerStore(() => {
   })
 
   if (error) return <div>Whoopps, something bad happened!</div>
-  if (!data) return <LoadingSpinner absoluteCentered />
+  if (!data) return <LoadingSpinner size="lg" absoluteCentered />
   return <Room room={data} />
 })
 

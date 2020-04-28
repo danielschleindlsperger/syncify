@@ -2,6 +2,7 @@ import React from 'react'
 import cx from 'classnames'
 import { useDelayedSpinner } from './use-delayed-spinner'
 
+type Size = 'sm' | 'md' | 'lg'
 type LoadingSpinnerProps = {
   // Center the spinner in the middle of the viewport
   absoluteCentered?: boolean
@@ -9,6 +10,7 @@ type LoadingSpinnerProps = {
   // can look distracting.
   // See: `useDelayedSpinner`
   delayed?: boolean | number
+  size?: Size
 }
 
 // styles for the spinner are actually imported in the custom _app.tsx because of limitations with next.js:
@@ -16,6 +18,7 @@ type LoadingSpinnerProps = {
 export const LoadingSpinner = ({
   absoluteCentered = false,
   delayed = true,
+  size = 'md',
   ...props
 }: LoadingSpinnerProps) => {
   const delay = typeof delayed === 'number' ? delayed : delayed === false ? 0 : undefined
@@ -25,8 +28,8 @@ export const LoadingSpinner = ({
     <div className={cx(absoluteCentered && 'fixed inset-0 flex justify-center items-center')}>
       <svg
         className="loading-spinner"
-        width="65px"
-        height="65px"
+        width={dimensions[size]}
+        height={dimensions[size]}
         viewBox="0 0 66 66"
         xmlns="http://www.w3.org/2000/svg"
         {...props}
@@ -42,4 +45,10 @@ export const LoadingSpinner = ({
       </svg>
     </div>
   ) : null
+}
+
+const dimensions: Record<Size, number> = {
+  sm: 24,
+  md: 40,
+  lg: 64,
 }
