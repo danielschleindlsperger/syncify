@@ -4,11 +4,7 @@
     "strict": true,
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "moduleResolution": "node",
@@ -18,12 +14,17 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "module": "esnext",
-    "isolatedModules": true
+    "isolatedModules": true,
+    "types": [
+      "@types/jest",
+      "@testing-library/jest-dom",
+      "@types/spotify-web-playback-sdk",
+      "node",
+      "webdriverio",
+      "expect-webdriverio",
+      "@wdio/mocha-framework"
+    ]
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src", "e2e"],
+  "exclude": ["node_modules"]
 }
