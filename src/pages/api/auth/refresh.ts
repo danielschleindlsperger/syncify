@@ -40,7 +40,7 @@ export default async (req: NowRequest, res: NowResponse) => {
   const { access_token } = await spotifyApi.refreshAccessToken().then((res) => res.body)
 
   // create the access token and set as cookie
-  res.setHeader('Set-Cookie', authCookie(signToken({ ...user, access_token })))
+  res.setHeader('Set-Cookie', authCookie(signToken(user)))
 
   const dbUser = await findUser(user.id)
 

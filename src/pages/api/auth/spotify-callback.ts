@@ -34,7 +34,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 
     await upsertUser(user)
 
-    res.setHeader('Set-Cookie', authCookie(signToken({ id, access_token, refresh_token })))
+    res.setHeader('Set-Cookie', authCookie(signToken({ id, refresh_token })))
 
     // Send back to previous location or /rooms as a fallback
     // TODO: for some reason this does not work. The client seems to send old referer values after client-side navigation
