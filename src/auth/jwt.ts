@@ -6,7 +6,7 @@ if (!JWT_SECRET) {
   throw new Error('JWT_SECRET is not defined')
 }
 
-type TokenUser = { id: string; access_token: string; refresh_token: string }
+type TokenUser = { id: string; refresh_token: string }
 
 export const signToken = (user: TokenUser): string =>
   jwt.sign(
