@@ -4,6 +4,7 @@ export const AuthCookieName = 'syncify_token'
 
 export const authCookie = (token: string): string => {
   return Cookie.serialize(AuthCookieName, token, {
+    // matches jwt expiration, see ./jwt.ts
     maxAge: 60 * 60 * 24 * 7, // 7 days
     path: '/',
     httpOnly: true,

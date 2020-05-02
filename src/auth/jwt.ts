@@ -14,7 +14,12 @@ export const signToken = (user: TokenUser): string =>
       user,
     },
     JWT_SECRET,
-    { algorithm: 'HS256', expiresIn: '30min' },
+
+    {
+      algorithm: 'HS256',
+      // matches cookie maxAge, see ./auth-cookie.ts
+      expiresIn: '7days',
+    },
   )
 
 type SuccessfulVerification = {
