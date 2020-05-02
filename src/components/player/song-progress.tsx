@@ -35,13 +35,13 @@ const useTimings = ({ position, duration }: TimeProps): { byGone: string; remain
 
     const id = window.setTimeout(() => {
       const milliDelta = Date.now() - before
-      setProgressedPosition(prev => prev + milliDelta)
+      setProgressedPosition((prev) => prev + milliDelta)
     }, 1000)
 
     return () => window.clearTimeout(id)
   }, [progressedPosition])
 
-  const format = pipe(clamp(0, duration), x => x / 1000, formatSeconds)
+  const format = pipe(clamp(0, duration), (x) => x / 1000, formatSeconds)
 
   return {
     byGone: format(progressedPosition),

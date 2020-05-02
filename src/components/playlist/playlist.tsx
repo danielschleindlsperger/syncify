@@ -1,6 +1,6 @@
 import React from 'react'
 import { dropWhile } from 'ramda'
-import { useSpotifyPlayer } from '../spotify-player'
+import { useSpotifyPlayer } from '../player'
 import { PlaylistTrack } from '../../types'
 import { UpcomingTracks } from './upcoming-tracks'
 
@@ -34,7 +34,7 @@ export const Playlist = React.memo(({ playlist, ...props }: PlaylistProps) => {
 
   const upcomingTracks = dropPlayedTracks(playlist)
 
-  // TODO: We can also move this higher and don't trigger the Spotify Player or Pusher connection.
+  // TODO: We can also move this higher in the component tree and don't trigger the Spotify Player or Pusher connection.
   if (upcomingTracks.length === 0)
     return <div className="mt-8">The show is over! Join another room or create one!</div>
 

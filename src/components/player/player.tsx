@@ -1,12 +1,12 @@
 import React from 'react'
-import { usePlayerState } from './spotify-player/player-store'
+import { usePlayerState } from './player-store'
 import { Progress } from './song-progress'
 import { VolumeSlider } from './volume-controls'
 
 // TODO: empty, skeleton state
 export const Player = (props: React.HTMLAttributes<HTMLElement>) => {
-  const playbackState = usePlayerState(state => state.playbackState)
-  const isPlaying = usePlayerState(state => state.isPlaying)
+  const playbackState = usePlayerState((state) => state.playbackState)
+  const isPlaying = usePlayerState((state) => state.isPlaying)
 
   if (!playbackState) return null
 

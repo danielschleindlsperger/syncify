@@ -1,6 +1,6 @@
 import React from 'react'
 import cx from 'classnames'
-import { useSpotifyPlayer } from './spotify-player'
+import { useSpotifyPlayer } from './spotify-web-player'
 
 declare module 'react' {
   interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
