@@ -1,12 +1,11 @@
 import React from 'react'
 import { useRouter } from 'next/router'
-import { Room } from '../../types'
-import { useAuth } from '../auth'
+import { Room } from '../../../types'
+import { useAuth } from '../../auth'
 import SpotifyWebApi from 'spotify-web-api-js'
-import { AppUrl } from '../../config'
-import { CreateRoomPayload } from '../../pages/api/rooms'
-import { Button } from '../button'
-import { LoadingSpinner } from '../loading'
+import { CreateRoomPayload } from '../../../pages/api/rooms'
+import { Button } from '../../button'
+import { LoadingSpinner } from '../../loading'
 
 const spotify = new SpotifyWebApi()
 
@@ -110,7 +109,7 @@ export const CreateRoom = (props: React.HTMLAttributes<HTMLElement>) => {
 }
 
 const createRoom = async (data: CreateRoomPayload): Promise<Room> => {
-  const res = await fetch(AppUrl + '/api/rooms', {
+  const res = await fetch('/api/rooms', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

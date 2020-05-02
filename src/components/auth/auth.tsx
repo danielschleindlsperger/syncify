@@ -4,7 +4,7 @@ import { AppUrl } from '../../config'
 const RefreshURL = `${AppUrl}/api/auth/refresh`
 const RefreshInterval = 1000 * 60 * 10 // 10 minutes
 
-type AuthUser = {
+export type AuthUser = {
   name: string
   avatar?: string
 
@@ -14,11 +14,11 @@ type AuthUser = {
   id: string
 }
 
-type LoginState = 'pending' | 'error' | 'logged-in' | 'logged-out'
+export type LoginState = 'pending' | 'error' | 'logged-in' | 'logged-out'
 
-type AuthState = { user: AuthUser | undefined; state: LoginState }
+export type AuthState = { user: AuthUser | undefined; state: LoginState }
 
-const AuthContext = React.createContext<AuthState>({ user: undefined, state: 'pending' })
+export const AuthContext = React.createContext<AuthState>({ user: undefined, state: 'pending' })
 
 type AuthProviderProps = { children: React.ReactNode }
 export const AuthProvider = ({ children }: AuthProviderProps) => {
