@@ -1,6 +1,6 @@
 import { NowRequest, NowResponse } from '@now/node'
 import Spotify from 'spotify-web-api-node'
-import { object, string, number, array, InferType, ValidationError } from 'yup'
+import { object, string, number, boolean, array, InferType, ValidationError } from 'yup'
 import { splitEvery } from 'ramda'
 import { withAuth } from '../../../auth'
 import { SpotifyConfig } from '../../../config'
@@ -51,6 +51,7 @@ async function handleGetRooms(req: NowRequest, res: NowResponse) {
 SELECT r.id, r.name, r.cover_image, COUNT(u) AS listeners_count
 FROM rooms r
 LEFT JOIN users u ON u.room_id = r.id
+WHERE r.publicly_listed = true
 GROUP BY r.id
 ORDER BY listeners_count DESC, r.created_at DESC
 OFFSET $1
@@ -76,9 +77,12 @@ const spotify = new Spotify(SpotifyConfig)
 
 async function handleCreateRoom(req: NowRequest, res: NowResponse) {
   try {
-    const { name, cover_image = null, trackIds } = await createRoomSchema.validate(req.body, {
-      stripUnknown: true,
-    })
+    const { name, cover_image = null, publiclyListed, trackIds } = await createRoomSchema.validate(
+      req.body,
+      {
+        stripUnknown: true,
+      },
+    )
 
     const { access_token } = await spotify.clientCredentialsGrant().then((x) => x.body)
     const tracks = await fetchTracks(access_token, uniqueNonNull(trackIds))
@@ -90,11 +94,11 @@ async function handleCreateRoom(req: NowRequest, res: NowResponse) {
 
     const { rows } = await conn.query(
       `
-INSERT INTO rooms (name, cover_image, playlist)
-VALUES ($1, $2, $3)
+INSERT INTO rooms (name, cover_image, publicly_listed, playlist)
+VALUES ($1, $2, $3, $4)
 RETURNING *
 `,
-      [name, cover_image, playlist],
+      [name, cover_image, publiclyListed, playlist],
     )
 
     const room = rows[0]
@@ -113,6 +117,7 @@ const createRoomSchema = object().shape({
   name: string().trim().min(3).max(255).required(),
   // TODO: Can we make this required?
   cover_image: string().notRequired(),
+  publiclyListed: boolean().notRequired(),
   trackIds: array().of(string().required()).max(1000).required(),
 })
 

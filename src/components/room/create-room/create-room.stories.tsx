@@ -15,7 +15,7 @@ storiesOf('Create Room', module)
 const FinalizeStepWithState = () => {
   const [roomState, setRoomState] = React.useState<RoomState>({
     name: 'Room Name',
-    isListed: true,
+    publiclyListed: true,
     image: undefined,
     trackIds: [],
   })

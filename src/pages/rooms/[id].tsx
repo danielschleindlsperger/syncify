@@ -45,6 +45,7 @@ const Room = ({ room }: RoomProps) => {
     <SpotifyPlayerProvider>
       <Head>
         <title key="title">{room.name} - Syncify</title>
+        {!room.publiclyListed && <meta name="robots" content="noindex, follow" />}
       </Head>
       <Navbar>
         <Link href="/rooms" passHref>

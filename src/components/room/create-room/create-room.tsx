@@ -16,7 +16,7 @@ export type RoomState = {
   name: string
   image: string | undefined
   trackIds: string[]
-  isListed: boolean
+  publiclyListed: boolean
 }
 
 export type SetRoomState = React.Dispatch<React.SetStateAction<RoomState>>
@@ -30,7 +30,7 @@ export const CreateRoom: React.FC<CreateRoomProps> = ({ onCreated, ...props }) =
     // TODO: make required, set default image
     image: undefined,
     trackIds: [],
-    isListed: false,
+    publiclyListed: true,
   })
 
   const handleSubmit = async () => {

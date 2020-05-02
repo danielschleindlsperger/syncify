@@ -1,6 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import cx from 'classnames'
+import { Button } from '../button'
 
 type RoomlistProps = React.HTMLAttributes<HTMLElement> & {
   rooms: { id: string; name: string; cover_image?: string; listeners_count: number }[]
@@ -44,8 +45,12 @@ export const Roomlist = ({ rooms, className, ...props }: RoomlistProps) => {
 const NoActiveRooms = (props: React.HTMLAttributes<HTMLElement>) => {
   return (
     <div {...props}>
-      <div>No active rooms are available to join!</div>
-      <button>Create the first room!</button>
+      <div className="mt-4 mb-8">No active rooms are available to join!</div>
+      <Link href="/rooms/create" passHref>
+        <Button variant="primary" as="a">
+          Create the first room!
+        </Button>
+      </Link>
     </div>
   )
 }
