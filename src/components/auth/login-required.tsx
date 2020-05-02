@@ -16,7 +16,7 @@ export const LoginRequired = ({ className, ...props }: React.HTMLAttributes<HTML
     <p className="mt-4">After accepting to will be redirected here and can start listening.</p>
 
     <p className="mt-12 text-sm text-gray-500 font-semibold">
-      Note: To you Syncify properly you need a Spotify Premium Subscription.
+      Note: To use Syncify properly you need a Spotify Premium subscription.
     </p>
 
     <Link href="/api/auth/login" passHref>
