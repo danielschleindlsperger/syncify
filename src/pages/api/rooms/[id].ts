@@ -25,7 +25,7 @@ export default withAuth(async (req: NowRequest, res: NowResponse) => {
 
 const findRoom = async (id: string): Promise<Room | undefined> => {
   const { rows } = await conn.query(
-    `SELECT id, name, publicly_listed as "publiclyListed", playlist
+    `SELECT id, name, publicly_listed as "publiclyListed", playlist, admins
         FROM rooms r
         WHERE id = $1
 `,
