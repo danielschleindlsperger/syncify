@@ -13,6 +13,7 @@ import { ShareButton } from '../../components/share-button'
 import { Button } from '../../components/button'
 import { useApiRequest } from '../../hooks/use-api-request'
 import { LoadingSpinner } from '../../components/loading'
+import { useAuthorization } from '../../hooks/use-authorization'
 
 type Room = import('../../types').Room
 type PlaylistTrack = import('../../types').PlaylistTrack
@@ -37,7 +38,8 @@ export default withPlayerStore(() => {
 
 // actual "dumb" room component
 const Room = ({ room }: RoomProps) => {
-  const { name, playlist } = room
+  const { name, playlist, admins } = room
+  const { isAdmin } = useAuthorization({ admins })
 
   const remainingTracks = dropPlayedTracks(playlist)
 
