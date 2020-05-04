@@ -5,6 +5,8 @@ import { CreatePlaylistStep } from './steps/create-playlist-step'
 import { FinalizeStep } from './steps/finalize-step'
 import { CreateRoomPayload } from '../../../pages/api/rooms'
 import { Room } from '../../../types'
+import { useDeferredState } from '../../../hooks/use-deferred'
+import { LoadingSpinner } from '../../loading'
 
 export type CreatePlaylistMode =
   | 'user-playlist'
@@ -32,10 +34,18 @@ export const CreateRoom: React.FC<CreateRoomProps> = ({ onCreated, ...props }) =
     trackIds: [],
     publiclyListed: true,
   })
+  const { idle, isLoading, load, error, fail, settle } = useDeferredState()
 
   const handleSubmit = async () => {
-    const room = await createRoom({ ...roomState, cover_image: roomState.image })
-    if (onCreated) onCreated(room)
+    try {
+      load()
+      const room = await createRoom({ ...roomState, cover_image: roomState.image })
+      if (onCreated) onCreated(room)
+      settle()
+    } catch (e) {
+      console.error(e)
+      fail('Could not create room. Try again.')
+    }
   }
 
   const steps = [
@@ -55,6 +65,12 @@ export const CreateRoom: React.FC<CreateRoomProps> = ({ onCreated, ...props }) =
   return (
     <div {...props}>
       <Wizard steps={steps} onSubmit={handleSubmit} />
+      {!idle && (
+        <div className="mt-4 flex justify-center">
+          {isLoading && <LoadingSpinner />}
+          {error && <div className="text-red-600">{error}</div>}
+        </div>
+      )}
     </div>
   )
 }
