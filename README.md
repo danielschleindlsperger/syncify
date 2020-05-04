@@ -54,6 +54,10 @@ Serverless paas.
 
 Integration with Vercel.
 
+### [Plausible.io](https://plausible.io/)
+
+Ethical analytics.
+
 ## How it works
 
 ### Authentication
