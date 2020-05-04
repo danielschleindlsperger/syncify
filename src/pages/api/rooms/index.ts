@@ -2,15 +2,15 @@ import { NowRequest, NowResponse } from '@now/node'
 import Spotify from 'spotify-web-api-node'
 import { object, string, number, boolean, array, InferType, ValidationError } from 'yup'
 import { splitEvery } from 'ramda'
-import { withAuth } from '../../../auth'
+import { withAuth, AuthenticatedNowRequest } from '../../../auth'
 import { SpotifyConfig } from '../../../config'
-import { PlaylistTrack, Playlist } from '../../../types'
+import { PlaylistTrack, Playlist, Room } from '../../../types'
 import { createConnection } from '../../../database-connection'
 
 const conn = createConnection()
 conn.connect()
 
-export default withAuth(async (req: NowRequest, res: NowResponse) => {
+export default withAuth(async (req: AuthenticatedNowRequest, res: NowResponse) => {
   if (req.method === 'POST') {
     return handleCreateRoom(req, res)
   }
@@ -75,7 +75,7 @@ LIMIT $2
 
 const spotify = new Spotify(SpotifyConfig)
 
-async function handleCreateRoom(req: NowRequest, res: NowResponse) {
+async function handleCreateRoom(req: AuthenticatedNowRequest, res: NowResponse) {
   try {
     const { name, cover_image = null, publiclyListed, trackIds } = await createRoomSchema.validate(
       req.body,
@@ -92,13 +92,15 @@ async function handleCreateRoom(req: NowRequest, res: NowResponse) {
       tracks,
     }
 
+    const admins: Room['admins'] = [{ id: req.auth.id }]
+
     const { rows } = await conn.query(
       `
-INSERT INTO rooms (name, cover_image, publicly_listed, playlist)
-VALUES ($1, $2, $3, $4)
+INSERT INTO rooms (name, cover_image, publicly_listed, playlist, admins)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING *
 `,
-      [name, cover_image, publiclyListed, playlist],
+      [name, cover_image, publiclyListed, playlist, JSON.stringify(admins)],
     )
 
     const room = rows[0]
