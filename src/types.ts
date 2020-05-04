@@ -4,6 +4,7 @@ export type Room = Readonly<{
   cover_image: string | undefined
   publiclyListed: boolean
   playlist: Playlist
+  admins: { id: string }[]
 }>
 
 export type Playlist = Readonly<{
