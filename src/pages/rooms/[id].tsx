@@ -13,68 +13,65 @@ import { ShareButton } from '../../components/share-button'
 import { Button } from '../../components/button'
 import { useApiRequest } from '../../hooks/use-api-request'
 import { LoadingSpinner } from '../../components/loading'
-import { useAuthorization } from '../../hooks/use-authorization'
+import { RoomControls, RoomProvider } from '../../components/room'
 
 type Room = import('../../types').Room
 type PlaylistTrack = import('../../types').PlaylistTrack
 type Playlist = import('../../types').Playlist
 
-type RoomProps = { room: Room }
-
-// room container
 export default withPlayerStore(() => {
   const router = useRouter()
   const { id } = router.query
   if (Array.isArray(id)) throw new Error('id must be a string!')
 
-  const { data, error } = useApiRequest<Room>(id ? `/api/rooms/${id}` : null, {
+  const { data: room, error, revalidate } = useApiRequest<Room>(id ? `/api/rooms/${id}` : null, {
     shouldRetryOnError: false,
   })
 
   if (error) return <div>Whoopps, something bad happened!</div>
-  if (!data) return <LoadingSpinner size="lg" absoluteCentered />
-  return <Room room={data} />
-})
+  if (!room) return <LoadingSpinner size="lg" absoluteCentered />
 
-// actual "dumb" room component
-const Room = ({ room }: RoomProps) => {
-  const { name, playlist, admins } = room
-  const { isAdmin } = useAuthorization({ admins })
-
-  const remainingTracks = dropPlayedTracks(playlist)
+  const remainingTracks = dropPlayedTracks(room.playlist)
 
   return (
-    <SpotifyPlayerProvider>
-      <Head>
-        <title key="title">{room.name} - Syncify</title>
-        {!room.publiclyListed && <meta name="robots" content="noindex, follow" />}
-      </Head>
-      <Navbar>
-        <Link href="/rooms" passHref>
-          <Button as="a" variant="secondary">
-            {'< Join a different room'}
-          </Button>
-        </Link>
-      </Navbar>
-      <div className="mt-16 px-8 max-w-5xl mx-auto">
-        {remainingTracks.length > 0 ? (
-          <>
-            <div className="flex items-end">
-              <h1 className="text-4xl font-bold">{name}</h1>
-              <ShareButton className="flex-grow-0 ml-auto" />
-            </div>
+    <RoomProvider room={room} revalidate={revalidate}>
+      <SpotifyPlayerProvider>
+        <Head>
+          <title key="title">{room.name} - Syncify</title>
+          {!room.publiclyListed && <meta name="robots" content="noindex, follow" />}
+        </Head>
+        <Navbar>
+          <Link href="/rooms" passHref>
+            <Button as="a" variant="secondary">
+              Join a different room
+            </Button>
+          </Link>
+        </Navbar>
+        <div className="mt-16 px-8 max-w-5xl mx-auto">
+          {remainingTracks.length > 0 ? (
+            <>
+              <div className="flex items-end">
+                <h1 className="text-4xl font-bold">{room.name}</h1>
+                <ShareButton className="flex-grow-0 ml-auto" />
+              </div>
 
-            <Chat roomId={room.id} className="mt-8" />
-            <Playlist playlist={playlist} className="mt-8" />
-            <Player />
-          </>
-        ) : (
-          <PlaylistIsOver className="mt-8" />
-        )}
-      </div>
-    </SpotifyPlayerProvider>
+              <div className="grid grid-cols-2 mt-8">
+                <div className="grid grid-cols-1 grid-rows-4 gap-4">
+                  <Chat roomId={room.id} />
+                  <RoomControls room={room} className="row-start-4" />
+                </div>
+                <Playlist playlist={room.playlist} />
+              </div>
+              <Player />
+            </>
+          ) : (
+            <PlaylistIsOver className="mt-8" />
+          )}
+        </div>
+      </SpotifyPlayerProvider>
+    </RoomProvider>
   )
-}
+})
 
 const PlaylistIsOver = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
   <div className={cx(className, 'mt-8')} {...props}>
