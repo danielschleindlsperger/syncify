@@ -13,7 +13,7 @@ import { ShareButton } from '../../components/share-button'
 import { Button } from '../../components/button'
 import { useApiRequest } from '../../hooks/use-api-request'
 import { LoadingSpinner } from '../../components/loading'
-import { RoomControls, RoomProvider } from '../../components/room'
+import { RoomProvider, RoomControls } from '../../components/room'
 
 type Room = import('../../types').Room
 type PlaylistTrack = import('../../types').PlaylistTrack
@@ -30,7 +30,6 @@ export default withPlayerStore(() => {
 
   if (error) return <div>Whoopps, something bad happened!</div>
   if (!room) return <LoadingSpinner size="lg" absoluteCentered />
-
   const remainingTracks = dropPlayedTracks(room.playlist)
 
   return (
