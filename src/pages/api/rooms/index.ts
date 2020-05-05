@@ -1,6 +1,6 @@
 import { NowRequest, NowResponse } from '@now/node'
 import Spotify from 'spotify-web-api-node'
-import { object, string, number, boolean, array, InferType, ValidationError } from 'yup'
+import * as Yup from 'yup'
 import { splitEvery } from 'ramda'
 import { withAuth, AuthenticatedNowRequest } from '../../../auth'
 import { SpotifyConfig } from '../../../config'
@@ -34,9 +34,9 @@ export type GetRoomsResponse = {
   data: Rooms
 }
 
-const getRoomsSchema = object()
+const getRoomsSchema = Yup.object()
   .shape({
-    offset: number().min(0).max(10000).notRequired(),
+    offset: Yup.number().min(0).max(10000).notRequired(),
   })
   .default({})
 
@@ -65,7 +65,7 @@ LIMIT $2
       data: rooms.slice(0, limit),
     })
   } catch (e) {
-    if (e instanceof ValidationError) {
+    if (e instanceof Yup.ValidationError) {
       console.warn('validation error', e.errors)
       return res.status(422).json({ msg: 'Invalid payload.', errors: e.errors })
     }
@@ -107,7 +107,7 @@ RETURNING *
 
     return res.json(room)
   } catch (e) {
-    if (e instanceof ValidationError) {
+    if (e instanceof Yup.ValidationError) {
       console.warn('validation error', e.errors)
       return res.status(422).json({ msg: 'Invalid payload.', errors: e.errors })
     }
@@ -115,15 +115,15 @@ RETURNING *
   }
 }
 
-const createRoomSchema = object().shape({
-  name: string().trim().min(3).max(255).required(),
+const createRoomSchema = Yup.object().shape({
+  name: Yup.string().trim().min(3).max(255).required(),
   // TODO: Can we make this required?
-  cover_image: string().notRequired(),
-  publiclyListed: boolean().notRequired(),
-  trackIds: array().of(string().required()).max(1000).required(),
+  cover_image: Yup.string().notRequired(),
+  publiclyListed: Yup.boolean().notRequired(),
+  trackIds: Yup.array().of(Yup.string().required()).max(1000).required(),
 })
 
-export type CreateRoomPayload = InferType<typeof createRoomSchema>
+export type CreateRoomPayload = Yup.InferType<typeof createRoomSchema>
 
 const limit = 50
 const fetchTracks = async (accessToken: string, ids: string[]): Promise<PlaylistTrack[]> => {

@@ -1,10 +1,8 @@
 import React from 'react'
-import Pusher, { Members } from 'pusher-js'
-import { User } from '../../types'
 import { Userlist } from './user-list'
 import { ChatLogEntry, Chatlog } from './chat-log'
-
-const PusherAppKey = process.env.PUSHER_APP_KEY!
+import { useRoomChannel, useRoom } from '../room'
+import { SkippedTrack } from '../../pusher-events'
 
 type PusherMember = {
   id: string
@@ -19,71 +17,47 @@ type ChatProps = React.HTMLAttributes<HTMLElement> & {
 }
 
 export const Chat = ({ roomId, ...props }: ChatProps) => {
-  const [members, setMembers] = React.useState<User[]>([])
+  const { members, channel } = useRoomChannel()
   const [log, setLog] = React.useState<ChatLogEntry[]>([])
 
+  const appendLog = (log: Pick<ChatLogEntry, 'type' | 'message'>) => {
+    setLog((logEntries) =>
+      logEntries.concat({
+        ...log,
+        id: Date.now().toString(),
+        timestamp: Date.now(),
+      }),
+    )
+  }
   React.useEffect(() => {
-    const pusher = new Pusher(PusherAppKey, {
-      cluster: 'eu',
-      forceTLS: true,
-      authEndpoint: '/api/auth/pusher',
-    })
-
-    pusher.connect()
-
-    const channel = pusher.subscribe(`presence-${roomId}`)
-
-    channel.bind('pusher:subscription_succeeded', (members: Members) => {
-      const allMembers: User[] = []
-
-      members.each((member: PusherMember) => {
-        allMembers.push({ id: member.id, ...member.info })
-      })
-
-      setMembers(allMembers)
-    })
-
-    channel.bind('pusher:subscription_error', (statusCode: number) => {
-      console.error(statusCode)
-    })
+    if (!channel) return
 
     channel.bind('pusher:member_added', (member: PusherMember) => {
-      const newMember: User = { id: member.id, ...member.info }
-      setMembers((ms) => [...ms, newMember])
-      setLog((log) => [
-        ...log,
-        {
-          id: Date.now().toString(),
-          type: 'USER_JOINED',
-          timestamp: Date.now(),
-          message: `${member.info.name} joined!`,
-        },
-      ])
+      appendLog({
+        type: 'USER_JOINED',
+        message: `${member.info.name} joined`,
+      })
     })
 
     channel.bind('pusher:member_removed', (member: PusherMember) => {
-      setMembers((ms) => ms.filter((m) => m.id !== member.id))
-      setLog((log) => [
-        ...log,
-        {
-          id: Date.now().toString(),
-          type: 'USER_LEFT',
-          timestamp: Date.now(),
-          message: `${member.info.name} left.`,
-        },
-      ])
+      appendLog({
+        type: 'USER_LEFT',
+        message: `${member.info.name} left`,
+      })
     })
 
-    return () => {
-      channel.disconnect()
-      pusher.disconnect()
-    }
-  }, [])
+    channel.bind(SkippedTrack, () => {
+      appendLog({
+        type: 'TRACK_SKIPPED',
+        message: 'Admin skipped a track',
+      })
+    })
+  }, [channel])
 
   return (
     <div {...props}>
-      <Chatlog log={log} />
-      <Userlist users={members} className="mt-8" />
+      <Userlist users={members} />
+      <Chatlog log={log} className="mt-2" />
     </div>
   )
 }
