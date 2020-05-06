@@ -51,13 +51,15 @@ export default withPlayerStore(() => {
             <>
               <div className="flex items-end">
                 <h1 className="text-4xl font-bold">{room.name}</h1>
-                <ShareButton className="flex-grow-0 ml-auto" />
+                <div className="ml-auto flex space-x-3">
+                  <RoomControls room={room} />
+                  <ShareButton />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 mt-8">
                 <div className="grid grid-cols-1 grid-rows-4 gap-4">
                   <Chat roomId={room.id} />
-                  <RoomControls room={room} className="row-start-4" />
                 </div>
                 <Playlist playlist={room.playlist} />
               </div>
