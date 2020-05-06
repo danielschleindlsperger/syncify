@@ -57,11 +57,10 @@ export default withPlayerStore(() => {
               <div className="grid grid-cols-2 mt-8">
                 <div className="grid grid-cols-1 grid-rows-4 gap-4">
                   <Chat roomId={room.id} />
-                  <RoomControls room={room} className="row-start-4" />
                 </div>
                 <Playlist playlist={room.playlist} />
               </div>
-              <Player />
+              <Player room={room} />
             </>
           ) : (
             <PlaylistIsOver className="mt-8" />

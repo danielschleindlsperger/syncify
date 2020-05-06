@@ -2,9 +2,13 @@ import React from 'react'
 import { usePlayerState } from './player-store'
 import { Progress } from './song-progress'
 import { VolumeSlider } from './volume-controls'
+import { RoomControls } from '../room'
+import { Room } from '../../types'
 
 // TODO: empty, skeleton state
-export const Player = (props: React.HTMLAttributes<HTMLElement>) => {
+type PlayerProps = React.HTMLAttributes<HTMLElement> & { room: Room }
+
+export const Player = (props: PlayerProps) => {
   const playbackState = usePlayerState((state) => state.playbackState)
   const isPlaying = usePlayerState((state) => state.isPlaying)
 
@@ -28,6 +32,7 @@ export const Player = (props: React.HTMLAttributes<HTMLElement>) => {
           )}
         </div>
         <VolumeSlider className="ml-auto" />
+        <RoomControls room={props.room} className="ml-auto" />
       </div>
     </div>
   )
