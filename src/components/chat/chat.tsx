@@ -52,6 +52,17 @@ export const Chat = ({ roomId, ...props }: ChatProps) => {
         message: 'Admin skipped a track',
       })
     })
+
+    type LikeData = {
+      name: string
+    }
+
+    channel.bind('client-member_liked', (data: LikeData) => {
+      appendLog({
+        type: 'USER_LIKED',
+        message: `${data.name}: ❤️🎵❤️`,
+      })
+    })
   }, [channel])
 
   return (

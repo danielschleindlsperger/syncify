@@ -14,6 +14,7 @@ import { Button } from '../../components/button'
 import { useApiRequest } from '../../hooks/use-api-request'
 import { LoadingSpinner } from '../../components/loading'
 import { RoomProvider, RoomControls } from '../../components/room'
+import { RoomReactions } from '../../components/room/room-reactions'
 
 type Room = import('../../types').Room
 type PlaylistTrack = import('../../types').PlaylistTrack
@@ -52,6 +53,7 @@ export default withPlayerStore(() => {
               <div className="flex items-end">
                 <h1 className="text-4xl font-bold">{room.name}</h1>
                 <div className="ml-auto flex space-x-3">
+                  <RoomReactions />
                   <RoomControls room={room} />
                   <ShareButton />
                 </div>
