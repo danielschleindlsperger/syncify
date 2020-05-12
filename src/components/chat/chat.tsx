@@ -2,7 +2,7 @@ import React from 'react'
 import { Userlist } from './user-list'
 import { ChatLogEntry, Chatlog } from './chat-log'
 import { useRoomChannel, useRoom } from '../room'
-import { SkippedTrack } from '../../pusher-events'
+import { SkippedTrack, UserLikedPayload, UserLiked } from '../../pusher-events'
 
 type PusherMember = {
   id: string
@@ -53,14 +53,10 @@ export const Chat = ({ roomId, ...props }: ChatProps) => {
       })
     })
 
-    type LikeData = {
-      name: string
-    }
-
-    channel.bind('client-member_liked', (data: LikeData) => {
+    channel.bind(UserLiked, (data: UserLikedPayload) => {
       appendLog({
         type: 'USER_LIKED',
-        message: `${data.name}: ❤️🎵❤️`,
+        message: `${data.name} ❤️ ${data.track.name} by ${data.track.byline}`,
       })
     })
   }, [channel])
