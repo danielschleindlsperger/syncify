@@ -3,7 +3,7 @@ import cx from 'classnames'
 
 export type ChatLogEntry = {
   id: string
-  type: 'USER_JOINED' | 'USER_LEFT' | 'TRACK_SKIPPED'
+  type: 'USER_JOINED' | 'USER_LEFT' | 'USER_LIKED' | 'TRACK_SKIPPED'
   timestamp: number
   message: string
 }
