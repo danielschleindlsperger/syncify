@@ -99,8 +99,8 @@ const PlaylistItem = ({ id, name, image, isActive, className, ...props }: Playli
     <button
       className={cx(
         className,
-        'flex items-center w-full px-6 py-3 border-gray-700',
-        isActive && 'border-2',
+        'flex items-center w-full px-6 py-3 border-2',
+        isActive ? 'border-gray-700' : 'border-transparent',
       )}
       {...props}
     >
