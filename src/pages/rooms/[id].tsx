@@ -60,9 +60,7 @@ export default withPlayerStore(() => {
               </div>
 
               <div className="grid grid-cols-2 mt-8">
-                <div className="grid grid-cols-1 grid-rows-4 gap-4">
-                  <Chat roomId={room.id} />
-                </div>
+                <Chat roomId={room.id} />
                 <Playlist playlist={room.playlist} />
               </div>
               <Player />
