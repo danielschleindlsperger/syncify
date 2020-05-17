@@ -20,7 +20,7 @@ export const Chatlog = ({ log, className, style, ...props }: ChatlogProps) => {
     >
       {log.map((entry) => (
         <li key={entry.id} className="mt-2">
-          <div className="text-gray-700 font-semibold">
+          <div className="text-gray-500 font-semibold text-xs">
             {new Date(entry.timestamp).toLocaleTimeString().slice(0, 5)}
           </div>
           <div className="text-sm">{entry.message}</div>
