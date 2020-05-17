@@ -18,7 +18,7 @@ export const VolumeSlider = ({ className, ...props }: VolumeSliderProps) => {
 
   React.useEffect(() => {
     if (player) {
-      player.setVolume(volume)
+      player.setVolume(Math.pow(volume, 2))
     }
   }, [player, volume])
 
