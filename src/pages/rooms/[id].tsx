@@ -40,7 +40,7 @@ export default withPlayerStore(() => {
           <title key="title">{room.name} - Syncify</title>
           {!room.publiclyListed && <meta name="robots" content="noindex, follow" />}
         </Head>
-        <div className="grid h-screen flex flex-col">
+        <div className="h-screen flex flex-col">
           <Navbar>
             <Link href="/rooms" passHref>
               <Button as="a" variant="secondary">
