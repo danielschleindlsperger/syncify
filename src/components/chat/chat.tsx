@@ -1,7 +1,8 @@
 import React from 'react'
+import cx from 'classnames'
 import { Userlist } from './user-list'
 import { ChatLogEntry, Chatlog } from './chat-log'
-import { useRoomChannel, useRoom } from '../room'
+import { useRoomChannel } from '../room'
 import { SkippedTrack, UserLikedPayload, UserLiked } from '../../pusher-events'
 
 type PusherMember = {
@@ -16,7 +17,7 @@ type ChatProps = React.HTMLAttributes<HTMLElement> & {
   roomId: string
 }
 
-export const Chat = ({ roomId, ...props }: ChatProps) => {
+export const Chat = ({ roomId, className, ...props }: ChatProps) => {
   const { members, channel } = useRoomChannel()
   const [log, setLog] = React.useState<ChatLogEntry[]>([])
 
@@ -62,7 +63,7 @@ export const Chat = ({ roomId, ...props }: ChatProps) => {
   }, [channel])
 
   return (
-    <div {...props}>
+    <div className={cx(className, 'flex flex-col min-h-0')} {...props}>
       <Userlist users={members} />
       <Chatlog log={log} className="mt-2" />
     </div>

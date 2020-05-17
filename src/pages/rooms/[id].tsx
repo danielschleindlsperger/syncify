@@ -40,34 +40,36 @@ export default withPlayerStore(() => {
           <title key="title">{room.name} - Syncify</title>
           {!room.publiclyListed && <meta name="robots" content="noindex, follow" />}
         </Head>
-        <Navbar>
-          <Link href="/rooms" passHref>
-            <Button as="a" variant="secondary">
-              Join a different room
-            </Button>
-          </Link>
-        </Navbar>
-        <div className="mt-16 px-8 max-w-5xl mx-auto">
-          {remainingTracks.length > 0 ? (
-            <>
-              <div className="flex items-end">
-                <h1 className="text-4xl font-bold">{room.name}</h1>
-                <div className="ml-auto flex space-x-3">
-                  <RoomReactions />
-                  <RoomControls room={room} />
-                  <ShareButton />
+        <div className="grid h-screen flex flex-col">
+          <Navbar>
+            <Link href="/rooms" passHref>
+              <Button as="a" variant="secondary">
+                Join a different room
+              </Button>
+            </Link>
+          </Navbar>
+          <div className="mt-16 px-8 max-w-5xl mx-auto flex-grow-0 flex flex-col min-h-0">
+            {remainingTracks.length > 0 ? (
+              <>
+                <div className="flex items-end">
+                  <h1 className="text-4xl font-bold">{room.name}</h1>
+                  <div className="ml-auto flex space-x-3">
+                    <RoomReactions />
+                    <RoomControls room={room} />
+                    <ShareButton />
+                  </div>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-2 mt-8">
-                <Chat roomId={room.id} />
-                <Playlist playlist={room.playlist} />
-              </div>
-              <Player />
-            </>
-          ) : (
-            <PlaylistIsOver className="mt-8" />
-          )}
+                <div className="flex-grow-0 min-h-0 grid grid-cols-2 gap-8  mt-8">
+                  <Chat roomId={room.id} className="pr-8 border-r-2" />
+                  <Playlist playlist={room.playlist} />
+                </div>
+                <Player className="mt-8" />
+              </>
+            ) : (
+              <PlaylistIsOver className="mt-8" />
+            )}
+          </div>
         </div>
       </SpotifyPlayerProvider>
     </RoomProvider>

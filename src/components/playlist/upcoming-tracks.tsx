@@ -7,20 +7,11 @@ type UpcomingTracksProps = React.HTMLAttributes<HTMLElement> & {
   upcomingTracks: Playlist['tracks']
 }
 
-export const UpcomingTracks = ({
-  upcomingTracks,
-  style,
-  className,
-  ...props
-}: UpcomingTracksProps) => {
+export const UpcomingTracks = ({ upcomingTracks, ...props }: UpcomingTracksProps) => {
   if (upcomingTracks.length === 0) return null
 
   return (
-    <ul
-      className={cx(className, 'overflow-scroll')}
-      style={{ height: '30rem', ...style }}
-      {...props}
-    >
+    <ul className="overflow-scroll" {...props}>
       {upcomingTracks.map((t, i) => (
         <li key={t.id} className={i === 0 ? 'font-bold' : undefined}>
           <span>{t.name}</span>

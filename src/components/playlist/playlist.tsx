@@ -38,11 +38,7 @@ export const Playlist = React.memo(({ playlist, ...props }: PlaylistProps) => {
   if (upcomingTracks.length === 0)
     return <div className="mt-8">The show is over! Join another room or create one!</div>
 
-  return (
-    <div {...props}>
-      <UpcomingTracks upcomingTracks={upcomingTracks} />
-    </div>
-  )
+  return <UpcomingTracks upcomingTracks={upcomingTracks} {...props} />
 })
 
 const dropPlayedTracks = (playlist: Playlist): PlaylistTrack[] => {
