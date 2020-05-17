@@ -28,7 +28,7 @@ export const Player = ({ className, ...props }: React.HTMLAttributes<HTMLElement
             <Progress className="w-full mt-auto" duration={duration} position={position} />
           )}
         </div>
-        <VolumeSlider className="ml-auto" />
+        <VolumeSlider className="ml-auto h-32" />
       </div>
     </div>
   )
