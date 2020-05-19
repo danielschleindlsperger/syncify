@@ -47,7 +47,7 @@ export default async (req: NowRequest, res: NowResponse) => {
   }
 }
 
-async function upsertUser({ id, name, avatar }: Pick<User, 'id' | 'name' | 'avatar'>) {
+export async function upsertUser({ id, name, avatar }: Pick<User, 'id' | 'name' | 'avatar'>) {
   await conn.query(
     `
 INSERT INTO users (id, name, avatar)

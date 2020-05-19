@@ -6,6 +6,18 @@ jobs:
   checks:
     name: Run checks
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - '5432:5432'
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout source
         uses: actions/checkout@v1
@@ -15,10 +27,19 @@ jobs:
           node-version: 12.x
       - name: Install dependencies
         run: npm ci --prefer-offline
-      - name: Test
+      - name: Unit Tests
         run: npm t
       - name: Typecheck
         run: npm run typecheck
+      - name: E2E Tests
+        env:
+          PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}
+          PUSHER_APP_KEY: ${{ secrets.PUSHER_APP_KEY }}
+          PUSHER_SECRET: ${{ secrets.PUSHER_SECRET }}
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          SPOTIFY_REFRESH_TOKEN_A: ${{ secrets.SPOTIFY_REFRESH_TOKEN_A }}
+        run: cp .env.test .env.build && npm run migrate up && npm run e2e:ci
 
   # Deploy job only runs on master after checks are successful
   deploy:
