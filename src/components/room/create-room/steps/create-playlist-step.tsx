@@ -102,6 +102,7 @@ const PlaylistItem = ({ id, name, image, isActive, className, ...props }: Playli
         'flex items-center w-full px-6 py-3 border-2',
         isActive ? 'border-gray-700' : 'border-transparent',
       )}
+      data-testid="select-playlist"
       {...props}
     >
       <img src={image} className="w-16" />
@@ -118,7 +119,7 @@ const ActivePlaylistTracks = ({ tracks }: ActivePlaylistTracksProps) => {
   // TODO: we can actually have a "listen to preview" feature here
   // TODO: display artists
   return (
-    <ul className="font-semibold">
+    <ul className="font-semibold" data-testid="playlist-tracks">
       {tracks.map((t) => (
         <li key={t.id}>{t.name}</li>
       ))}
