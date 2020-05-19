@@ -48,7 +48,7 @@ export default withPlayerStore(() => {
               </Button>
             </Link>
           </Navbar>
-          <div className="mt-16 px-8 max-w-5xl mx-auto flex-grow-0 flex flex-col min-h-0">
+          <div className="mt-16 px-8 max-w-5xl w-full mx-auto flex-grow flex flex-col min-h-0">
             {remainingTracks.length > 0 ? (
               <>
                 <div className="flex items-end">
@@ -60,7 +60,7 @@ export default withPlayerStore(() => {
                   </div>
                 </div>
 
-                <div className="flex-grow-0 min-h-0 grid grid-cols-2 gap-8  mt-8">
+                <div className="flex-grow min-h-0 grid grid-cols-2 gap-8  mt-8">
                   <Chat roomId={room.id} className="pr-8 border-r-2" />
                   <Playlist playlist={room.playlist} />
                 </div>
