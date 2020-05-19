@@ -1,3 +1,5 @@
+const { Client } = require('pg')
+
 exports.config = {
   //
   // ====================
@@ -170,8 +172,24 @@ exports.config = {
    * @param {Array.<Object>} capabilities list of capabilities details
    * @param {Array.<String>} specs List of spec file paths that are to be run
    */
-  // before: function (capabilities, specs) {
-  // },
+  before: async function (capabilities, specs) {
+    const addTruncateTables = `
+          CREATE OR REPLACE FUNCTION truncate_tables() RETURNS void AS $$
+          DECLARE
+          statements CURSOR FOR
+              SELECT tablename FROM pg_tables
+          WHERE tableowner = 'postgres' AND schemaname = 'public';
+          BEGIN
+          FOR stmt IN statements LOOP
+          EXECUTE 'TRUNCATE TABLE ' || quote_ident(stmt.tablename) || ' CASCADE;';
+          END LOOP;
+          END;
+          $$ LANGUAGE plpgsql;
+    `
+    const conn = new Client({ connectionString: process.env.DATABASE_URL })
+    conn.connect()
+    await conn.query(addTruncateTables)
+  },
   /**
    * Runs before a WebdriverIO command gets executed.
    * @param {String} commandName hook command name
@@ -188,8 +206,11 @@ exports.config = {
   /**
    * Function to be executed before a test (in Mocha/Jasmine) starts.
    */
-  // beforeTest: function (test, context) {
-  // },
+  beforeTest: async function (test, context) {
+    const conn = new Client({ connectionString: process.env.DATABASE_URL })
+    conn.connect()
+    await conn.query('SELECT truncate_tables()')
+  },
   /**
    * Hook that gets executed _before_ a hook within the suite starts (e.g. runs before calling
    * beforeEach in Mocha)
