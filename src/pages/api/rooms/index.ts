@@ -5,10 +5,9 @@ import { splitEvery } from 'ramda'
 import { withAuth, AuthenticatedNowRequest } from '../../../auth'
 import { SpotifyConfig } from '../../../config'
 import { PlaylistTrack, Playlist, Room } from '../../../types'
-import { createConnection } from '../../../database-connection'
+import { makeClient, query, many } from '../../../db'
 
-const conn = createConnection()
-conn.connect()
+const client = makeClient()
 
 export default withAuth(async (req: AuthenticatedNowRequest, res: NowResponse) => {
   if (req.method === 'POST') {
@@ -46,19 +45,18 @@ async function handleGetRooms(req: NowRequest, res: NowResponse) {
     const { offset = 0 } = await getRoomsSchema.validate(req.query, {
       stripUnknown: true,
     })
-    const { rows: rooms } = await conn.query(
-      `
+
+    const rooms = await many(client)`
 SELECT r.id, r.name, r.cover_image, COUNT(u) AS listeners_count
 FROM rooms r
 LEFT JOIN users u ON u.room_id = r.id
 WHERE r.publicly_listed = true
 GROUP BY r.id
 ORDER BY listeners_count DESC, r.created_at DESC
-OFFSET $1
-LIMIT $2
-`,
-      [offset, limit + 1],
-    )
+OFFSET ${offset}
+LIMIT ${limit + 1}
+`
+
     return res.json({
       nextOffset: offset + limit,
       hasMore: rooms.length === limit + 1,
@@ -94,14 +92,11 @@ async function handleCreateRoom(req: AuthenticatedNowRequest, res: NowResponse) 
 
     const admins: Room['admins'] = [{ id: req.auth.id }]
 
-    const { rows } = await conn.query(
-      `
+    const { rows } = await query<Room>(client)`
 INSERT INTO rooms (name, cover_image, publicly_listed, playlist, admins)
-VALUES ($1, $2, $3, $4, $5)
+VALUES (${name}, ${cover_image}, ${publiclyListed}, ${playlist}, ${JSON.stringify(admins)})
 RETURNING *
-`,
-      [name, cover_image, publiclyListed, playlist, JSON.stringify(admins)],
-    )
+`
 
     const room = rows[0]
 

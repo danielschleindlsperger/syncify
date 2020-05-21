@@ -2,7 +2,7 @@ import { NowRequest, NowResponse } from '@now/node'
 import Pusher from 'pusher'
 import { AuthCookieName, verifyToken } from '../../../auth'
 import { User } from '../../../types'
-import { createConnection } from '../../../database-connection'
+import { makeClient, first } from '../../../db'
 
 const pusher = new Pusher({
   appId: process.env.PUSHER_APP_ID!,
@@ -12,8 +12,7 @@ const pusher = new Pusher({
   useTLS: true,
 })
 
-const conn = createConnection()
-conn.connect()
+const client = makeClient()
 
 export default async (req: NowRequest, res: NowResponse) => {
   if (req.method !== 'POST') return res.status(405).send('Method not allowed.')
@@ -59,14 +58,8 @@ export default async (req: NowRequest, res: NowResponse) => {
   return res.json(pusher.authenticate(socket_id, channel_name, presenceData))
 }
 
-const findUser = async (id: string): Promise<User | undefined> => {
-  const { rows } = await conn.query(
-    `
+const findUser = async (id: string) => first<User>(client)`
 SELECT id, name, avatar
 FROM users
-WHERE id = $1
-`,
-    [id],
-  )
-  return rows[0]
-}
+WHERE id = ${id}
+`
