@@ -24,6 +24,7 @@
   },
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/tasks": "^2.0.0",
     "classnames": "^2.2.6",
     "cookie": "^0.4.1",
     "easy-peasy": "^3.3.0",
