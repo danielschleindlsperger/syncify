@@ -3,12 +3,10 @@ import Spotify from 'spotify-web-api-node'
 import { User } from '../../../types'
 import { AppUrl, SpotifyConfig } from '../../../config'
 import { authCookie, signToken } from '../../../auth'
-import { createConnection } from '../../../database-connection'
+import { makeClient, query } from '../../../db'
 
 const spotifyApi = new Spotify(SpotifyConfig)
-
-const conn = createConnection()
-conn.connect()
+const client = makeClient()
 
 export default async (req: NowRequest, res: NowResponse) => {
   const { code, state } = req.query
@@ -48,13 +46,11 @@ export default async (req: NowRequest, res: NowResponse) => {
 }
 
 export async function upsertUser({ id, name, avatar }: Pick<User, 'id' | 'name' | 'avatar'>) {
-  await conn.query(
-    `
+  await query(client)`
 INSERT INTO users (id, name, avatar)
-VALUES ($1, $2, $3)
+VALUES (${id}, ${name}, ${avatar})
 ON CONFLICT (id) DO UPDATE SET name = $2, avatar = $3
-`,
-    [id, name, avatar],
-  )
+`
 }
+
 const getImage = (images: SpotifyApi.ImageObject[]) => images[0] && images[0].url

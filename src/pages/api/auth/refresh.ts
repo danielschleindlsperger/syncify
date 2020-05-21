@@ -3,12 +3,10 @@ import Spotify from 'spotify-web-api-node'
 import { SpotifyConfig } from '../../../config'
 import { User } from '../../../types'
 import { AuthCookieName, verifyToken, authCookie, signToken } from '../../../auth'
-import { createConnection } from '../../../database-connection'
+import { makeClient, first } from '../../../db'
 
 const spotifyApi = new Spotify(SpotifyConfig)
-
-const conn = createConnection()
-conn.connect()
+const client = makeClient()
 
 // this endpoint is called by a user to
 // a) refresh the session token
@@ -59,14 +57,8 @@ export default async (req: NowRequest, res: NowResponse) => {
   })
 }
 
-const findUser = async (id: string): Promise<User | undefined> => {
-  const { rows } = await conn.query(
-    `
+const findUser = async (id: string) => first<User>(client)`
 SELECT id, name, avatar
 FROM users
-WHERE id = $1
-`,
-    [id],
-  )
-  return rows[0]
-}
+WHERE id = ${id}
+`

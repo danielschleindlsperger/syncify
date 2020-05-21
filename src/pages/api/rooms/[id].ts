@@ -1,14 +1,12 @@
 import { NowRequest, NowResponse } from '@now/node'
 import * as Yup from 'yup'
-import { Client } from 'pg'
 import { Room } from '../../../types'
 import { withAuth, AuthenticatedNowRequest } from '../../../auth'
-import { createConnection } from '../../../database-connection'
 import { pusher } from '../../../pusher'
 import { RoomEvent, SkippedTrack } from '../../../pusher-events'
+import { makeClient, first, query } from '../../../db'
 
-const conn = createConnection()
-conn.connect()
+const client = makeClient()
 
 export default withAuth(async (req: AuthenticatedNowRequest, res: NowResponse) => {
   if (req.method === 'PUT') {
@@ -37,17 +35,11 @@ async function handleGetRoom(req: NowRequest, res: NowResponse) {
   return res.json(room)
 }
 
-const findRoom = async (id: string): Promise<Room | undefined> => {
-  const { rows } = await conn.query(
-    `SELECT id, name, publicly_listed as "publiclyListed", playlist, admins
-        FROM rooms r
-        WHERE id = $1
-`,
-    [id],
-  )
-
-  return rows[0]
-}
+const findRoom = async (id: string) => first<Room>(client)`
+SELECT id, name, publicly_listed as "publiclyListed", playlist, admins
+FROM rooms r
+WHERE id = ${id}
+`
 
 async function handleUpdateRoom(req: AuthenticatedNowRequest, res: NowResponse) {
   const { id } = req.query
@@ -67,7 +59,7 @@ async function handleUpdateRoom(req: AuthenticatedNowRequest, res: NowResponse) 
 
   try {
     const validated = await UpdateRoomSchema.validate(req.body, { stripUnknown: true })
-    await updateRoom(conn, validated.room)
+    await updateRoom(validated.room)
     const event = validated.event
     // TODO: dispatch on event type
     pusher.trigger(`presence-${room.id}`, event, { triggeredBy: req.auth.id })
@@ -104,15 +96,14 @@ export type UpdateRoomPayload = Yup.InferType<typeof UpdateRoomSchema>
 const isRoomAdmin = (room: Room, userId: string): boolean =>
   room.admins.some((admin) => admin.id === userId)
 
-const updateRoom = async (conn: Client, room: Room): Promise<void> => {
+const updateRoom = async (room: Room): Promise<void> => {
   const { id, name, cover_image, publiclyListed, playlist, admins } = room
-  await conn.query(
-    `
+  // TODO: set updated_at
+  await query(client)`
 UPDATE rooms
-SET name = $2, cover_image = $3, publicly_listed = $4, playlist = $5, admins = $6
-WHERE id = $1;
-`,
-    // TODO: set updated_at
-    [id, name, cover_image, publiclyListed, playlist, JSON.stringify(admins)],
-  )
+SET name = ${name}, cover_image = ${cover_image}, publicly_listed = ${publiclyListed}, playlist = ${playlist}, admins = ${JSON.stringify(
+    admins,
+  )}
+WHERE id = ${id};
+`
 }
