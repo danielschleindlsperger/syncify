@@ -1,12 +1,16 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
-import { UpcomingTracks } from './upcoming-tracks'
+import { Playlist } from './playlist'
+
+type Playlist = import('../../types').Playlist
 
 storiesOf('Playlist', module)
-  .add('Five songs remaining', () => <UpcomingTracks upcomingTracks={upcomingTracks.slice(0, 5)} />)
-  .add('One song remaining', () => <UpcomingTracks upcomingTracks={upcomingTracks.slice(0, 1)} />)
-  .add('No songs remaining', () => <UpcomingTracks upcomingTracks={[]} />)
-  .add('50 songs remaining', () => <UpcomingTracks upcomingTracks={upcomingTracks.slice(0, 50)} />)
+  .add('Five songs', () => <Playlist playlist={mkPlaylist(upcomingTracks.slice(0, 5))} />)
+  .add('One song', () => <Playlist playlist={mkPlaylist(upcomingTracks.slice(0, 1))} />)
+  .add('No songs', () => <Playlist playlist={mkPlaylist([])} />)
+  .add('50 songs', () => <Playlist playlist={mkPlaylist(upcomingTracks.slice(0, 50))} />)
+
+const mkPlaylist = (tracks: any[]): Playlist => ({ tracks } as Playlist)
 
 const upcomingTracks = [
   {

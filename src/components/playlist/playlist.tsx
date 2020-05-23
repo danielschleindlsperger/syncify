@@ -1,54 +1,24 @@
 import React from 'react'
-import { dropWhile } from 'ramda'
-import { useSpotifyPlayer } from '../player'
-import { PlaylistTrack } from '../../types'
-import { UpcomingTracks } from './upcoming-tracks'
+import { usePlayerState } from '../player/player-store'
 
 type Playlist = import('../../types').Playlist
 
 type PlaylistProps = React.HTMLAttributes<HTMLElement> & { playlist: Playlist }
 
+// TODO: scroll to active song when active song changes. Don't change when user currently scrolls the list.
 export const Playlist = React.memo(({ playlist, ...props }: PlaylistProps) => {
-  const { play } = useSpotifyPlayer()
+  const currentTrack = usePlayerState((s) => s.playbackState?.track_window.current_track)
 
-  React.useEffect(() => {
-    // Find current offset and start playlist playback.
-    // This should only run each time the playlist changes (almost never).
-    if (playlist.tracks && playlist.tracks.length > 0 && play) {
-      let offset = Date.now() - Date.parse(playlist.createdAt)
-      const tracksToPlay = dropWhile((t) => {
-        const trackIsOver = offset > t.duration_ms
-        if (trackIsOver) {
-          offset = offset - t.duration_ms
-          return true
-        }
-        return false
-      }, playlist.tracks)
+  if (playlist.tracks.length === 0) return null
 
-      play(
-        tracksToPlay.map((t) => `spotify:track:${t.id}`),
-        offset,
-      )
-    }
-  }, [playlist.tracks, play])
-
-  const upcomingTracks = dropPlayedTracks(playlist)
-
-  // TODO: We can also move this higher in the component tree and don't trigger the Spotify Player or Pusher connection.
-  if (upcomingTracks.length === 0)
-    return <div className="mt-8">The show is over! Join another room or create one!</div>
-
-  return <UpcomingTracks upcomingTracks={upcomingTracks} {...props} />
+  return (
+    <ul className="overflow-scroll" {...props}>
+      {playlist.tracks.map((t) => (
+        // TODO: This check does not work all the time: IDs are not consistent and names sometimes change as well
+        <li key={t.id} className={t.id === currentTrack?.id ? 'font-bold' : undefined}>
+          <span>{t.name}</span>
+        </li>
+      ))}
+    </ul>
+  )
 })
-
-const dropPlayedTracks = (playlist: Playlist): PlaylistTrack[] => {
-  let offset = Date.now() - Date.parse(playlist.createdAt)
-  return dropWhile((t) => {
-    const trackIsOver = offset > t.duration_ms
-    if (trackIsOver) {
-      offset = offset - t.duration_ms
-      return true
-    }
-    return false
-  }, playlist.tracks)
-}

@@ -1,8 +1,4 @@
-export type RoomEvent = typeof SkippedTrack | typeof UserLiked | typeof TrackChanged
-
-// explicit track skip of user with the current, spotify queue based implementation of playback
-export type SkippedTrackPayload = { triggeredBy: string }
-export const SkippedTrack = 'room:skip-track'
+export type RoomEvent = typeof UserLiked | typeof TrackChanged
 
 export const UserLiked = 'client-user_liked'
 export type UserLikedPayload = {
@@ -15,7 +11,7 @@ type LikedTrack = {
 }
 
 // server event for the client to skip the track to the specified one
-export const TrackChanged = 'room:track-skipped'
+export const TrackChanged = 'room:track-changed'
 export type TrackChangedPayload = {
   trackId: string
 }

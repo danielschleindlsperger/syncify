@@ -1,10 +1,9 @@
 import { NowRequest, NowResponse } from '@now/node'
 import * as Yup from 'yup'
-import { Room } from '../../../types'
-import { withAuth, AuthenticatedNowRequest } from '../../../auth'
-import { pusher } from '../../../pusher'
-import { SkippedTrack } from '../../../pusher-events'
-import { makeClient, first, query } from '../../../db'
+import { Room } from '../../../../types'
+import { withAuth, AuthenticatedNowRequest } from '../../../../auth'
+import { makeClient } from '../../../../db'
+import { findRoom, updateRoom } from '../../../../db/room'
 
 const client = makeClient()
 
@@ -26,7 +25,7 @@ async function handleGetRoom(req: NowRequest, res: NowResponse) {
     return res.status(400).json({ msg: 'No found in url' })
   }
 
-  const room = await findRoom(id)
+  const room = await findRoom(client, id)
 
   if (!room) {
     return res.status(404).json({ msg: `No room found for id "${id}"` })
@@ -35,12 +34,6 @@ async function handleGetRoom(req: NowRequest, res: NowResponse) {
   return res.json(room)
 }
 
-const findRoom = async (id: string) => first<Room>(client)`
-SELECT id, name, publicly_listed as "publiclyListed", playlist, admins
-FROM rooms r
-WHERE id = ${id}
-`
-
 async function handleUpdateRoom(req: AuthenticatedNowRequest, res: NowResponse) {
   const { id } = req.query
 
@@ -48,7 +41,7 @@ async function handleUpdateRoom(req: AuthenticatedNowRequest, res: NowResponse) 
     return res.status(400).json({ msg: 'No found in url' })
   }
 
-  const room = await findRoom(id)
+  const room = await findRoom(client, id)
 
   if (!room) {
     return res.status(404).json({ msg: `No room found for id "${id}"` })
@@ -59,10 +52,8 @@ async function handleUpdateRoom(req: AuthenticatedNowRequest, res: NowResponse) 
 
   try {
     const validated = await UpdateRoomSchema.validate(req.body, { stripUnknown: true })
-    await updateRoom(validated.room)
-    const event = validated.event
-    // TODO: dispatch on event type
-    pusher.trigger(`presence-${room.id}`, event, { triggeredBy: req.auth.id })
+    await updateRoom(client, validated.room)
+    // TODO: send pusher event that the room was updated
     return res.json({ msg: 'Successfully updated room.' })
   } catch (e) {
     if (e instanceof Yup.ValidationError) {
@@ -75,7 +66,6 @@ async function handleUpdateRoom(req: AuthenticatedNowRequest, res: NowResponse) 
 
 // TODO: this is a duplicate from room creation
 const UpdateRoomSchema = Yup.object({
-  event: Yup.string<typeof SkippedTrack>().oneOf([SkippedTrack]).required(),
   room: Yup.object().shape({
     id: Yup.string().required(),
     name: Yup.string().trim().min(3).max(255).required(),
@@ -95,15 +85,3 @@ export type UpdateRoomPayload = Yup.InferType<typeof UpdateRoomSchema>
 
 const isRoomAdmin = (room: Room, userId: string): boolean =>
   room.admins.some((admin) => admin.id === userId)
-
-const updateRoom = async (room: Room): Promise<void> => {
-  const { id, name, cover_image, publiclyListed, playlist, admins } = room
-  // TODO: set updated_at
-  await query(client)`
-UPDATE rooms
-SET name = ${name}, cover_image = ${cover_image}, publicly_listed = ${publiclyListed}, playlist = ${playlist}, admins = ${JSON.stringify(
-    admins,
-  )}
-WHERE id = ${id};
-`
-}

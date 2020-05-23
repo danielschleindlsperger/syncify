@@ -89,6 +89,10 @@ async function handleCreateRoom(req: AuthenticatedNowRequest, res: NowResponse) 
     const playlist: Playlist = {
       createdAt: new Date().toISOString(),
       tracks,
+      playback: {
+        currentTrackId: tracks[0]?.id,
+        currentTrackStartedAt: new Date().toISOString(),
+      },
     }
 
     const admins: Room['admins'] = [{ id: req.auth.id }]
@@ -104,7 +108,7 @@ RETURNING *
     // EXPERIMENTAL
     if (room.playlist.tracks.length > 0) {
       const [first, second] = room.playlist.tracks
-      await scheduleSongChange({
+      await scheduleSongChange(client, {
         delaySeconds: first.duration_ms / 1000,
         roomId: room.id,
         trackId: second.id,

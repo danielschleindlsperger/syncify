@@ -1,13 +1,37 @@
 import React from 'react'
 import cx from 'classnames'
 import { usePlayerState } from './player-store'
+import { useRoom, useRoomChannel } from '../room'
+import { useSpotifyPlayer } from './spotify-web-player'
 import { Progress } from './song-progress'
 import { VolumeSlider } from './volume-controls'
+import { TrackChanged, TrackChangedPayload } from '../../pusher-events'
 
 // TODO: empty, skeleton state
 export const Player = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => {
   const playbackState = usePlayerState((state) => state.playbackState)
   const isPlaying = usePlayerState((state) => state.isPlaying)
+  const { play } = useSpotifyPlayer()
+  const playlist = useRoom().room?.playlist
+  const { channel } = useRoomChannel()
+
+  // play initial track
+  React.useEffect(() => {
+    if (play && playlist) {
+      if (!playlist.playback) return
+      const initialTrackId = playlist.playback.currentTrackId
+      const offset = Date.now() - Date.parse(playlist.playback.currentTrackStartedAt)
+      play([`spotify:track:${initialTrackId}`], offset)
+    }
+  }, [playlist, play])
+
+  // change track after event
+  React.useEffect(() => {
+    if (!channel || !play) return
+    channel.bind(TrackChanged, (data: TrackChangedPayload) => {
+      play([`spotify:track:${data.trackId}`])
+    })
+  }, [channel, play])
 
   if (!playbackState) return null
 

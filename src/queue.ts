@@ -1,4 +1,7 @@
 import { CloudTasksClient } from '@google-cloud/tasks'
+import { randomString } from './utils/random'
+import { Client } from 'pg'
+import { findRoom, updateRoom } from './db'
 
 const baseUrl =
   process.env.WEBHOOK_BASE_URL ?? process.env.APP_URL ?? 'https://syncify-daniel.serveo.net'
@@ -16,21 +19,26 @@ const client = new CloudTasksClient({
 type ScheduleTaskPayload<T = any> = {
   delaySeconds?: number
   queue: string
-  body?: T
+  payload?: T
 }
 
 export async function scheduleTask({
   delaySeconds,
   queue,
-  body,
-}: ScheduleTaskPayload): Promise<void> {
+  payload,
+}: ScheduleTaskPayload): Promise<{ taskId: string }> {
   const parent = client.queuePath(project, location, queue)
+  const taskId = await randomString()
+  const body = {
+    ...payload,
+    taskId,
+  }
 
   const task = {
     httpRequest: {
       httpMethod: 'POST',
       url,
-      body: body && Buffer.from(JSON.stringify(body)).toString('base64'),
+      body: Buffer.from(JSON.stringify(body)).toString('base64'),
     },
     scheduleTime:
       delaySeconds !== undefined
@@ -41,6 +49,7 @@ export async function scheduleTask({
   } as const
 
   await client.createTask({ parent, task })
+  return { taskId }
 }
 
 /*
@@ -66,13 +75,20 @@ type ScheduleSongChangePayload = {
   trackId: string
 }
 
-export async function scheduleSongChange({
-  delaySeconds,
-  ...body
-}: ScheduleSongChangePayload): Promise<void> {
-  await scheduleTask({
+export async function scheduleSongChange(
+  client: Client,
+  { delaySeconds, ...body }: ScheduleSongChangePayload,
+): Promise<void> {
+  const { taskId } = await scheduleTask({
     queue: 'song-changed-test-queue',
     delaySeconds,
-    body: { ...body, createdTimestamp: Date.now() },
+    payload: { ...body, createdTimestamp: Date.now() },
+  })
+
+  const room = await findRoom(client, body.roomId)
+  if (!room) throw new Error(`No room with id ${body.roomId} found. Song scheduling broke.`)
+  await updateRoom(client, {
+    ...room,
+    playlist: { ...room.playlist, nextTrackChangeTaskId: taskId },
   })
 }

@@ -2,7 +2,6 @@ import React from 'react'
 import Pusher, { Members, Channel } from 'pusher-js'
 import { User } from '../../types'
 import { useRoom } from '.'
-import { SkippedTrack } from '../../pusher-events'
 
 const PusherAppKey = process.env.PUSHER_APP_KEY!
 const pusherOptions = {
@@ -57,11 +56,6 @@ export const useRoomChannel = () => {
 
     channel.bind('pusher:member_removed', (member: PusherMember) => {
       setMembers((ms) => ms.filter((m) => m.id !== member.id))
-    })
-
-    channel.bind(SkippedTrack, () => {
-      // refetch room when track is skipped
-      revalidate()
     })
 
     return () => {
