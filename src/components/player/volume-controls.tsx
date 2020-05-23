@@ -9,17 +9,30 @@ declare module 'react' {
   }
 }
 
+const syncifyVolumePersistKey = 'syncify:volume-9ap8hsda'
+const defaultVolume = 0.3
+
 type VolumeSliderProps = React.InputHTMLAttributes<HTMLInputElement>
 
 export const VolumeSlider = ({ className, ...props }: VolumeSliderProps) => {
   const { player } = useSpotifyPlayer()
-  // TODO: persist
-  const [volume, setVolume] = React.useState(0.3)
+  // set default to 0 here in order to not set volume higher than the persisted value
+  const [volume, setVolume] = React.useState(0)
+
+  React.useEffect(() => {
+    const item = localStorage.getItem(syncifyVolumePersistKey)
+    if (item) {
+      setVolume(parseFloat(item))
+    } else {
+      setVolume(defaultVolume)
+    }
+  }, [])
 
   React.useEffect(() => {
     if (player) {
       player.setVolume(Math.pow(volume, 2))
     }
+    localStorage.setItem(syncifyVolumePersistKey, String(volume))
   }, [player, volume])
 
   return (
