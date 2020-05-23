@@ -3,7 +3,7 @@ import * as Yup from 'yup'
 import { Room } from '../../../types'
 import { withAuth, AuthenticatedNowRequest } from '../../../auth'
 import { pusher } from '../../../pusher'
-import { RoomEvent, SkippedTrack } from '../../../pusher-events'
+import { SkippedTrack } from '../../../pusher-events'
 import { makeClient, first, query } from '../../../db'
 
 const client = makeClient()
@@ -75,7 +75,7 @@ async function handleUpdateRoom(req: AuthenticatedNowRequest, res: NowResponse) 
 
 // TODO: this is a duplicate from room creation
 const UpdateRoomSchema = Yup.object({
-  event: Yup.string<RoomEvent>().oneOf([SkippedTrack]).required(),
+  event: Yup.string<typeof SkippedTrack>().oneOf([SkippedTrack]).required(),
   room: Yup.object().shape({
     id: Yup.string().required(),
     name: Yup.string().trim().min(3).max(255).required(),

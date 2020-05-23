@@ -13,9 +13,9 @@ Syncify is a web application that lets users listen to the same music in synchro
 
 ```sh
 npm start # with Vercel account
-npm run dev # with vanilla Next.js: Some functionality might not work as expected
+npm run dev # with vanilla Next.js: Some functionality might not work as expected, e.g. the redirect from /
 
-# start a proxy to receive pusher webhooks on localhost
+# generate a publicly available url and proxy requests to localhost
 npm run webhook-proxy
 
 # run development environment
@@ -25,6 +25,14 @@ docker-compose up -d
 npm run migrate up
 npm run migrate down
 npm run migrate create my-new-migration
+
+## Nomeclature (Domain Language)
+
+This is how we name certain things:
+
+## Track or Song
+
+Always use the name **track**. Spotify uses it in all their APIs and doing it differently would increase complexity.
 ```
 
 ## Release (Deployment)

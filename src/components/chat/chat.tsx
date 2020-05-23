@@ -3,7 +3,13 @@ import cx from 'classnames'
 import { Userlist } from './user-list'
 import { ChatLogEntry, Chatlog } from './chat-log'
 import { useRoomChannel } from '../room'
-import { SkippedTrack, UserLikedPayload, UserLiked } from '../../pusher-events'
+import {
+  SkippedTrack,
+  UserLikedPayload,
+  UserLiked,
+  TrackChanged,
+  TrackChangedPayload,
+} from '../../pusher-events'
 
 type PusherMember = {
   id: string
@@ -59,6 +65,10 @@ export const Chat = ({ roomId, className, ...props }: ChatProps) => {
         type: 'USER_LIKED',
         message: `${data.name} ❤️ ${data.track.name} by ${data.track.byline}`,
       })
+    })
+
+    channel.bind(TrackChanged, (data: TrackChangedPayload) => {
+      console.log(data)
     })
   }, [channel])
 

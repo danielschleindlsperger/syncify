@@ -1,8 +1,10 @@
 import { CloudTasksClient } from '@google-cloud/tasks'
 
-const baseUrl = 'https://7e5c2726.eu.ngrok.io'
+const baseUrl =
+  process.env.WEBHOOK_BASE_URL ?? process.env.APP_URL ?? 'https://syncify-daniel.serveo.net'
 const url = baseUrl + '/api/webhooks/task-queue'
 const project = 'syncify'
+// TODO: europe-west1 is belgium, use queue in frankfurt: europe-west3
 const location = 'europe-west1'
 
 const b64creds = process.env.GCLOUD_CREDENTIALS!
@@ -60,8 +62,8 @@ The general idea:
 
 type ScheduleSongChangePayload = {
   delaySeconds?: number
-  roomEventCount: number
   roomId: string
+  trackId: string
 }
 
 export async function scheduleSongChange({

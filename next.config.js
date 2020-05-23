@@ -12,6 +12,7 @@ module.exports = (phase, { defaultConfig }) => {
       ...defaultConfig.env,
       JWT_SECRET: process.env.JWT_SECRET,
       APP_URL: process.env.APP_URL,
+      WEBHOOK_BASE_URL: process.env.WEBHOOK_BASE_URL,
       DATABASE_URL: process.env.DATABASE_URL,
       SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID,
       SPOTIFY_CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET,
@@ -19,6 +20,7 @@ module.exports = (phase, { defaultConfig }) => {
       PUSHER_APP_ID: process.env.PUSHER_APP_ID,
       PUSHER_APP_KEY: process.env.PUSHER_APP_KEY,
       PUSHER_SECRET: process.env.PUSHER_SECRET,
+      GCLOUD_CREDENTIALS: process.env.GCLOUD_CREDENTIALS,
     },
   }
 }

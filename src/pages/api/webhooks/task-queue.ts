@@ -1,16 +1,53 @@
 import { NextApiRequest, NextApiResponse } from 'next'
+import { scheduleSongChange } from '../../../queue'
+import { first, makeClient } from '../../../db'
+import { Room } from '../../../types'
+import { dropWhile } from 'ramda'
+import { pusher } from '../../../pusher'
+import { TrackChanged, TrackChangedPayload } from '../../../pusher-events'
+
+const client = makeClient()
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
-  // TODO: method
+  if (req.method !== 'POST') {
+    return res.status(405).send('Method not allowed.')
+  }
 
-  console.log(req.body)
-  console.log(req.headers)
+  // TODO: validate
+  const { roomId, trackId } = JSON.parse(req.body)
+  const room = await findRoom(roomId)
 
-  const eta: any = req.headers['x-cloudtasks-tasketa']
+  if (!room) {
+    throw new Error('NO ROOM')
+  }
 
-  const diff = Date.now() - parseInt(eta, 10) * 1000
+  const payload: TrackChangedPayload = {
+    trackId,
+  }
+  pusher.trigger(`presence-${roomId}`, TrackChanged, payload)
 
-  console.log({ diff })
+  const [currentTrack, nextTrack] = dropWhile<Room['playlist']['tracks'][0]>(
+    (t) => t.id !== trackId,
+  )(room.playlist.tracks)
 
-  return res.json({ foo: 'bar', diff })
+  if (!currentTrack || !nextTrack) {
+    // TODO: mark room's playlist as being over
+    console.info(`Playlist changed or playlist over`, { roomId, trackId })
+    return res.json({ msg: 'Playlist changed or playlist over' })
+  }
+
+  // TODO: task id
+  await scheduleSongChange({
+    delaySeconds: currentTrack.duration_ms / 1000,
+    roomId: room.id,
+    trackId: nextTrack.id,
+  })
+
+  return res.json({ msg: 'successfully schedule new task' })
 }
+
+const findRoom = async (id: string) => first<Room>(client)`
+SELECT *
+FROM rooms
+WHERE id = ${id}
+`

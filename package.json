@@ -14,7 +14,7 @@
     "typecheck": "tsc",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "webhook-proxy": "lt -h 'http://serverless.social' --print-requests --port 3000 --subdomain syncify-pusher"
+    "webhook-proxy": "ssh -R syncify-${USER}.serveo.net:80:localhost:3000 serveo.net"
   },
   "author": "Daniel Schleindlsperger",
   "husky": {
