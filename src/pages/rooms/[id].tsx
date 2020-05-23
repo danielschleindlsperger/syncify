@@ -27,6 +27,7 @@ export default withPlayerStore(() => {
 
   const { data: room, error, revalidate } = useApiRequest<Room>(id ? `/api/rooms/${id}` : null, {
     shouldRetryOnError: false,
+    revalidateOnFocus: false,
   })
 
   if (error) return <div>Whoopps, something bad happened!</div>
