@@ -25,15 +25,15 @@ docker-compose up -d
 npm run migrate up
 npm run migrate down
 npm run migrate create my-new-migration
+```
 
-## Nomeclature (Domain Language)
+## Nomenclature (Domain Language)
 
 This is how we name certain things:
 
-## Track or Song
+### Track or Song
 
-Always use the name **track**. Spotify uses it in all their APIs and doing it differently would increase complexity.
-```
+Always use the name **track**. Spotify uses this naming scheme in all their APIs and doing it differently would increase complexity.
 
 ## Release (Deployment)
 
