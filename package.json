@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next",
     "build": "next build",
-    "start": "now dev",
+    "start": "vercel dev",
     "migrate": "node database/migrate",
     "test": "jest",
     "e2e": "TS_NODE_PROJECT=tsconfig.e2e.json DOTENV_CONFIG_PATH=.env.build wdio",
@@ -76,12 +76,12 @@
     "husky": "^4.2.5",
     "jest": "^26.1.0",
     "localtunnel": "^2.0.0",
-    "now": "^19.1.1",
     "prettier": "^2.0.5",
     "pretty-quick": "^2.0.1",
     "start-server-and-test": "^1.11.0",
     "tailwindcss": "^1.4.6",
     "ts-node": "^8.10.2",
-    "typescript": "^3.9.6"
+    "typescript": "^3.9.6",
+    "vercel": "^19.2.0"
   }
 }
