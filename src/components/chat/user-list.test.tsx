@@ -26,6 +26,6 @@ describe('<Userlist />', () => {
 
   it('renders nothing if no users are in the list', () => {
     const { container } = render(<Userlist users={[]} />)
-    expect(container).toBeEmpty()
+    expect(container).toBeEmptyDOMElement()
   })
 })
