@@ -33,11 +33,16 @@ export const SpotifyPlayerProvider: React.FC = ({ children }) => {
 
   const state = usePlayerState((state) => state)
 
+  // Pack the access token in a mutable ref to allow the closure to read the value after it changed,
+  // without changing the closure itself (or creating a new closure).
+  // Creating a new closure would re-execute every React "useEffect" that uses the `play` function
+  // and breaking lots of stuff, since the Spotify player is a very stateful issue.
+  const accessTokenRef = React.useRef<string | undefined>(accessToken)
   const play = React.useCallback(
     async (uris: string[], offsetMs = 0): Promise<void> => {
-      if (player && accessToken && state.deviceId) {
+      if (player && accessTokenRef.current && state.deviceId) {
         const spotify = new SpotifyWebApi()
-        spotify.setAccessToken(accessToken)
+        spotify.setAccessToken(accessTokenRef.current)
         await spotify.play({
           uris,
           device_id: state.deviceId,
@@ -45,7 +50,7 @@ export const SpotifyPlayerProvider: React.FC = ({ children }) => {
         })
       }
     },
-    [player, accessToken, state.deviceId],
+    [player, state.deviceId],
   )
 
   const subscribe = usePlayerActions((actions) => actions.subscribe)
