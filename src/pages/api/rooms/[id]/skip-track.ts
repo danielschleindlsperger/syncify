@@ -43,6 +43,7 @@ export default withAuth(async (req: AuthenticatedNowRequest, res: NowResponse) =
     trackId: nextTrack.id,
   }
   pusher.trigger(`presence-${room.id}`, TrackChanged, payload)
+  console.log(`Playing track "${nextTrack.id}" in room "${roomId}".`)
 
   await updateRoom(client, {
     ...room,

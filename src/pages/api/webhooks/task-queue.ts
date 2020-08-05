@@ -32,6 +32,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     trackId,
   }
   pusher.trigger(`presence-${roomId}`, TrackChanged, payload)
+  console.log(`Playing track "${trackId}" in room "${roomId}".`)
 
   await updateRoom(client, {
     ...room,
