@@ -79,12 +79,14 @@ export async function scheduleTrackChange(
   client: Client,
   { delaySeconds, ...body }: ScheduleTrackChangePayload,
 ): Promise<void> {
+  const start = Date.now()
   const { taskId } = await scheduleTask({
     queue: 'song-changed-test-queue',
     delaySeconds,
     payload: { ...body, createdTimestamp: Date.now() },
   })
   console.log(`Scheduled track "${body.trackId}" in room "${body.roomId}"`)
+  console.log(`Scheduling track on Cloud Tasks took ${Date.now() - start}`)
 
   const room = await findRoom(client, body.roomId)
   if (!room) throw new Error(`No room with id ${body.roomId} found. Track scheduling broke.`)
