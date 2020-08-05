@@ -6,7 +6,7 @@ import { withAuth, AuthenticatedNowRequest } from '../../../auth'
 import { SpotifyConfig } from '../../../config'
 import { PlaylistTrack, Playlist, Room } from '../../../types'
 import { makeClient, query, many } from '../../../db'
-import { scheduleSongChange } from '../../../queue'
+import { scheduleTrackChange } from '../../../queue'
 
 const client = makeClient()
 
@@ -108,7 +108,7 @@ RETURNING *
     // EXPERIMENTAL
     if (room.playlist.tracks.length > 0) {
       const [first, second] = room.playlist.tracks
-      await scheduleSongChange(client, {
+      await scheduleTrackChange(client, {
         delaySeconds: first.duration_ms / 1000,
         roomId: room.id,
         trackId: second.id,

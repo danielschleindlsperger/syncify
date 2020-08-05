@@ -44,7 +44,7 @@ export const PickModeStep = ({ setMode, activeMode }: PickModeStepProps) => {
             onClick={() => setMode('create-from-scratch')}
             disabled
           >
-            <span className="text-gray-500">Coming soon: Handpick Every Song</span>
+            <span className="text-gray-500">Coming soon: Handpick Every Track</span>
           </ModeButton>
         </li>
       </ul>

@@ -7,7 +7,7 @@ import { PlayerStoreProvider } from './player-store'
 
 storiesOf('Player', module)
   .addDecorator(withSpotifyCredentials)
-  .add('Start of song', () => (
+  .add('Start of track', () => (
     <PlayerStoreProvider>
       <SpotifyPlayerProvider>
         <PlayTrack uris={['spotify:track:5PTQyBvYT020Bj75v01CDW']} />
@@ -15,7 +15,7 @@ storiesOf('Player', module)
       </SpotifyPlayerProvider>
     </PlayerStoreProvider>
   ))
-  .add('Change of songs', () => (
+  .add('Change of tracks', () => (
     <PlayerStoreProvider>
       <SpotifyPlayerProvider>
         <PlayTrack
@@ -26,7 +26,7 @@ storiesOf('Player', module)
       </SpotifyPlayerProvider>
     </PlayerStoreProvider>
   ))
-  .add('Last Song ends', () => (
+  .add('Last track ends', () => (
     <PlayerStoreProvider>
       <SpotifyPlayerProvider>
         <PlayTrack uris={['spotify:track:5PTQyBvYT020Bj75v01CDW']} offset={250000} />

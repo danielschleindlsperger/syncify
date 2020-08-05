@@ -52,7 +52,7 @@ export async function seed(knex: Knex): Promise<any> {
 
 const playlist: Playlist = {
   created: new Date().toISOString(),
-  songs: [
+  tracks: [
     { id: '5j6ZZwA9BnxZi5Bk0Ng4jB' },
     {
       id: '6CWbnFaVAhWLacSZBbS3h8',

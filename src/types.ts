@@ -22,11 +22,6 @@ export type Playlist = Readonly<{
   }
 }>
 
-export type Song = Readonly<{
-  // Spotify id, can be used to create a Spotify URI in the format "spotify:track:{id}"
-  id: string
-}>
-
 export type PlaylistTrack = Readonly<{
   id: string
   name: string

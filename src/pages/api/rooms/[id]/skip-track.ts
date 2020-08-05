@@ -5,7 +5,7 @@ import { Room } from '../../../../types'
 import { TrackChangedPayload, TrackChanged } from '../../../../pusher-events'
 import { pusher } from '../../../../pusher'
 import { dropWhile } from 'ramda'
-import { scheduleSongChange } from '../../../../queue'
+import { scheduleTrackChange } from '../../../../queue'
 
 const client = makeClient()
 
@@ -27,7 +27,7 @@ export default withAuth(async (req: AuthenticatedNowRequest, res: NowResponse) =
   const currentTrackId = room.playlist.playback?.currentTrackId
 
   if (!currentTrackId) {
-    return res.status(500).json({ msg: 'No current song found' })
+    return res.status(500).json({ msg: 'No current track found' })
   }
 
   const [currentTrack, nextTrack, trackToSchedule] = dropWhile<Room['playlist']['tracks'][0]>(
@@ -53,7 +53,7 @@ export default withAuth(async (req: AuthenticatedNowRequest, res: NowResponse) =
   })
 
   if (trackToSchedule) {
-    await scheduleSongChange(client, {
+    await scheduleTrackChange(client, {
       delaySeconds: currentTrack.duration_ms / 1000,
       roomId: room.id,
       trackId: trackToSchedule.id,

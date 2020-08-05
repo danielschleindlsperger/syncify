@@ -22,7 +22,7 @@ export const FinalizeStep = ({ roomState, setRoomState, onSubmit }: FinalizeStep
     setRoomState((s) => ({ ...s, publiclyListed }))
   }
 
-  // TODO: display a sort of overview or preview of the songs/playlist picked
+  // TODO: display a sort of overview or preview of the tracks/playlist picked
 
   return (
     <div>

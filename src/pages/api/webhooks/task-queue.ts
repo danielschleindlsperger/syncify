@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { scheduleSongChange } from '../../../queue'
+import { scheduleTrackChange } from '../../../queue'
 import { makeClient, findRoom, updateRoom } from '../../../db'
 import { Room } from '../../../types'
 import { dropWhile } from 'ramda'
@@ -23,7 +23,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
   if (!taskId || taskId !== room.playlist.nextTrackChangeTaskId) {
     console.info(
-      `Room change in room "${roomId}": Task id "${taskId}" does not match. Skipping song "${trackId}".`,
+      `Room change in room "${roomId}": Task id "${taskId}" does not match. Skipping track "${trackId}".`,
     )
     return res.json({ msg: 'taskId does not match' })
   }
@@ -53,7 +53,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     return res.json({ msg: 'Playlist changed or playlist over' })
   }
 
-  await scheduleSongChange(client, {
+  await scheduleTrackChange(client, {
     delaySeconds: currentTrack.duration_ms / 1000,
     roomId: room.id,
     trackId: nextTrack.id,

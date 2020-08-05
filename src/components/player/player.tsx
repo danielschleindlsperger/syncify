@@ -3,7 +3,7 @@ import cx from 'classnames'
 import { usePlayerState } from './player-store'
 import { useRoom, useRoomChannel } from '../room'
 import { useSpotifyPlayer } from './spotify-web-player'
-import { Progress } from './song-progress'
+import { Progress } from './track-progress'
 import { VolumeSlider } from './volume-controls'
 import { TrackChanged, TrackChangedPayload } from '../../pusher-events'
 

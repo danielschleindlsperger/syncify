@@ -5,7 +5,7 @@ type Playlist = import('../../types').Playlist
 
 type PlaylistProps = React.HTMLAttributes<HTMLElement> & { playlist: Playlist }
 
-// TODO: scroll to active song when active song changes. Don't change when user currently scrolls the list.
+// TODO: scroll to active track when active track changes. Don't change when user currently scrolls the list.
 export const Playlist = React.memo(({ playlist, ...props }: PlaylistProps) => {
   const currentTrack = usePlayerState((s) => s.playbackState?.track_window.current_track)
 
