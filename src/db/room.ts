@@ -4,7 +4,7 @@ import { Room } from '../types'
 
 export async function findRoom(client: Client, id: string): Promise<Room | undefined> {
   return first<Room>(client)`
-SELECT id, name, publicly_listed as "publiclyListed", playlist, admins
+SELECT id, name, cover_image, publicly_listed as "publiclyListed", playlist, admins
 FROM rooms r
 WHERE id = ${id}
 `
