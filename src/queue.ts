@@ -84,6 +84,7 @@ export async function scheduleSongChange(
     delaySeconds,
     payload: { ...body, createdTimestamp: Date.now() },
   })
+  console.log(`scheduled song "${body.trackId}" in room "${body.roomId}"`)
 
   const room = await findRoom(client, body.roomId)
   if (!room) throw new Error(`No room with id ${body.roomId} found. Song scheduling broke.`)

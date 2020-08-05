@@ -22,7 +22,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   }
 
   if (!taskId || taskId !== room.playlist.nextTrackChangeTaskId) {
-    console.info('Task id does not match', { roomId, taskId })
+    console.info(
+      `Room change in room "${roomId}": Task id "${taskId}" does not match. Skipping song "${trackId}".`,
+    )
     return res.json({ msg: 'taskId does not match' })
   }
 
@@ -38,6 +40,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       playback: { currentTrackId: trackId, currentTrackStartedAt: new Date().toISOString() },
     },
   })
+
+  // We changed the room's current track to the scheduled one, now we attempt to schedule the next track change
 
   const [currentTrack, nextTrack] = dropWhile<Room['playlist']['tracks'][0]>(
     (t) => t.id !== trackId,
