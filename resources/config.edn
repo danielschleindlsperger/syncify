@@ -1,0 +1,4 @@
+{:base-url #or [#env BASE_URL "http://localhost:8000"]
+ :port #long #or [#env PORT 8000]
+ :db {:jdbcUrl #or [#env DATABASE_URL "jdbc:postgresql:postgres?user=postgres&password=postgres"]}
+ :jwt-secret #or [#env JWT_SECRET "!G$J%M&N*Q)R+T@U"]}
