@@ -35,6 +35,6 @@
     (queue/put! q :add [1 2 3])
     (queue/put! q :add [4 5 6])
     (queue/put! q :add [7 8 9])
-    @(sleep 500)
-    (is (= @results [6 15 24]))
+    @(sleep 50)
+    (is (every? #{6 15 24} @results))
     (cancel-schedule)))

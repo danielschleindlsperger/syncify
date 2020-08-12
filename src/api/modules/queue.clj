@@ -1,6 +1,3 @@
-;; Later:
-;; - Listen/Notify to avoid polling?
-
 (ns api.modules.queue
   (:require [next.jdbc :as jdbc]
             [next.jdbc.sql :as sql]
@@ -96,13 +93,17 @@
    The following options are supported:
    
    * `poll-interval` -- The interval in milliseconds to wait between trying to poll the database for new jobs.
+   * `worker-count` -- The number of threads to work the queue. Note that database load increases linearely with each worker added. Default is 4.
    * `handler-fn` -- Binary (2 argument) function that takes the name of the tasks as the first argument
-      and the payload of the task as the second argument. Ideal for dispatching with multi-methods."
+      and the payload of the task as the second argument. Ideal for dispatching with multi-methods.
+   
+   Note: With the default settings the scheduel will create a load of approximately 40 queries per second on your database."
   [queue opts]
-  (let [{:keys [poll-interval handler-fn]} opts
-        schedule (chime/chime-at (-> (chime/periodic-seq (Instant/now) (Duration/ofMillis poll-interval)))
-                                 (fn [_] (process! queue handler-fn)))
-        close #(.close schedule)]
+  (let [{:keys [poll-interval worker-count handler-fn]} opts
+        schedules (doall (repeatedly (or worker-count 4)
+                                     #(chime/chime-at (-> (chime/periodic-seq (Instant/now) (Duration/ofMillis poll-interval)))
+                                                      (fn [_] (process! queue handler-fn)))))
+        close #(doall (for [schedule schedules] (.close schedule)))]
     close))
 
 (comment
