@@ -20,8 +20,17 @@
 
         ;; JSON
          metosin/jsonista {:mvn/version "0.2.6"}
-         camel-snake-kebab {:mvn/version "0.4.1"}}
+         camel-snake-kebab {:mvn/version "0.4.1"}
+
+         raml-clj-parser {:mvn/version "0.1.1-SNAPSHOT"}
+
+         jarohen/chime {:mvn/version "0.3.2"}}
+
  :paths ["src" "resources"]
- :aliases {:dev {:extra-paths ["dev"]}
+ :aliases {:dev {:extra-paths ["dev/src" "test"]}
+           :test {:extra-paths ["test"]
+                  :extra-deps {com.cognitect/test-runner {:git/url "https://github.com/cognitect-labs/test-runner.git"
+                                                          :sha "209b64504cb3bd3b99ecfec7937b358a879f55c1"}}
+                  :main-opts ["-m" "cognitect.test-runner"]}
            :uberjar {:extra-deps {uberdeps {:mvn/version "0.1.10"}}
                      :main-opts ["-m" "uberdeps.uberjar" "--target target/syncify-api.jar"]}}}

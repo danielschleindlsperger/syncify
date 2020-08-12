@@ -4,6 +4,7 @@
             [next.jdbc.sql :as sql]
             [next.jdbc :as jdbc]
             [api.sql :refer [as-kebab-maps]]
+            [api.modules.queue :as queue]
             [api.util.http :refer [json]]))
 
 ;; TODO: This query does not use indexes right now because we sort by the COUNT aggregate.
@@ -31,7 +32,7 @@ LIMIT ?")
           offset (-> req :query-params (get "offset" "0") Integer/parseInt)
           ;; Overfetch by one to be able to determine if there's more rows available
           rooms (get-rooms-data (:ds ctx) {:offset offset :limit (inc limit)})
-          has-more? (< 24 (count rooms))]
+          has-more? (< limit (count rooms))]
       (json {:next-offset (+ offset limit)
              :has-more has-more?
              :data (take limit rooms)}))))
@@ -50,6 +51,8 @@ WHERE id = ?")
   (fn [req]
     (let [id (-> req :path-params :id)
           room (get-room-data (:ds ctx) id)]
+      (queue/put! (:queue ctx) :change-track {:foo "bar"})
+      (println "fooo")
       (json room))))
 
 ;; TODO:

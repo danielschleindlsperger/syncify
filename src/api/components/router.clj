@@ -24,13 +24,15 @@
     (ring/router ["/" {:get homepage}])
     (rooms/new-router ctx))))
 
-(defrecord Router [database config;; dependencies
+(defrecord Router [application config;; dependencies
                    routes]
   component/Lifecycle
   (start [this]
-    (let [ds (:ds database)]
+    (let [ds (-> application :database :ds)
+          queue (-> application :queue :queue)]
       (if routes
         this
         (assoc this :routes (compile-routes {:config config
-                                             :ds ds})))))
+                                             :ds ds
+                                             :queue queue})))))
   (stop [this] this))

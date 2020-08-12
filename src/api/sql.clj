@@ -2,6 +2,7 @@
   (:require [clojure.string :as str]
             [next.jdbc.prepare :as prepare]
             [next.jdbc.result-set :as rs]
+            [next.jdbc.date-time]
             [jsonista.core :as json]))
 (import [org.postgresql.util PGobject]
         [java.sql PreparedStatement])
