@@ -18,8 +18,8 @@
 (defn- app []
   (component/using (map->Application {}) [:database :queue]))
 
-(defn- config [env]
-  (component/using (map->Config {:env env}) '[]))
+(defn- config [profile]
+  (component/using (map->Config {:profile profile}) '[]))
 
 (defn- router []
   (component/using (map->Router {})
@@ -37,9 +37,9 @@
   (component/using (map->Queue {})
                    [:database :config]))
 
-(defn new-system [env]
+(defn new-system [profile]
   (component/system-map :application (app)
-                        :config (config env)
+                        :config (config profile)
                         :database    (database)
                         :web-server  (web-server)
                         :router (router)

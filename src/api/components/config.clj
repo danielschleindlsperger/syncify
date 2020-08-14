@@ -4,16 +4,19 @@
             [clojure.java.io :as io]))
 
 (defn- load-config
-  []
+  [profile]
   (-> (io/resource "config.edn")
-      (aero/read-config)))
+      (aero/read-config {:profile profile
+                         :resolver aero/resource-resolver})))
 
-(defrecord Config [env ;; :dev or :prod
-                   ;; the config keys
+(defrecord Config [profile ;; :dev or :prod
+                   ;; the config keys:
                    port
+                   base-url
                    db
-                   jwt-secret]
+                   jwt-secret
+                   spotify]
   component/Lifecycle
   (start [this]
-    (merge this (load-config)))
+    (merge this (load-config profile)))
   (stop  [this] this))

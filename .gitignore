@@ -10,3 +10,4 @@ node_modules
 .calva/
 .cpcache/
 .nrepl-port
+dev/resources/secrets.edn
