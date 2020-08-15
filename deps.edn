@@ -22,8 +22,6 @@
          metosin/jsonista {:mvn/version "0.2.6"}
          camel-snake-kebab {:mvn/version "0.4.1"}
 
-         raml-clj-parser {:mvn/version "0.1.1-SNAPSHOT"}
-
          jarohen/chime {:mvn/version "0.3.2"}}
 
  :paths ["src" "resources"]

@@ -52,7 +52,6 @@ WHERE id = ?")
     (let [id (-> req :path-params :id)
           room (get-room-data (:ds ctx) id)]
       (queue/put! (:queue ctx) :change-track {:foo "bar"})
-      (println "fooo")
       (json room))))
 
 ;; TODO:

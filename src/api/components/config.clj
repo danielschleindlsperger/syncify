@@ -19,4 +19,4 @@
   component/Lifecycle
   (start [this]
     (merge this (load-config profile)))
-  (stop  [this] this))
+  (stop [this] this))
