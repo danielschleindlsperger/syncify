@@ -13,6 +13,7 @@
             options (:queue config)
             cancel-schedule (queue/create-schedule queue
                                                    (assoc options :handler-fn handle-event))]
-        (merge this {:queue queue :cancel-schedule cancel-schedule}))))
+        (merge this {:queue queue
+                     :cancel-schedule cancel-schedule}))))
   (stop [this]
-    (cancel-schedule)))
+    (when cancel-schedule (cancel-schedule))))

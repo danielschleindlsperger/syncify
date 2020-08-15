@@ -10,7 +10,7 @@
                          :resolver aero/resource-resolver})))
 
 (defrecord Config [profile ;; :dev or :prod
-                   ;; the config keys:
+                   ;; the config keys
                    port
                    base-url
                    db

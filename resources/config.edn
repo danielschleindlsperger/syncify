@@ -2,16 +2,20 @@
 {:secrets #include "secrets.edn"
  :base-url #profile {:dev "http://localhost:8000"
                      :prod #env BASE_URL}
- :port #long #profile {:dev 8000
-                       :prod #env PORT}
+ :port #profile {:dev 8000
+                 :prod #long #env PORT}
  :db {:jdbcUrl #profile {:dev "jdbc:postgresql:postgres?user=postgres&password=postgres"
                          :prod #env DATABASE_URL}}
  :spotify {:client-id #profile {:dev #ref [:secrets :spotify :client-id]
                                 :prod #env SPOTIFY_CLIENT_ID}
            :client-secret #profile {:dev #ref [:secrets :spotify :client-secret]
                                     :prod #env SPOTIFY_CLIENT_SECRET}
-           :redirect-uri #profile {:dev "http://localhost:8000/spotify-callback"
+           :redirect-uri #profile {:dev "http://localhost:8000/auth/spotify-callback"
                                    :prod #env SPOTIFY_REDIRECT_URI}}
  :queue {:poll-interval 100}
  :jwt-secret #profile {:dev "!G$J%M&N*Q)R+T@U"
-                       :prod #env JWT_SECRET}}
+                       :prod #env JWT_SECRET}
+ :logging {:level #profile {:dev :info
+                            :prod :info}
+           :format #profile {:dev :line ; is it really called :line?
+                             :prod :json}}}

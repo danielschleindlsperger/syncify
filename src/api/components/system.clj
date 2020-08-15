@@ -5,7 +5,8 @@
             [api.components.web-server :refer [map->WebServer]]
             [api.components.router :refer [map->Router]]
             [api.components.database :refer [map->Database]]
-            [api.components.queue :refer [map->Queue]]))
+            [api.components.queue :refer [map->Queue]]
+            [api.components.logging :refer [map->Logging]]))
 
 (defrecord Application [database queue ; dependency
                         state]   ; behavior
@@ -16,7 +17,7 @@
     (assoc this :state "Stopped")))
 
 (defn- app []
-  (component/using (map->Application {}) [:database :queue]))
+  (component/using (map->Application {}) [:config :database :queue]))
 
 (defn- config [profile]
   (component/using (map->Config {:profile profile}) '[]))
@@ -37,13 +38,18 @@
   (component/using (map->Queue {})
                    [:database :config]))
 
+(defn- logging []
+  (component/using (map->Logging {})
+                   [:config]))
+
 (defn new-system [profile]
   (component/system-map :application (app)
                         :config (config profile)
                         :database    (database)
                         :web-server  (web-server)
                         :router (router)
-                        :queue (queue)))
+                        :queue (queue)
+                        :logging (logging)))
 
 (defn start
   "Performs side effects to initialize the system, acquire resources,
