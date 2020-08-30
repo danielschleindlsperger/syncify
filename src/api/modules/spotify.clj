@@ -220,7 +220,7 @@
   (replace-path-params endpoint '{}))
 
 (defn invoke
-  "This is the bread and butter. It is how you interact with the Spotify Web API.
+  "This is how you interact with the Spotify Web API.
    Returns either the requested payload within the :body key or an error within the :error key.
    Examples:
    (invoke :artist access-token '{:id \"0OdUWJ0sBjDrqHygGUXeCF\"})"

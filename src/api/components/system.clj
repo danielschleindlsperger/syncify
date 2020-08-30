@@ -45,8 +45,8 @@
 (defn new-system [profile]
   (component/system-map :application (app)
                         :config (config profile)
-                        :database    (database)
-                        :web-server  (web-server)
+                        :database (database)
+                        :web-server (web-server)
                         :router (router)
                         :queue (queue)
                         :logging (logging)))

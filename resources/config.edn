@@ -12,7 +12,9 @@
                                     :prod #env SPOTIFY_CLIENT_SECRET}
            :redirect-uri #profile {:dev "http://localhost:8000/auth/spotify-callback"
                                    :prod #env SPOTIFY_REDIRECT_URI}}
- :queue {:poll-interval 100}
+ :queue {:poll-interval 100
+         :worker-count #profile {:dev 1
+                                 :prod 4}}
  :jwt-secret #profile {:dev "!G$J%M&N*Q)R+T@U"
                        :prod #env JWT_SECRET}
  :logging {:level #profile {:dev :info

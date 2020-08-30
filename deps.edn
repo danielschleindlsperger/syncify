@@ -1,8 +1,12 @@
 {:deps  {org.clojure/clojure {:mvn/version "1.10.1"}
          org.clojure/tools.namespace {:mvn/version "1.0.0"}
+         com.stuartsierra/component {:mvn/version "1.0.0"}
+
+         ;; logging
          com.taoensso/timbre {:mvn/version "4.10.0"}
          com.fzakaria/slf4j-timbre {:mvn/version "0.3.19"}
-         com.stuartsierra/component {:mvn/version "1.0.0"}
+
+         ;; config management
          aero {:mvn/version "1.1.6"}
 
          ;; HTTP
@@ -17,18 +21,31 @@
          seancorfield/next.jdbc {:mvn/version "1.1.581"}
          org.postgresql/postgresql {:mvn/version "42.2.10"}
          com.zaxxer/HikariCP {:mvn/version "3.4.5"}
+         honeysql {:mvn/version "1.0.444"}
+         nilenso/honeysql-postgres {:mvn/version "0.2.6"}
 
         ;; JSON
          metosin/jsonista {:mvn/version "0.2.6"}
          camel-snake-kebab {:mvn/version "0.4.1"}
 
+         ;; error handling
+         failjure {:mvn/version "2.0.0"}
+         slingshot {:mvn/version "0.12.2"}
+
+         ;; validation
+         metosin/malli {:git/url "https://github.com/metosin/malli"
+                        :sha "3246df27bd758757650c3e0510702dfb562422b4"}
+
+         ;; scheduling
          jarohen/chime {:mvn/version "0.3.2"}}
 
  :paths ["src" "resources"]
- :aliases {:dev {:extra-paths ["dev/src" "dev/resources" "test"]}
+ :aliases {:dev {:extra-paths ["dev/src" "dev/resources" "test"]
+                 :extra-deps {ring/ring-mock {:mvn/version "0.4.0"}}}
            :test {:extra-paths ["test"]
                   :extra-deps {com.cognitect/test-runner {:git/url "https://github.com/cognitect-labs/test-runner.git"
-                                                          :sha "209b64504cb3bd3b99ecfec7937b358a879f55c1"}}
+                                                          :sha "209b64504cb3bd3b99ecfec7937b358a879f55c1"}
+                               ring/ring-mock {:mvn/version "0.4.0"}}
                   :main-opts ["-m" "cognitect.test-runner"]}
            :uberjar {:extra-deps {uberdeps {:mvn/version "0.1.10"}}
                      :main-opts ["-m" "uberdeps.uberjar" "--target target/syncify-api.jar"]}}}
