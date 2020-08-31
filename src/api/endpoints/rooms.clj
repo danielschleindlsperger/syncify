@@ -8,7 +8,7 @@
             [api.util.http :refer [json]]))
 
 ;; TODO: This query does not use indexes right now because we sort by the COUNT aggregate.
-;; Maybe we can use a view here? 
+;; Maybe we can use a view here?
 (def rooms-query "
 SELECT r.id, r.name, r.cover_image, COUNT (u) AS listeners_count
 FROM rooms r

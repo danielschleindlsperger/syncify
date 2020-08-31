@@ -2,25 +2,33 @@
   (:require [com.stuartsierra.component :as component]
             [reitit.ring :as ring]
             [reitit.core :as reitit]
-            [api.util.http :refer [json]]
+            [ring.middleware.session :refer [wrap-session]]
+            [ring.middleware.session.cookie :refer [cookie-store]]
+            [api.util.http :refer [json wrap-handle-errors]]
+            [api.util.string :refer [str->byte-arr]]
             [api.components.logging :as logging]
             [api.endpoints.rooms :as rooms]
-            [api.endpoints.auth :as auth]))
+            [api.endpoints.auth :as auth]
+            [api.modules.auth :refer [wrap-authentication]]))
 
 (defn homepage
-  [_]
-  {:status 200 :body "homepage"})
+  [req]
+  {:status 200 :body "homepage" :session {:foo "bar"}})
 
 (defn- default-handler [_]
-  (-> {:status 404
-       :error "The requested resource could not be found."}
+  (-> {:error "The requested resource could not be found."}
       json
       (assoc :status 404)))
 
-(def ^:private default-middleware [[logging/wrap-trace]
-                                   [logging/wrap-request-logging]
-                                  ;; TODO: authentication
-                                   ])
+(defn- default-middleware
+  [ctx]
+  [[logging/wrap-trace]
+   [logging/wrap-request-logging]
+   [wrap-handle-errors {:stacktrace? (= :dev (get-in ctx [:config :profile]))}]
+   [wrap-session {:store (cookie-store {:key (-> ctx :config :jwt-secret str->byte-arr)})
+                  :cookie-name "syncify-session"
+                  :cookie-attrs {:max-age (* 60 60 24 7)}}]
+   [wrap-authentication]])
 
 (defn merge-routers
   "Merge multiple Reitit router into a single one."
@@ -35,11 +43,13 @@
   [ctx]
   (ring/ring-handler
    (merge-routers
-    (ring/router ["/" {:get homepage}])
+    (ring/router ["/" {:get homepage :foo "bar"}])
     (rooms/new-router ctx)
     (auth/new-router ctx))
    default-handler
-   {:middleware default-middleware}))
+   {:middleware (default-middleware ctx)
+    :inject-match? true
+    :inject-router? true}))
 
 (defrecord Router [application;; dependencies
                    routes]

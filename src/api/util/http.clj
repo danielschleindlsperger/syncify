@@ -1,8 +1,11 @@
 (ns api.util.http
   (:require [clojure.string :as str]
             [jsonista.core :as jsonista]
-            [camel-snake-kebab.core :refer [->camelCase ->kebab-case-keyword]])
-  (:import [java.nio.charset StandardCharsets]
+            [slingshot.slingshot :refer [try+]]
+            [camel-snake-kebab.core :refer [->camelCase ->kebab-case-keyword]]
+            [api.modules.validation])
+  (:import [api.modules.validation ServerError ValidationError]
+           [java.nio.charset StandardCharsets]
            [java.net URLDecoder]))
 
 (set! *warn-on-reflection* true)
@@ -43,3 +46,20 @@
    :headers {"content-type" "application/json"}})
 
 (defn temporary-redirect [target-url] {:status 307 :headers {"Location" target-url}})
+
+(def unauthenticated (-> {:error "Request is unauthenticated."} json (assoc :status 401)))
+
+(def unauthorized (-> {:error "Request is unauthorized."} json (assoc :status 403)))
+
+(defn wrap-handle-errors
+  "Ring middleware to handle all thrown errors gracefully.
+ If option `:stacktrace?` is truthy, shows more info about the error which may help diagnose and fix the root cause."
+  [handler {:keys [stacktrace?]}]
+  (fn [req]
+    (try+ (handler req)
+          (catch ValidationError e (-> (json e) (assoc :status 422)))
+          (catch ServerError e (-> (json e) (assoc :status 500)))
+          (catch Object e (let [res (if stacktrace?
+                                      &throw-context
+                                      {:error "A server error occurred."})]
+                            (-> res json (assoc :status 500)))))))

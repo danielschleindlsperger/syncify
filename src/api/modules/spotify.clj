@@ -93,6 +93,19 @@
       {:error error}
       (parse-json body))))
 
+(defn refresh-access-token
+  "Fetch a new access token for the Spotify API with an existing refresh token.
+   Takes a map with the following keys as an argument: `:client-id`, `:client-secret`, `:refresh-token`"
+  [{:keys [client-id client-secret refresh-token]}]
+  (let [form-params {:refresh_token refresh-token
+                     :grant_type "refresh_token"}
+        headers {"Authorization" (str "Basic " (->base64 (str client-id ":" client-secret)))}
+        {:keys [body error]} @(http/post token-url {:headers headers
+                                                    :form-params form-params})]
+    (if error
+      {:error error}
+      (parse-json body))))
+
 (comment
   (authorization-url {:client-id "sad9hdsfoaf"
                       :redirect-uri "https://localhost.com/foo"
