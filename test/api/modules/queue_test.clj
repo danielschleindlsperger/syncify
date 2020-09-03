@@ -2,31 +2,28 @@
   (:require [clojure.test :refer [deftest use-fixtures is]]
             [next.jdbc :as jdbc]
             [next.jdbc.sql :as sql]
-            [api.modules.queue :as queue]))
+            [api.modules.queue :as queue]
+            [api.test-utils :refer [test-ctx fresh-database]]))
 
 (defn sleep [n] (future (Thread/sleep n)))
 
-(def ^:private db "jdbc:postgresql:postgres?user=postgres&password=postgres")
+(def ^:private ds (:ds test-ctx))
 
-(defn clean-queue-table [f]
-  (jdbc/execute! db ["truncate table queue"])
-  (f))
-
-(use-fixtures :each clean-queue-table)
+(use-fixtures :each fresh-database)
 
 (deftest queue-test
-  (let [q (queue/create {:db db})]
+  (let [q (queue/create {:db ds})]
     (queue/put! q :foo {:a :b})
     (queue/put! q :baz {:c :d})
     (queue/put! q :bar {:e :f})
-    (is (= 3 (count (sql/query db ["select * from queue"]))))
+    (is (= 3 (count (sql/query ds ["select * from queue"]))))
     (queue/process! q (fn [name payload]
                         (is (= :foo name))
                         (is (= {:a :b} payload))))
-    (is (= 2 (count (sql/query db ["select * from queue"]))))))
+    (is (= 2 (count (sql/query ds ["select * from queue"]))))))
 
 (deftest schedule-test
-  (let [q (queue/create {:db db})
+  (let [q (queue/create {:db ds})
         results (atom [])
         cancel-schedule (queue/create-schedule q {:poll-interval 100
                                                   :handler-fn (fn

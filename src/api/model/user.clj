@@ -6,13 +6,10 @@
             [honeysql.format :refer [format]]
             [honeysql-postgres.format]
             [honeysql-postgres.helpers :refer [upsert on-conflict do-update-set returning]]
-            [camel-snake-kebab.core :refer [->kebab-case-keyword]])
+            [api.sql :refer [as-unqualified-kebab-maps]])
   (:import [java.time Instant]))
 
 ;; TODO: specs?
-
-(defn- as-unqualified-kebab-maps [rs opts]
-  (result-set/as-unqualified-modified-maps rs (assoc opts :qualifier-fn ->kebab-case-keyword :label-fn ->kebab-case-keyword)))
 
 (defn find-user [ds id] (sql/get-by-id ds :users id {:builder-fn as-unqualified-kebab-maps}))
 

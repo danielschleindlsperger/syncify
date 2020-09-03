@@ -9,7 +9,9 @@
 (defn- config [ds]
   {:store :database
    :migration-table-name "migrations"
-   :db {:datasource ds}})
+   :db (if (= javax.sql.DataSource (type ds))
+         {:datasource ds}
+         ds)})
 
 (defn run-migrations! [ds]
   (migratus/migrate (config ds)))

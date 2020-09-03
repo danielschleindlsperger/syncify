@@ -3,7 +3,7 @@
             [reitit.ring.middleware.parameters :refer [parameters-middleware]]
             [next.jdbc.sql :as sql]
             [next.jdbc :as jdbc]
-            [api.sql :refer [as-kebab-maps]]
+            [api.sql :refer [as-unqualified-kebab-maps]]
             [api.modules.queue :as queue]
             [api.util.http :refer [json]]))
 
@@ -21,7 +21,7 @@ LIMIT ?")
 
 (defn- get-rooms-data
   [ds {:keys [offset limit]}]
-  (sql/query ds [rooms-query offset limit] {:builder-fn as-kebab-maps}))
+  (sql/query ds [rooms-query offset limit] {:builder-fn as-unqualified-kebab-maps}))
 
 (defn all-rooms
   [ctx]
@@ -44,7 +44,7 @@ WHERE id = ?")
 
 (defn- get-room-data
   [ds ^String id]
-  (jdbc/execute-one! ds [get-room-query (java.util.UUID/fromString id)] {:builder-fn as-kebab-maps}))
+  (jdbc/execute-one! ds [get-room-query (java.util.UUID/fromString id)] {:builder-fn as-unqualified-kebab-maps}))
 
 (defn get-room
   [ctx]

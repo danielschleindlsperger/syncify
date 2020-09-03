@@ -1,12 +1,14 @@
 (ns api.endpoints.auth-test
-  (:require [clojure.test :refer [deftest testing is]]
+  (:require [clojure.test :refer [deftest testing is use-fixtures]]
+            [api.test-utils :refer [fresh-database test-ctx]]
             [ring.mock.request :as mock]
             [next.jdbc.sql :as sql]
+            [api.components.database :refer [reset-schema! run-migrations!]]
+            [api.sql :refer [as-unqualified-kebab-maps]]
             [api.modules.spotify :as spotify]
             [api.endpoints.auth :as auth]))
 
-(def ^:private test-ctx {:config {:spotify {:client-id "client-id" :redirect-uri "https://redirect.uri"}}
-                         :ds "jdbc:postgresql:postgres?user=postgres&password=postgres"})
+(use-fixtures :each fresh-database)
 
 (deftest auth-test
   (testing "/auth/login"
@@ -17,14 +19,13 @@
     (with-redefs [spotify/trade-code-for-tokens (fn [_] {:access-token "access-token"
                                                          :refresh-token "refresh-token"
                                                          :expires-in 3600})
-                  spotify/invoke (fn [_ _] {:avatar "avatar" :id "id" :display-name "display-name"})]
+                  spotify/invoke (fn [_ _] {:images [{:url "avatar"}] :id "id" :display-name "display-name"})]
       (is (nil? (sql/get-by-id (:ds test-ctx) :users "id")))
       (let [handler (auth/spotify-callback test-ctx)
             result (handler (-> (mock/request :get "/auth/spotify-callback") (mock/query-string (str "code=" (apply str (repeat 191 "x"))))))]
-       ;; TODO: assert user in database 
-        (let [user (sql/get-by-id (:ds test-ctx) :users "id")]
+        (let [user (sql/get-by-id (:ds test-ctx) :users "id" {:builder-fn as-unqualified-kebab-maps})]
           (is (some? user))
           (is (= "id" (:id user)))
-          (is (= "display-name" (:display-name user)))
+          (is (= "display-name" (:name user)))
           (is (= "avatar" (:avatar user))))
         (is (= 307 (:status result)))))))

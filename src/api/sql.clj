@@ -1,9 +1,10 @@
 (ns api.sql
   (:require [clojure.string :as str]
             [next.jdbc.prepare :as prepare]
-            [next.jdbc.result-set :as rs]
+            [next.jdbc.result-set :as result-set]
             [next.jdbc.date-time]
-            [jsonista.core :as json]))
+            [jsonista.core :as json]
+            [camel-snake-kebab.core :refer [->kebab-case-keyword]]))
 (import [org.postgresql.util PGobject]
         [java.sql PreparedStatement])
 
@@ -13,12 +14,12 @@
 ;; - How to handle keyword in database access (don't use namespaces)
 ;; - Postgres JSON/JSONB encoding and decoding
 
-(defn as-kebab-maps
+
+(defn as-unqualified-kebab-maps
   "Transform the keys of next.jdbc's function's result rows to kebab case.
-   Usage: (next.jdbc.sql/get-by-id ds :users 1 {:builder-fn as-kebab-maps})"
+   Usage: (next.jdbc.sql/get-by-id ds :users 1 {:builder-fn as-unqualified-kebab-maps})"
   [rs opts]
-  (let [kebab #(str/replace % #"_" "-")]
-    (rs/as-modified-maps rs (assoc opts :qualifier-fn kebab :label-fn kebab))))
+  (result-set/as-unqualified-modified-maps rs (assoc opts :qualifier-fn ->kebab-case-keyword :label-fn ->kebab-case-keyword)))
 
 ;; :decode-key-fn here specifies that JSON-keys will become keywords:
 (def mapper (json/object-mapper {:decode-key-fn keyword}))
@@ -58,7 +59,7 @@
 
 ;; if a row contains a PGobject then we'll convert them to Clojure data
 ;; while reading (if column is either "json" or "jsonb" type):
-(extend-protocol rs/ReadableColumn
+(extend-protocol result-set/ReadableColumn
   PGobject
   (read-column-by-label [^PGobject v _]
     (<-pgobject v))
