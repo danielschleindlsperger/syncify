@@ -1,5 +1,6 @@
 (ns user
-  (:require [clojure.tools.namespace.repl :refer [refresh]]
+  (:require [taoensso.timbre]
+            [clojure.tools.namespace.repl :refer [refresh]]
             [api.components.system :as system]))
 
 (def system nil)
