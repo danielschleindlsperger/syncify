@@ -6,13 +6,18 @@
             [api.modules.validation])
   (:import [api.modules.validation ServerError ValidationError]
            [java.nio.charset StandardCharsets]
-           [java.net URLDecoder]))
+           [java.net URLEncoder URLDecoder]))
 
 (set! *warn-on-reflection* true)
 
+(defn url-encode
+  "Encode given string into a valid URL component."
+  [^String s]
+  (if (string? s) (URLEncoder/encode s (.toString StandardCharsets/UTF_8)) s))
+
 (defn url-decode
   "Decode URL-encoded entities in the supplied string."
-  [s]
+  [^String s]
   (URLDecoder/decode s (.toString StandardCharsets/UTF_8)))
 
 (defn parse-query-params

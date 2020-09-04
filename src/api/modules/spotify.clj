@@ -18,6 +18,7 @@
             [clojure.walk :refer [postwalk]]
             [org.httpkit.client :as http]
             [jsonista.core :as jsonista]
+            [api.util.http :refer [url-encode]]
             [camel-snake-kebab.core :refer [->kebab-case-keyword ->snake_case_string]])
   (:import [java.util Base64]
            [java.net URLEncoder]
@@ -61,10 +62,9 @@
    * `:encode-key-fn` -- a function that determines the string representation of a map key. Default `name`."
   ([m] (->query-string m {:encode-key-fn name}))
   ([m {:keys [encode-key-fn]}]
-   (let [url-encode  #(if (string? %) (URLEncoder/encode % (.toString StandardCharsets/UTF_8)) %)]
-     (->> m
-          (map (fn [[k v]] (str (encode-key-fn k) "=" (url-encode v))))
-          (str/join "&")))))
+   (->> m
+        (map (fn [[k v]] (str (encode-key-fn k) "=" (url-encode v))))
+        (str/join "&"))))
 
 (defn authorization-url
   "Utility function to create an authorization URL for the Authorization Code Flow (refreshable client authorization).
