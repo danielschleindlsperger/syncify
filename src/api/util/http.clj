@@ -1,5 +1,6 @@
 (ns api.util.http
   (:require [clojure.string :as str]
+            [taoensso.timbre :as log]
             [jsonista.core :as jsonista]
             [slingshot.slingshot :refer [try+]]
             [camel-snake-kebab.core :refer [->camelCase ->kebab-case-keyword]]
@@ -63,8 +64,11 @@
   (fn [req]
     (try+ (handler req)
           (catch ValidationError e (-> (json e) (assoc :status 422)))
-          (catch ServerError e (-> (json e) (assoc :status 500)))
+          (catch ServerError e (let [res (-> (json e) (assoc :status 500))]
+                                 (log/error e)
+                                 res))
           (catch Object e (let [res (if stacktrace?
                                       &throw-context
                                       {:error "A server error occurred."})]
+                            (log/error e)
                             (-> res json (assoc :status 500)))))))
