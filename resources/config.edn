@@ -14,6 +14,11 @@
                                     :prod #env SPOTIFY_CLIENT_SECRET}
            :redirect-uri #profile {:dev "http://localhost:8000/auth/spotify-callback"
                                    :prod #env SPOTIFY_REDIRECT_URI}}
+ :pusher #profile {:dev #ref [:secrets :pusher]
+                   :prod {:app-id #env PUSHER_APP_ID
+                          :key #env PUSHER_APP_KEY
+                          :secret #env PUSHER_SECRET
+                          :cluster "eu"}}
  :queue {:poll-interval 100
          :worker-count #profile {:dev 1
                                  :prod 4}}

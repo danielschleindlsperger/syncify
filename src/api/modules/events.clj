@@ -1,4 +1,5 @@
-(ns api.modules.events)
+(ns api.modules.events
+  (:require [api.modules.pusher :refer [map->PusherClient trigger-event]]))
 
 (defmulti handle-event (fn [event-name payload ctx] event-name))
 
@@ -6,8 +7,11 @@
   (throw (ex-info (str "No handler defined for event " event-name)
                   {:name event-name :payload payload})))
 
-(defrecord ChangeTrack [foo baz bar])
+(defrecord ChangeTrack [room-id event-id])
 (defmethod handle-event :change-track [event-name payload ctx]
   ;; send event to all connected clients in room
   ;; change track for all connected clients
+  (trigger-event (map->PusherClient (get-in ctx [:config :pusher])) {:name :change-track
+                                                                     :data {:foo "bar"}
+                                                                     :channel (:room-id payload)})
   (println "handling" payload))

@@ -83,7 +83,7 @@ WHERE id = ?")
     (flatten (pmap #(fetch-track-partition access-token %) parts))))
 
 (defn- schedule-track-change! [queue room]
-  (queue/put! queue :change-track {:foo "bar"} {:delay-ms 2000}))
+  (queue/put! queue :change-track {:room-id (:id room)} {:delay-ms 2000}))
 
 (defn- create-room
   [ctx]
