@@ -3,11 +3,45 @@
             [next.jdbc.sql :as sql]
             [next.jdbc.date-time]
             [chime.core :as chime]
-            [clojure.edn :as edn])
+            [clojure.edn :as edn]
+            [taoensso.timbre :as log])
   (:import [java.time Instant Duration]))
 
-(defrecord Queue [db statement-timeout])
-(defrecord Task [id name payload created-at execute-at])
+(defprotocol Queue
+  (put-task! [q name payload opts])
+  (delete-task! [q id])
+  (process! [q work-fn] "Take an item off the queue and process it.
+                         Takes the queue as the first parameter. The second argument is a function that takes two parameters.
+                         The first parameter is the name of the tasks. The second parameter is the task's payload.
+                         This allows for function dispatch using multimethods."))
+
+(defn- select-task [ds]
+  (jdbc/execute-one! ds ["select * from queue
+                          where execute_at < current_timestamp
+                          order by created_at asc
+                          limit 1
+                          for update skip locked"]))
+
+(defn- delete-task!
+  [ds id]
+  {:pre [(some? id)]}
+  (sql/delete! ds :queue {:id id}))
+
+(defrecord PGQueue [db statement-timeout]
+  Queue
+  (put-task! [q name payload opts]
+    (let [{:keys [delay-ms]} opts]
+      (sql/insert! db :queue {:name (print-str name)
+                              :payload (print-str payload)
+                              :execute_at (.plusMillis (Instant/now) (or delay-ms 0))})))
+  (process! [q work-fn]
+    (jdbc/with-transaction [tx db]
+      (let [task (select-task tx)
+            payload (-> task :queue/payload edn/read-string)
+            task-name (-> task :queue/name edn/read-string)]
+        (when task
+          (work-fn task-name payload)
+          (delete-task! tx (:queue/id task)))))))
 
 ;; TODO: don't hardcode table name?
 
@@ -27,25 +61,11 @@
   [queue]
   (jdbc/execute! (:db queue) [(format "set statement_timeout = %s" (:statement-timeout queue))]))
 
+;; Current caveats:
+;; Polling with multiple threads is not synchronized and spread evenly. This means all workers might poll at the same time
+;; with nothing happening until the next interval.
 
-(defn- select-task [ds]
-  (jdbc/execute-one! ds ["select * from queue
-                          where execute_at < current_timestamp
-                          order by created_at asc
-                          limit 1
-                          for update skip locked"]))
-
-(defn- delete-task!
-  [ds id]
-  {:pre [(some? id)]}
-  (sql/delete! ds :queue {:id id}))
-
-;; Scheduling
-;; Poll table in interval X (e.g. 100ms). This ensures that tasks are regularly pulled. Otherwise it might be possible that all workers
-;; pull at the same time and then nothing gets executed until the next iteration. This is bad for time critical tasks.
-;; If a new task is found: place it on core.async queue (Note: the task is inside a transaction while waiting to be executed).
-;; Worker pool pulls tasks of queue and executes them. The worker queue has no buffer, if placing a job on the queue does not work
-;; (maybe because all the workers are busy) we just try again in the next interval. PG has our back here.
+;; PUBLIC API
 
 (defn create
   "Creates a new queue from the given config.
@@ -54,7 +74,7 @@
    * `:db` -- A next.jdbc.protocols.Connectable,
    * `:statement-timeout` -- The maximum time a task can spend in a transaction before being killed by Postgres."
   [config]
-  (let [queue (map->Queue config)]
+  (let [queue (map->PGQueue config)]
     (create-table! queue)
     #_(set-statement-timeout! queue)
     queue))
@@ -62,47 +82,35 @@
 (defn put!
   "Put a new task onto the queue. Takes four arguments: The queue itself, the name of the tasks, the task's payload and an optional options map.
    The name of the task is usually a keyword and can be used to dispatch to different functions when handling the task.
-   The payload is any edn-serializable object, usually a clojure map.
+   The payload is any edn-serializable object, usually a clojure hash-map.
    The options map currently supports the following settings:
    * `delay-ms` -- Period in milliseconds until the task is ready to be processed."
   ([queue name payload] (put! queue name payload '{}))
   ([queue name payload opts]
-   (let [ds (:db queue)
-         {:keys [delay-ms]} opts]
-     (sql/insert! ds :queue {:name (print-str name)
-                             :payload (print-str payload)
-                             :execute_at (.plusMillis (Instant/now) (or delay-ms 0))}))))
-
-(defn process!
-  "Take an item off the queue and process it.
-   Takes the queue as the first parameter. The second argument is a function that takes two parameters.
-   The first parameter is the name of the tasks. The second parameter is the task's payload.
-   This allows for function dispatch using multimethods."
-  [queue work-fn]
-  (jdbc/with-transaction [tx (:db queue)]
-    (let [task (select-task tx)
-          payload (-> task :queue/payload edn/read-string)
-          task-name (-> task :queue/name edn/read-string)]
-      (when task
-        (work-fn task-name payload)
-        (delete-task! tx (:queue/id task))))))
+   (put-task! queue name payload opts)))
 
 (defn create-schedule
-  "Creates a new schedule for a queue. Takes the queue as the first argument and options as the second argument.
+  "Creates a new schedule for a queue. Takes the queue as the first argument, the handler function as
+  the second and options as the third argument.
+
+   The handler function is a binary (2 argument) function that takes the name of the tasks as the first argument
+   and the payload of the task as the second argument. Ideal for dispatching with multi-methods.
    
    The following options are supported:
    
    * `poll-interval` -- The interval in milliseconds to wait between trying to poll the database for new jobs.
    * `worker-count` -- The number of threads to work the queue. Note that database load increases linearely with each worker added. Default is 4.
-   * `handler-fn` -- Binary (2 argument) function that takes the name of the tasks as the first argument
-      and the payload of the task as the second argument. Ideal for dispatching with multi-methods.
+   * `error-handler` -- Function that is called on error. Receives the Exception as its single argument.
    
-   Note: With the default settings the scheduel will create a load of approximately 40 queries per second on your database."
-  [queue opts]
-  (let [{:keys [poll-interval worker-count handler-fn]} opts
+   Note: With the default settings the schedule will create a load of approximately 40 queries per second on your database."
+  [queue handler-fn opts]
+  (let [{:keys [poll-interval worker-count error-fn]} opts
         schedules (doall (repeatedly (or worker-count 4)
                                      #(chime/chime-at (-> (chime/periodic-seq (Instant/now) (Duration/ofMillis poll-interval)))
-                                                      (fn [_] (process! queue handler-fn)))))
+                                                      (fn [_] (process! queue handler-fn))
+                                                      {:error-handler (fn [e]
+                                                                        (when error-fn (error-fn e))
+                                                                        (not (instance? InterruptedException e)))})))
         close #(doall (for [schedule schedules] (.close schedule)))]
     close))
 

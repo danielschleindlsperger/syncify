@@ -2,6 +2,8 @@
 {:secrets #include "secrets.edn"
  :base-url #profile {:dev "http://localhost:8000"
                      :prod #env BASE_URL}
+ :app-url #profile {:dev "http://localhost:3000"
+                    :prod #env APP_URL}
  :port #profile {:dev 8000
                  :prod #long #env PORT}
  :db {:jdbcUrl #profile {:dev "jdbc:postgresql:postgres?user=postgres&password=postgres"

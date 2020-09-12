@@ -40,9 +40,17 @@
              {}
              segments))))
 
-(def ^{:private true} mapper
+;; JSON
+
+(def ^:private mapper
   (jsonista/object-mapper
-   {:encode-key-fn (comp ->camelCase name)}))
+   {:encode-key-fn (comp ->camelCase name)
+    :decode-key-fn ->kebab-case-keyword}))
+
+(defn parse-json-body
+  [req]
+;; TODO: read content-type
+  (jsonista/read-value (:body req) mapper))
 
 ;; ring response helpers
 

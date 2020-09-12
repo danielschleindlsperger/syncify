@@ -1,11 +1,15 @@
 (ns api.endpoints.rooms
-  (:require [reitit.ring :as ring]
+  (:require [clojure.string :as str]
+            [reitit.ring :as ring]
             [reitit.ring.middleware.parameters :refer [parameters-middleware]]
             [next.jdbc.sql :as sql]
             [next.jdbc :as jdbc]
             [api.sql :refer [as-unqualified-kebab-maps]]
             [api.modules.queue :as queue]
-            [api.util.http :refer [json]]))
+            [api.model.room :refer [insert-room!]]
+            [api.modules.spotify :as spotify]
+            [api.modules.queue :as queue]
+            [api.util.http :refer [parse-json-body json]]))
 
 ;; TODO: This query does not use indexes right now because we sort by the COUNT aggregate.
 ;; Maybe we can use a view here?
@@ -51,17 +55,57 @@ WHERE id = ?")
   (fn [req]
     (let [id (-> req :path-params :id)
           room (get-room-data (:ds ctx) id)]
-      (queue/put! (:queue ctx) :change-track {:foo "bar"})
       (json room))))
 
 ;; TODO:
 ;; create-room
 ;; update-room
 
+(defn- conform-create-payload [req]
+ ;; TODO: validate name, cover-image, publicly-listed, track-ids  
+  (parse-json-body req))
+
+(defn- fetch-track-partition
+  [access-token track-ids]
+  (let [res (spotify/invoke :get-several-tracks access-token {:ids (str/join "," track-ids)})
+        tracks (->> res :tracks (filter some?))]
+    (map (fn [track] {:name (:name track)
+                      :duration-ms (:duration-ms track)
+                      :artists (map (fn [artist] (:name artist)) (:artists track))
+                      :cover-art (get-in track [:album :images 1 :url])}) tracks)))
+
+(def ^:private spotify-fetch-limit 50)
+
+(defn- fetch-all-tracks
+  "Fetch tracks for supplied track ids."
+  [{:keys [access-token track-ids]}]
+  (let [parts (partition spotify-fetch-limit spotify-fetch-limit [] track-ids)]
+    (flatten (pmap #(fetch-track-partition access-token %) parts))))
+
+(defn- schedule-track-change! [queue room]
+  (queue/put! queue :change-track {:foo "bar"} {:delay-ms 2000}))
+
+(defn- create-room
+  [ctx]
+  (fn [req]
+    (let [ident (get-in req [:session :identity])
+          payload (conform-create-payload req)
+          tracks (fetch-all-tracks {:track-ids (:track-ids payload)
+                                    :access-token (:access-token ident)})
+          admins [(:id ident)]
+          room (insert-room! (:ds ctx) {:name (:name payload)
+                                        :cover-image (:cover-image payload)
+                                        :publicly-listed (:publicly-listed payload)
+                                        :playlist {:tracks tracks}
+                                        :admins admins})]
+      (schedule-track-change! (:queue ctx) room)
+      (json room))))
+
 (defn new-router
   [ctx]
   (ring/router ["/rooms"
-                ["" {:get (all-rooms ctx) :middleware [parameters-middleware]}]
+                ["" {:get (all-rooms ctx) :middleware [parameters-middleware]
+                     :post (create-room ctx)}]
                 ["/:id" {:get (get-room ctx)}]]))
 
 (comment
