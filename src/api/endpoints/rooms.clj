@@ -1,7 +1,6 @@
 (ns api.endpoints.rooms
   (:require [clojure.string :as str]
             [reitit.ring :as ring]
-            [reitit.ring.middleware.parameters :refer [parameters-middleware]]
             [next.jdbc.sql :as sql]
             [next.jdbc :as jdbc]
             [api.sql :refer [as-unqualified-kebab-maps]]
@@ -101,12 +100,11 @@ WHERE id = ?")
       (schedule-track-change! (:queue ctx) room)
       (json room))))
 
-(defn new-router
-  [ctx]
-  (ring/router ["/rooms"
-                ["" {:get (all-rooms ctx) :middleware [parameters-middleware]
-                     :post (create-room ctx)}]
-                ["/:id" {:get (get-room ctx)}]]))
+(defn routes [ctx]
+  [""
+   ["/rooms" {:get (all-rooms ctx)
+              :post (create-room ctx)}]
+   ["/rooms/:id" {:get (get-room ctx)}]])
 
 (comment
   (def system (var-get (requiring-resolve 'user/system)))

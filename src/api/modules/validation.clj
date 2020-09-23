@@ -1,8 +1,7 @@
 (ns api.modules.validation
   (:require [malli.core :as m]
             [malli.transform :as mt]
-            [malli.error :as me]
-            [slingshot.slingshot :refer [throw+]]))
+            [malli.error :as me]))
 
 (defrecord ValidationError [errors])
 (defrecord ServerError [errors])
@@ -18,4 +17,6 @@
     (if valid?
       (transform x)
       (let [errors (me/humanize (m/explain schema x))]
-        (throw+ (->ValidationError errors))))))
+        (throw (ex-info "input invalid." {:type :reitit.ring/response
+                                          :response {:status 422
+                                                     :body {:errors errors}}}))))))

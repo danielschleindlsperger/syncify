@@ -88,8 +88,9 @@
           (catch ServerError e (let [res (-> (json e) (assoc :status 500))]
                                  (log/error e)
                                  res))
-          (catch Object e (let [res (if stacktrace?
-                                      &throw-context
-                                      {:error "A server error occurred."})]
-                            (log/error e)
-                            (-> res json (assoc :status 500)))))))
+          #_(catch Object e (let [res (if stacktrace?
+                                        &throw-context
+                                        {:error "A server error occurred."})]
+                              (log/error e)
+                              (throw e)
+                              #_(-> res json (assoc :status 500)))))))

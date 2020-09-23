@@ -11,8 +11,8 @@
 
          ;; HTTP
          http-kit/http-kit {:mvn/version "2.4.0"}
-         metosin/reitit-ring {:mvn/version "0.5.5"}
-         metosin/reitit-middleware {:mvn/version "0.5.5"}
+         metosin/reitit {:mvn/version "0.5.5"}
+
          ring/ring-core {:mvn/version "1.8.1"}
          ring/ring-headers {:mvn/version "0.3.0"}
          ring/ring-anti-forgery {:mvn/version "1.3.0"}
@@ -35,8 +35,7 @@
          slingshot {:mvn/version "0.12.2"}
 
          ;; validation
-         metosin/malli {:git/url "https://github.com/metosin/malli"
-                        :sha "3246df27bd758757650c3e0510702dfb562422b4"}
+         ;; malli comes with reitit
 
          ;; scheduling
          jarohen/chime {:mvn/version "0.3.2"}}

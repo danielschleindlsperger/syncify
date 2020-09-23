@@ -9,8 +9,8 @@
 
 (defrecord ChangeTrack [room-id event-id])
 (defmethod handle-event :change-track [event-name payload ctx]
+  ;; validate this event is not obsolete
   ;; send event to all connected clients in room
-  ;; change track for all connected clients
   (trigger-event (map->PusherClient (get-in ctx [:config :pusher])) {:name :change-track
                                                                      :data {:foo "bar"}
                                                                      :channel (:room-id payload)})
