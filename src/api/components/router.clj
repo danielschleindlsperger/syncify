@@ -12,10 +12,11 @@
   "Compile the Reitit routing map to a ring handler.
   Reitit does some performance optimizations and needs to be compiled, that's the whole reason this is a Component in the first place."
   [ctx]
-  (create-router [["/" {:get homepage :foo "bar"}]
-                  (rooms/routes ctx)
-                  (auth/routes ctx)]
-                 {:jwt-secret (-> ctx :config :jwt-secret)}))
+  (let [routes [["/" {:get homepage :foo "bar"}]
+                (rooms/routes ctx)
+                (auth/routes ctx)]
+        opts {:jwt-secret (-> ctx :config :jwt-secret)}]
+    (create-router routes opts)))
 
 (defrecord Router [application;; dependencies
                    routes]
