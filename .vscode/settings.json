@@ -2,7 +2,7 @@
   "calva.customREPLCommandSnippets": [
     {
       "name": "Reset REPL",
-      "snippet": "(do (in-ns 'dev) (reset))",
+      "snippet": "(do (require 'dev) (in-ns 'dev) (reset))",
       "ns": "user",
       "repl": "clj"
     }

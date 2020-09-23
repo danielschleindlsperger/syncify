@@ -1,6 +1,6 @@
 (ns dev
   (:require [taoensso.timbre]
-            [clojure.tools.namespace.repl :refer [refresh]]
+            [clojure.tools.namespace.repl :refer [refresh-all]]
             [api.components.system :as system]))
 
 (def system nil)
@@ -14,7 +14,8 @@
 (defn start
   "Starts the current development system."
   []
-  (alter-var-root #'system system/start))
+  (alter-var-root #'system system/start)
+  :started)
 
 (defn stop
   "Shuts down and destroys the current development system."
@@ -32,4 +33,4 @@
 (defn reset
   []
   (stop)
-  (refresh :after 'dev/go))
+  (refresh-all :after 'dev/go))
