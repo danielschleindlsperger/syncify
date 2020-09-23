@@ -25,10 +25,8 @@
 (deftest schedule-test
   (let [q (queue/create {:db ds})
         results (atom [])
-        cancel-schedule (queue/create-schedule q {:poll-interval 100
-                                                  :handler-fn (fn
-                                                                [name payload]
-                                                                (swap! results conj (reduce + payload)))})]
+        handler (fn [name payload] (swap! results conj (reduce + payload)))
+        cancel-schedule (queue/create-schedule q handler {:poll-interval 100})]
     (queue/put! q :add [1 2 3])
     (queue/put! q :add [4 5 6])
     (queue/put! q :add [7 8 9])
