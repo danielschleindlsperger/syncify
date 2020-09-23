@@ -28,7 +28,7 @@
    If a key is present more often than once the later appearances will override the previous values."
   ([req] (parse-query-params req {:key-fn ->kebab-case-keyword}))
   ([req {:keys [key-fn]}]
-   (let [query-string (get req :query-string "")
+   (let [query-string (or (get req :query-string) "")
          segments (str/split query-string #"&")]
      (reduce (fn [params ^String seg]
                (if (str/blank? seg)
@@ -36,9 +36,22 @@
                  (let [[k v] (str/split seg #"=")
                        k (key-fn k)
                        v (if (string? v) (url-decode v) v)]
-                   (assoc params k v))))
+                   (if (contains? params k)
+                     (update params k #(if (vector? %) (conj % v) (vector % v)))
+                     (assoc params k v)))))
              {}
              segments))))
+
+;; TODO: form params
+;; TODO: body params
+(defn wrap-params
+  ([handler] (wrap-params handler {:key-fn ->kebab-case-keyword}))
+  ([handler opts]
+   (fn [req]
+     (let [query-params (parse-query-params req opts)
+           params (merge query-params)]
+       (handler (merge req {:query-params query-params
+                            :params params}))))))
 
 ;; JSON
 
