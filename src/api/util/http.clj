@@ -43,15 +43,11 @@
 
 ;; JSON
 
-(def ^:private mapper
-  (jsonista/object-mapper
-   {:encode-key-fn (comp ->camelCase name)
-    :decode-key-fn ->kebab-case-keyword}))
-
 (defn parse-body-params
   ([req] (parse-body-params req {:key-fn ->kebab-case-keyword}))
   ([req {:keys [key-fn]}]
    (let [content-type (get-in req [:headers "content-type"])
+        ;; TODO: create mapper once outside of critical path
          mapper (jsonista/object-mapper
                  {:encode-key-fn (comp ->camelCase name)
                   :decode-key-fn ->kebab-case-keyword})]
@@ -71,11 +67,6 @@
                             :params params}))))))
 
 ;; ring response helpers
-
-(defn json [body]
-  {:status 200
-   :body (jsonista/write-value-as-string body mapper)
-   :headers {"content-type" "application/json"}})
 
 (defn ok
   "Construct a 200 'OK' HTTP ring response."
