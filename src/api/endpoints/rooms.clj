@@ -3,6 +3,7 @@
             [reitit.ring :as ring]
             [next.jdbc.sql :as sql]
             [next.jdbc :as jdbc]
+            [reitit.coercion.malli :as malli-coercion]
             [api.sql :refer [as-unqualified-kebab-maps]]
             [api.modules.queue :as queue]
             [api.model.room :refer [insert-room!]]
@@ -60,10 +61,6 @@ WHERE id = ?")
 ;; create-room
 ;; update-room
 
-(defn- conform-create-payload [req]
- ;; TODO: validate name, cover-image, publicly-listed, track-ids  
-  (parse-json-body req))
-
 (defn- fetch-track-partition
   [access-token track-ids]
   (let [res (spotify/invoke :get-several-tracks access-token {:ids (str/join "," track-ids)})
@@ -88,7 +85,7 @@ WHERE id = ?")
   [ctx]
   (fn [req]
     (let [ident (get-in req [:session :identity])
-          payload (conform-create-payload req)
+          payload (get-in req [:parameters :body])
           tracks (fetch-all-tracks {:track-ids (:track-ids payload)
                                     :access-token (:access-token ident)})
           admins [(:id ident)]
@@ -103,7 +100,10 @@ WHERE id = ?")
 (defn routes [ctx]
   [""
    ["/rooms" {:get (all-rooms ctx)
-              :post (create-room ctx)}]
+              :post {:handler (create-room ctx)
+                     :coercion malli-coercion/coercion
+                    ;; TODO
+                     :parameters {:body [:map]}}}]
    ["/rooms/:id" {:get (get-room ctx)}]])
 
 (comment

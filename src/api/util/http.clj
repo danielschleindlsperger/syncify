@@ -41,15 +41,33 @@
              {}
              segments))))
 
+;; JSON
+
+(def ^:private mapper
+  (jsonista/object-mapper
+   {:encode-key-fn (comp ->camelCase name)
+    :decode-key-fn ->kebab-case-keyword}))
+
+(defn parse-body-params
+  ([req] (parse-body-params req {:key-fn ->kebab-case-keyword}))
+  ([req {:keys [key-fn]}]
+   (let [content-type (get-in req [:headers "content-type"])
+         mapper (jsonista/object-mapper
+                 {:encode-key-fn (comp ->camelCase name)
+                  :decode-key-fn ->kebab-case-keyword})]
+     (when (= "application/json" content-type)
+       (jsonista/read-value (:body req) mapper)))))
+
 ;; TODO: form params
-;; TODO: body params
 (defn wrap-params
   ([handler] (wrap-params handler {:key-fn ->kebab-case-keyword}))
   ([handler opts]
    (fn [req]
      (let [query-params (parse-query-params req opts)
-           params (merge query-params)]
+           body-params (parse-body-params req opts)
+           params (merge query-params body-params)]
        (handler (merge req {:query-params query-params
+                            :body-params body-params
                             :params params}))))))
 
 ;; ring response helpers
