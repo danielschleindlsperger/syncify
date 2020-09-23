@@ -52,18 +52,6 @@
        (handler (merge req {:query-params query-params
                             :params params}))))))
 
-;; JSON
-
-(def ^:private mapper
-  (jsonista/object-mapper
-   {:encode-key-fn (comp ->camelCase name)
-    :decode-key-fn ->kebab-case-keyword}))
-
-(defn parse-json-body
-  [req]
-;; TODO: read content-type
-  (jsonista/read-value (:body req) mapper))
-
 ;; ring response helpers
 
 (defn json [body]
@@ -71,25 +59,24 @@
    :body (jsonista/write-value-as-string body mapper)
    :headers {"content-type" "application/json"}})
 
-(defn temporary-redirect [target-url] {:status 307 :headers {"Location" target-url}})
+(defn ok
+  "Construct a 200 'OK' HTTP ring response."
+  ([body] (ok body {}))
+  ([body headers] {:status 200 :body body :headers headers}))
 
-(def unauthenticated (-> {:error "Request is unauthenticated."} json (assoc :status 401)))
+(defn created
+  "Construct a 201 'Created' HTTP ring response."
+  ([body] (created body {}))
+  ([body headers] {:status 201 :body body :headers headers}))
 
-(def unauthorized (-> {:error "Request is unauthorized."} json (assoc :status 403)))
+(defn temporary-redirect
+  ([target-url] (temporary-redirect target-url {}))
+  ([target-url headers] {:status 307 :body "" :headers (assoc headers "Location" target-url)}))
 
-(defn wrap-handle-errors
-  "Ring middleware to handle all thrown errors gracefully.
- If option `:stacktrace?` is truthy, shows more info about the error which may help diagnose and fix the root cause."
-  [handler {:keys [stacktrace?]}]
-  (fn [req]
-    (try+ (handler req)
-          (catch ValidationError e (-> (json e) (assoc :status 422)))
-          (catch ServerError e (let [res (-> (json e) (assoc :status 500))]
-                                 (log/error e)
-                                 res))
-          #_(catch Object e (let [res (if stacktrace?
-                                        &throw-context
-                                        {:error "A server error occurred."})]
-                              (log/error e)
-                              (throw e)
-                              #_(-> res json (assoc :status 500)))))))
+(def unauthenticated {:status 401
+                      :body {:error "Request is unauthenticated."}
+                      :headers {"Content-Type" "application/json"}})
+
+(def unauthorized {:status 403
+                   :body {:error "Request is unauthorized."}
+                   :headers {"Content-Type" "application/json"}})

@@ -8,7 +8,7 @@
             [api.model.room :refer [insert-room!]]
             [api.modules.spotify :as spotify]
             [api.modules.queue :as queue]
-            [api.util.http :refer [parse-json-body json]]))
+            [api.util.http :as http]))
 
 ;; TODO: This query does not use indexes right now because we sort by the COUNT aggregate.
 ;; Maybe we can use a view here?
@@ -36,9 +36,9 @@ LIMIT ?")
           ;; Overfetch by one to be able to determine if there's more rows available
           rooms (get-rooms-data (:ds ctx) {:offset offset :limit (inc limit)})
           has-more? (< limit (count rooms))]
-      (json {:next-offset (+ offset limit)
-             :has-more has-more?
-             :data (take limit rooms)}))))
+      (http/ok {:next-offset (+ offset limit)
+                :has-more has-more?
+                :data (take limit rooms)}))))
 
 (def get-room-query "
 SELECT id, name, publicly_listed, playlist, admins
@@ -54,7 +54,7 @@ WHERE id = ?")
   (fn [req]
     (let [id (-> req :path-params :id)
           room (get-room-data (:ds ctx) id)]
-      (json room))))
+      (http/ok room))))
 
 ;; TODO:
 ;; create-room
@@ -98,7 +98,7 @@ WHERE id = ?")
                                         :playlist {:tracks tracks}
                                         :admins admins})]
       (schedule-track-change! (:queue ctx) room)
-      (json room))))
+      (http/created room))))
 
 (defn routes [ctx]
   [""
