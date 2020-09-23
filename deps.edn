@@ -30,10 +30,6 @@
          metosin/jsonista {:mvn/version "0.2.6"}
          camel-snake-kebab {:mvn/version "0.4.1"}
 
-         ;; error handling
-         failjure {:mvn/version "2.0.0"}
-         slingshot {:mvn/version "0.12.2"}
-
          ;; validation
          ;; malli comes with reitit
 

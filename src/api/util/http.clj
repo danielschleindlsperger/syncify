@@ -2,7 +2,6 @@
   (:require [clojure.string :as str]
             [taoensso.timbre :as log]
             [jsonista.core :as jsonista]
-            [slingshot.slingshot :refer [try+]]
             [camel-snake-kebab.core :refer [->camelCase ->kebab-case-keyword]]
             [api.modules.validation])
   (:import [api.modules.validation ServerError ValidationError]

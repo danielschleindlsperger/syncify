@@ -3,7 +3,6 @@
             [api.test-utils :refer [fresh-database test-ctx]]
             [ring.mock.request :as mock]
             [next.jdbc.sql :as sql]
-            [api.components.database :refer [reset-schema! run-migrations!]]
             [api.sql :refer [as-unqualified-kebab-maps]]
             [api.modules.spotify :as spotify]
             [api.endpoints.auth :as auth]))
