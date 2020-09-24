@@ -110,7 +110,7 @@ WHERE id = ?")
    ["/rooms/:id" {:get (get-room ctx)}]])
 
 (comment
-  (def system (var-get (requiring-resolve 'user/system)))
+  (def system (var-get (requiring-resolve 'dev/system)))
   (def ds (-> system :database :ds))
   (get-room-data ds "36779d59-aec0-4671-877b-687d5639dbbd")
   (get-rooms-data ds {:offset 0 :limit 1}))

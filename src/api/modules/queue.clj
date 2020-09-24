@@ -124,7 +124,7 @@
 
 (comment
   ;; load database dependency from system 
-  (def system (var-get (requiring-resolve 'user/system)))
+  (def system (var-get (requiring-resolve 'dev/system)))
   (def ds (-> system :database :ds))
 
   (def queue (create {:db ds}))
