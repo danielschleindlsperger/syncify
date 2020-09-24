@@ -46,6 +46,8 @@
                   :main-opts ["-m" "cognitect.test-runner"]}
            :uberjar {:extra-deps {uberdeps {:mvn/version "0.1.10"}}
                      :main-opts ["-m" "uberdeps.uberjar" "--target target/syncify-api.jar"]}
+           :clj-kondo {:extra-deps {clj-kondo {:mvn/version "2020.09.09"}}
+                       :main-opts ["-m" "clj-kondo.main"]}
            ;; usage: `clj -A:make-migration my-migration`
            :make-migration {:extra-paths ["scripts"]
                             :main-opts ["-m" "make-migration"]}}}

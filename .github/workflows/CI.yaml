@@ -31,6 +31,8 @@ jobs:
         run: 'clojure -A:test'
         env:
           TIMBRE_LEVEL: ':warn'
+      - name: 'API: Run clj-kondo linter'
+        run: 'clojure -A:clj-kondo --lint src'
       - name: Setting up Node.js
         uses: actions/setup-node@v1
         with:
