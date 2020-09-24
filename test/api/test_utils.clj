@@ -7,7 +7,7 @@
 (def test-ctx {:config {:spotify {:client-id "client-id" :redirect-uri "https://redirect.uri"}
                         :jwt-secret "aaaaaaaaaaaaaaaa"}
                :queue test-queue
-               :ds "jdbc:postgresql:postgres?user=postgres&password=postgres"})
+               :ds "jdbc:postgresql://localhost:5433/postgres?user=postgres&password=postgres"})
 
 (defn fresh-queue
   "Fixture to reset the queue state."
