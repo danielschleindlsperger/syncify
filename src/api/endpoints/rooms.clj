@@ -1,6 +1,5 @@
 (ns api.endpoints.rooms
   (:require [clojure.string :as str]
-            [reitit.ring :as ring]
             [next.jdbc.sql :as sql]
             [next.jdbc :as jdbc]
             [reitit.coercion.malli :as malli-coercion]
@@ -8,7 +7,6 @@
             [api.modules.queue :as queue]
             [api.model.room :refer [insert-room!]]
             [api.modules.spotify :as spotify]
-            [api.modules.queue :as queue]
             [api.util.http :as http]))
 
 ;; TODO: This query does not use indexes right now because we sort by the COUNT aggregate.

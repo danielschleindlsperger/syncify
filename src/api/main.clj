@@ -5,7 +5,7 @@
             [api.components.system :refer [new-system]]))
 
 (defn -main
-  [& args]
+  [& _args]
   (log/info "Booting application...")
   (-> (component/start (new-system :prod))
         ;; wait for the web server to shutdown

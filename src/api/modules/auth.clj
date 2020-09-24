@@ -4,8 +4,7 @@
 ;; - automatically refresh all spotify tokens
 (ns api.modules.auth
   (:require [clojure.string :as str]
-            [api.util.http :refer [unauthenticated]]
-            [reitit.ring :refer [get-match get-router]])
+            [api.util.http :refer [unauthenticated]])
   (:import [java.time Instant]))
 
 ;; The data attached to the session.

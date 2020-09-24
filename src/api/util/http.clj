@@ -1,11 +1,9 @@
 (ns api.util.http
   (:require [clojure.string :as str]
-            [taoensso.timbre :as log]
             [jsonista.core :as jsonista]
             [camel-snake-kebab.core :refer [->camelCase ->kebab-case-keyword]]
             [api.modules.validation])
-  (:import [api.modules.validation ServerError ValidationError]
-           [java.nio.charset StandardCharsets]
+  (:import [java.nio.charset StandardCharsets]
            [java.net URLEncoder URLDecoder]))
 
 (set! *warn-on-reflection* true)
@@ -50,7 +48,7 @@
         ;; TODO: create mapper once outside of critical path
          mapper (jsonista/object-mapper
                  {:encode-key-fn (comp ->camelCase name)
-                  :decode-key-fn ->kebab-case-keyword})]
+                  :decode-key-fn (or key-fn ->kebab-case-keyword)})]
      (when (= "application/json" content-type)
        (jsonista/read-value (:body req) mapper)))))
 

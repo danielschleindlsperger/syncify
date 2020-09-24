@@ -1,7 +1,6 @@
 (ns api.model.user
   (:require [next.jdbc :as jdbc]
             [next.jdbc.sql :as sql]
-            [next.jdbc.result-set :as result-set]
             [honeysql.helpers :refer [insert-into values]]
             [honeysql.format :refer [format]]
             [honeysql-postgres.format]

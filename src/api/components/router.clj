@@ -5,7 +5,7 @@
             [api.modules.http.router :refer [create-router]]))
 
 (defn homepage
-  [req]
+  [_]
   {:status 200 :body "homepage"})
 
 (defn- compile-routes

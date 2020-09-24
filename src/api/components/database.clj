@@ -2,8 +2,7 @@
   (:require [com.stuartsierra.component :as component]
             [next.jdbc.connection :as connection]
             [next.jdbc :as jdbc]
-            [migratus.core :as migratus]
-            [taoensso.timbre :as log])
+            [migratus.core :as migratus])
   (:import (com.zaxxer.hikari HikariDataSource)))
 
 (defn- config [ds]

@@ -15,4 +15,4 @@
   (cond
     (sequential? x) x
     (nil? x) (vector)
-    :default (vector x)))
+    :else (vector x)))

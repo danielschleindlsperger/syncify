@@ -20,9 +20,7 @@
             [jsonista.core :as jsonista]
             [api.util.http :refer [url-encode]]
             [camel-snake-kebab.core :refer [->kebab-case-keyword ->snake_case_string]])
-  (:import [java.util Base64]
-           [java.net URLEncoder]
-           [java.nio.charset StandardCharsets]))
+  (:import [java.util Base64]))
 
 (set! *warn-on-reflection* true)
 

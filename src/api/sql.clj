@@ -1,6 +1,5 @@
 (ns api.sql
-  (:require [clojure.string :as str]
-            [next.jdbc.prepare :as prepare]
+  (:require [next.jdbc.prepare :as prepare]
             [next.jdbc.result-set :as result-set]
             [next.jdbc.date-time]
             [jsonista.core :as json]

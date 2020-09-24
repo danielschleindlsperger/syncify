@@ -3,8 +3,7 @@
             [api.util.http :refer [temporary-redirect]]
             [api.modules.spotify :as spotify]
             [api.modules.auth :refer [attach-identity get-identity get-refresh-token]]
-            [api.model.user :as user])
-  (:import [java.time Instant]))
+            [api.model.user :as user]))
 
 ;; TODO: use state to prevent CSRF attacks
 
@@ -30,9 +29,9 @@
           spotify-config (-> ctx :config :spotify)
           tokens (-> (assoc spotify-config :code code) spotify/trade-code-for-tokens conform-spotify-response)
           spotify-user (->> (:access-token tokens) (spotify/invoke :get-current-users-profile) conform-spotify-response)
-          db-user (user/upsert-users (:ds ctx) [{:id (:id spotify-user)
-                                                 :name (:display-name spotify-user)
-                                                 :avatar (get-in spotify-user [:images 0 :url])}])]
+          _db-user (user/upsert-users (:ds ctx) [{:id (:id spotify-user)
+                                                  :name (:display-name spotify-user)
+                                                  :avatar (get-in spotify-user [:images 0 :url])}])]
       (-> req
           ;; TODO: figure our redirect location: nextUrl query parameter > referer > fallback
           (redirect-back "/rooms")

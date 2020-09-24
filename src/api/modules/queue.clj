@@ -3,8 +3,7 @@
             [next.jdbc.sql :as sql]
             [next.jdbc.date-time]
             [chime.core :as chime]
-            [clojure.edn :as edn]
-            [taoensso.timbre :as log])
+            [clojure.edn :as edn])
   (:import [java.time Instant Duration]))
 
 (defprotocol Queue
@@ -22,7 +21,7 @@
                           limit 1
                           for update skip locked"]))
 
-(defn- delete-task!
+(defn- pg-delete-task!
   [ds id]
   {:pre [(some? id)]}
   (sql/delete! ds :queue {:id id}))
@@ -41,7 +40,7 @@
             task-name (-> task :queue/name edn/read-string)]
         (when task
           (work-fn task-name payload)
-          (delete-task! tx (:queue/id task)))))))
+          (pg-delete-task! tx (:queue/id task)))))))
 
 (defrecord InMemoryQueue [state] ;; state is an atom containing a vector
   Queue
@@ -64,11 +63,11 @@
  created_at timestamp with time zone not null default current_timestamp,
  execute_at timestamp with time zone not null default current_timestamp)"]))
 
-(defn- set-statement-timeout!
-  "Set the Postgres statement timeout. Necessary to release the locks in case of failure.
+#_(defn- set-statement-timeout!
+    "Set the Postgres statement timeout. Necessary to release the locks in case of failure.
    By default there is no timeout. See: https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-STATEMENT-TIMEOUT"
-  [queue]
-  (jdbc/execute! (:db queue) [(format "set statement_timeout = %s" (:statement-timeout queue))]))
+    [queue]
+    (jdbc/execute! (:db queue) [(format "set statement_timeout = %s" (:statement-timeout queue))]))
 
 ;; Current caveats:
 ;; Polling with multiple threads is not synchronized and spread evenly. This means all workers might poll at the same time
@@ -138,11 +137,12 @@
   (def stop-processing (atom nil))
   (do
     (when @stop-processing (@stop-processing))
-    (reset! stop-processing (create-schedule queue {:poll-interval 1000
-                                                    :handler-fn (fn [name payload]
+    (reset! stop-processing (create-schedule queue
+                                             (fn [name payload]
                                                                 ;; simulate a tasks failure
-                                                                  (when (< 0.9 (rand)) (throw (ex-info "random failure" '{})))
-                                                                  (println "processing" name " payload" payload))})))
+                                               (when (< 0.9 (rand)) (throw (ex-info "random failure" '{})))
+                                               (println "processing" name " payload" payload))
+                                             {:poll-interval 1000})))
 
   ;; create new tasks in interval. For testing only.
   (defn run-every [n f] (chime/chime-at (-> (chime/periodic-seq (Instant/now) (Duration/ofMillis n)))

@@ -2,7 +2,7 @@
   (:require [reitit.ring.middleware.exception :as exception]
             [taoensso.timbre :as log]))
 
-(defn exception-handler [message exception request]
+(defn exception-handler [message exception _request]
   {:status 500
    :body {:type message
           :message (.getMessage exception)

@@ -29,8 +29,9 @@
 (defn str->hex [^String s]
   (hexify (.getBytes s)))
 
-(defn sign [key s]
+(defn sign
   "Returns the signature of a string with a given key, using a SHA-256 HMAC."
+  [key s]
   (let [mac (Mac/getInstance "HMACSHA256")
         secret-key (secretKeyInst key mac)]
     (-> (doto mac
