@@ -102,8 +102,13 @@ WHERE id = ?")
    ["/rooms" {:get (all-rooms ctx)
               :post {:handler (create-room ctx)
                      :coercion malli-coercion/coercion
-                    ;; TODO
-                     :parameters {:body [:map]}}}]
+                     :parameters {:body [:map
+                                         [:name [:string]]
+                                         [:cover-image {:optional true} [:string]]
+                                         [:publicly-listed boolean?]
+                                         [:playlist [:map
+                                                     [:tracks [:vector [:map [:name [:string]]
+                                                                        [:duration-ms integer?]]]]]]]}}}]
    ["/rooms/:id" {:get (get-room ctx)}]])
 
 (comment

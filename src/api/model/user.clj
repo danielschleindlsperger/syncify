@@ -6,15 +6,32 @@
             [honeysql.format :refer [format]]
             [honeysql-postgres.format]
             [honeysql-postgres.helpers :refer [upsert on-conflict do-update-set returning]]
+            [camel-snake-kebab.core :refer [->snake_case_string]]
             [api.sql :refer [as-unqualified-kebab-maps]])
   (:import [java.time Instant]))
 
 ;; TODO: specs?
 
-(defn find-user [ds id] (sql/get-by-id ds :users id {:builder-fn as-unqualified-kebab-maps}))
+(def ^:private db-opts {:return-keys true
+                        :builder-fn as-unqualified-kebab-maps
+                        :table-fn ->snake_case_string
+                        :column-fn ->snake_case_string})
+
+(defn find-user [ds id] (sql/get-by-id ds :users id db-opts))
+
+(defn upsert-user
+  "Update or create the given user in the database."
+  [ds user]
+  (let [query (-> (insert-into :users)
+                  (values [(assoc user :updated-at (Instant/now))])
+                  (upsert (-> (on-conflict :id)
+                              (do-update-set :name :avatar :updated-at)))
+                  (returning :*)
+                  format)]
+    (jdbc/execute-one! ds query db-opts)))
 
 (defn upsert-users
-  "Update the given users in the database."
+  "Update or create the given users in the database."
   [ds users]
   (let [query (-> (insert-into :users)
                   (values (map #(assoc % :updated-at (Instant/now)) users))
@@ -22,4 +39,6 @@
                               (do-update-set :name :avatar :updated-at)))
                   (returning :*)
                   format)]
-    (jdbc/execute-one! ds query)))
+    (if (< 0 (count users))
+      (jdbc/execute! ds query db-opts)
+      [])))

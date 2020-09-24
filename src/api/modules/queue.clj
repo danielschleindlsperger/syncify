@@ -43,6 +43,15 @@
           (work-fn task-name payload)
           (delete-task! tx (:queue/id task)))))))
 
+(defrecord InMemoryQueue [state] ;; state is an atom containing a vector
+  Queue
+  (put-task! [q name payload opts]
+    (let [{:keys [delay-ms]} opts]
+      (swap! state conj {:name name
+                         :payload payload
+                         :execute-at (.plusMillis (Instant/now) (or delay-ms 0))})))
+  (process! [q work-fn] "Not implemented!"))
+
 ;; TODO: don't hardcode table name?
 
 (defn- create-table!

@@ -13,7 +13,7 @@
   (testing "/auth/login"
     (let [handler (auth/redirect-to-spotify test-ctx)
           result (handler (-> (mock/request :get "/auth/login")))]
-      (is (= {:status 307 :headers {"Location" "https://accounts.spotify.com/authorize?client_id=client-id&redirect_uri=https%3A%2F%2Fredirect.uri&response_type=code"}} result))))
+      (is (= {:status 307 :body "" :headers {"Location" "https://accounts.spotify.com/authorize?client_id=client-id&redirect_uri=https%3A%2F%2Fredirect.uri&response_type=code"}} result))))
   (testing "/auth/spotify-callback"
     (with-redefs [spotify/trade-code-for-tokens (fn [_] {:access-token "access-token"
                                                          :refresh-token "refresh-token"

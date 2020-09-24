@@ -26,16 +26,18 @@
        (assoc-in [:formats "application/json" :encoder-opts] {:encode-key-fn ->camelCaseString})
        (assoc-in [:formats "application/json" :decoder-opts] {:decode-key-fn ->kebab-case-keyword}))))
 
+(defn- default-cookie-options [jwt-secret] {:store (cookie-store {:key (str->byte-arr jwt-secret)})
+                                            :cookie-name "syncify-session"
+                                            :cookie-attrs {:max-age (* 60 60 24 7)}})
+
 (defn create-router
   "Compile the Reitit routing tree to a ring handler.
   Reitit does some performance optimizations and needs to be compiled."
-  [routes {:keys [jwt-secret] :as opts}]
+  [routes {:keys [jwt-secret cookie-options] :as opts}]
   (ring/ring-handler
    (ring/router routes
                 {:data {:muuntaja muuntaja-instance
-                        :middleware [[wrap-session {:store (cookie-store {:key (str->byte-arr jwt-secret)})
-                                                    :cookie-name "syncify-session"
-                                                    :cookie-attrs {:max-age (* 60 60 24 7)}}]
+                        :middleware [[wrap-session (or cookie-options (default-cookie-options jwt-secret))]
                                     ;; TODO: security middleware
                                      logging/wrap-trace
                                      logging/wrap-request-logging
