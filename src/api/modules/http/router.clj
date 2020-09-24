@@ -2,6 +2,8 @@
   (:require [reitit.ring :as ring]
             [ring.middleware.session :refer [wrap-session]]
             [ring.middleware.session.cookie :refer [cookie-store]]
+            [ring.middleware.default-charset :refer [wrap-default-charset]]
+            [ring.middleware.x-headers :as x-headers]
             [reitit.ring.coercion :as coercion]
             [reitit.ring.middleware.muuntaja :as muuntaja]
             [muuntaja.core :as muuj]
@@ -34,7 +36,10 @@
    (ring/router routes
                 {:data {:muuntaja muuntaja-instance
                         :middleware [[wrap-session (or cookie-options (default-cookie-options jwt-secret))]
-                                    ;; TODO: security middleware
+                                     [wrap-default-charset "utf-8"]
+                                     [x-headers/wrap-content-type-options :nosniff]
+                                     [x-headers/wrap-frame-options :deny]
+                                     [x-headers/wrap-xss-protection true {:mode :block}]
                                      logging/wrap-trace
                                      logging/wrap-request-logging
                                      wrap-authentication
