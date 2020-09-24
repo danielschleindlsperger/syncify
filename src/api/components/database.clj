@@ -13,7 +13,7 @@
          ds)})
 
 (defn run-migrations! [ds]
-  (migratus/migrate (config ds)))
+  (or (migratus/migrate (config ds)) :success))
 
 (defn reset-schema!
   "Drops the `public` schema and restores it to a 'virgin' state.
@@ -40,6 +40,8 @@ COMMENT ON SCHEMA public IS 'standard public schema';
     (when ds (.close ds))))
 
 (comment
-  (def system (var-get (requiring-resolve 'user/system)))
+  (def system (var-get (requiring-resolve 'dev/system)))
   (def ds (-> system :database :ds))
+
+  (run-migrations! ds)
   (reset-schema! ds))

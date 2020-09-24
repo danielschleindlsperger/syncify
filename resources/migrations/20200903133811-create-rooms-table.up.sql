@@ -4,8 +4,11 @@ create table rooms(
   cover_image text,
   publicly_listed boolean default false,
   playlist jsonb not null,
+  listeners_count integer default 0,
   -- we might actually model this as an n:m relationship in a separate table, for now this will suffice though
   admins jsonb default '[]'::jsonb,
   created_at timestamp without time zone not null default now(),
   updated_at timestamp without time zone not null default now()
 );
+--;;
+create index on rooms (listeners_count, created_at);

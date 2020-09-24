@@ -80,10 +80,8 @@
   ([target-url] (temporary-redirect target-url {}))
   ([target-url headers] {:status 307 :body "" :headers (assoc headers "Location" target-url)}))
 
-(def unauthenticated {:status 401
-                      :body {:error "Request is unauthenticated."}
-                      :headers {"Content-Type" "application/json"}})
+(def unauthenticated {:status 401 :body {:error "Request is unauthenticated."}})
 
-(def unauthorized {:status 403
-                   :body {:error "Request is unauthorized."}
-                   :headers {"Content-Type" "application/json"}})
+(def unauthorized {:status 403 :body {:error "Request is unauthorized."}})
+
+(def not-found {:status 404 :body {:error "Resource not found."}})
