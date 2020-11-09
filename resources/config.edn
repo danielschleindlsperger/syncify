@@ -26,5 +26,5 @@
                        :prod #env JWT_SECRET}
  :logging {:level #profile {:dev :info
                             :prod :info}
-           :format #profile {:dev :line ; is it really called :line?
+           :format #profile {:dev :text
                              :prod :json}}}
