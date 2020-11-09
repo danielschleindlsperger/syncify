@@ -3,10 +3,10 @@
             [next.jdbc.sql :as sql]
             [next.jdbc :as jdbc]
             [reitit.coercion.malli :as malli-coercion]
+            [spotify-clj.core :as spotify]
             [api.sql :refer [as-unqualified-kebab-maps]]
             [api.modules.queue :as queue]
             [api.model.room :as room]
-            [api.modules.spotify :as spotify]
             [api.util.http :as http]))
 
 (defn all-rooms

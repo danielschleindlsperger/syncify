@@ -33,7 +33,10 @@
          ;; malli comes with reitit
 
          ;; scheduling
-         jarohen/chime {:mvn/version "0.3.2"}}
+         jarohen/chime {:mvn/version "0.3.2"}
+
+         ;; Spotify client
+         spotify-cl {:local/root "./libs/spotify-clj"}}
 
  :paths ["src" "resources"]
  :aliases {:dev {:extra-paths ["dev/src" "dev/resources" "test"]

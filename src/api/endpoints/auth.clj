@@ -1,7 +1,7 @@
 (ns api.endpoints.auth
   (:require [reitit.coercion.malli :as malli-coercion]
+            [spotify-clj.core :as spotify]
             [api.util.http :refer [temporary-redirect]]
-            [api.modules.spotify :as spotify]
             [api.modules.auth :refer [attach-identity get-identity get-refresh-token]]
             [api.model.user :as user]))
 

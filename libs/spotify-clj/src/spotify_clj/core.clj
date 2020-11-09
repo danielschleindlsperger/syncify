@@ -13,13 +13,14 @@
 ;; - Retries
 ;; - Exponential backoff and circuit breaker
 
-(ns api.modules.spotify
+(ns spotify-clj.core
   (:require [clojure.string :as str]
             [clojure.walk :refer [postwalk]]
             [org.httpkit.client :as http]
             [jsonista.core :as jsonista]
-            [api.util.http :refer [url-encode]]
-            [camel-snake-kebab.core :refer [->kebab-case-keyword ->snake_case_string]])
+            [camel-snake-kebab.core :refer [->kebab-case-keyword ->snake_case_string]]
+            [spotify-clj.util :refer [url-encode]])
+
   (:import [java.util Base64]))
 
 (set! *warn-on-reflection* true)
