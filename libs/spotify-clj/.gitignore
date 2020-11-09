@@ -1,0 +1,10 @@
+.cpcache/
+.nrepl-port
+.clj-kondo/.cache
+resources/secrets.edn
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.calva/
