@@ -1,17 +1,3 @@
-;; Goal:
-;; Generate a data-driven api client for Spotify using an OpenAPI specification 
-;; Inspiration is taken from Cognitect's data-driven AWS client https://github.com/cognitect-labs/aws-api
-;;
-;; TODO (must):
-;; - POST parameter replacement
-;; 
-;; Later:
-;; - Filterable (select returned keys)
-;; - Limit
-;; - Offset
-;; - Pagination (helper to fetch all resources)
-;; - Retries
-;; - Exponential backoff and circuit breaker
 
 (ns spotify-clj.core
   (:require [clojure.string :as str]
@@ -172,5 +158,5 @@
   (invoke :get-an-artists-albums access-token {:id "0OdUWJ0sBjDrqHygGUXeCF"})
 
   (explore :get-several-tracks)
-  (invoke :get-several-tracks access-token, {:ids "0M5pEUmRD3b4nP31L88IdL,4z0PnuB07fxtVZZRWsCfxb"
-                                             :market "DE"}))
+  (invoke :get-several-tracks access-token {:ids "0M5pEUmRD3b4nP31L88IdL,4z0PnuB07fxtVZZRWsCfxb"
+                                            :market "DE"}))
