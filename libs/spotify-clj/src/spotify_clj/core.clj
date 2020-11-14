@@ -1,4 +1,3 @@
-
 (ns spotify-clj.core
   (:require [clojure.string :as str]
             [clojure.walk :refer [postwalk]]

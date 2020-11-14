@@ -2,7 +2,12 @@
   (:require [clojure.string :as str]
             [spotify-clj.util :refer [url-encode parse-json]]
             [camel-snake-kebab.core :refer [->snake_case_string]]
-            [org.httpkit.client :as http])
+            [org.httpkit.client :as http]
+            [clojure.spec.alpha :as s]
+            [clojure.spec.test.alpha :as stest]
+            [orchestra.spec.test :as st]
+            [orchestra.core :refer [defn-spec]]
+            [expound.alpha :as expound])
   (:import [java.util Base64]))
 
 (set! *warn-on-reflection* true)
@@ -29,6 +34,18 @@
 ;; Public API ;;
 ;;;;;;;;;;;;;;;;
 
+(s/def ::client-id string?)
+(s/def ::redirect-uri string?)
+(s/def ::state string?)
+(s/def ::scope string?)
+(s/def ::show-dialog boolean?)
+(s/def ::auth-url (s/keys :req-un [::client-id ::redirect-uri]
+                          :opt-un [::state ::scope ::show-dialog]))
+
+(s/fdef authorization-url
+  :args (s/cat :opts ::auth-url)
+  :ret string?)
+
 (defn authorization-url
   "Utility function to create an authorization URL for the Authorization Code Flow (refreshable client authorization).
    See: https://developer.spotify.com/documentation/general/guides/authorization-guide/#authorization-code-flow
@@ -41,6 +58,8 @@
   [opts]
   (let [qs (->query-string (assoc opts :response-type "code") {:encode-key-fn ->snake_case_string})]
     (str "https://accounts.spotify.com/authorize?" qs)))
+
+(stest/check `authorization-url)
 
 (defn trade-code-for-tokens
   "Trade the Spotify Authorization Code for a refresh and an access token.
@@ -83,6 +102,9 @@
     (if error
       {:error error}
       (parse-json body))))
+
+(st/instrument)
+(set! s/*explain-out* expound/printer)
 
 (comment
   (def spotify-config (-> (clojure.java.io/resource "secrets.edn") (slurp) (read-string)))
