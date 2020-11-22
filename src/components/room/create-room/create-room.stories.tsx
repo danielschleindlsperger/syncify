@@ -2,7 +2,7 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { CreateRoom, RoomState } from './create-room'
 import { PickModeStep } from './steps/pick-mode-step'
-import { UserPlaylist } from './steps/create-playlist-step'
+import { PlaylistProvider, UserPlaylist } from './steps/create-playlist-step'
 import { withSpotifyCredentials } from './spotify-credentials-decorator'
 import { FinalizeStep } from './steps/finalize-step'
 
@@ -24,4 +24,8 @@ const FinalizeStepWithState = () => {
 
 storiesOf('Create Room/Modes', module)
   .addDecorator(withSpotifyCredentials)
-  .add('User Playlist', () => <UserPlaylist setRoomState={() => {}} />)
+  .add('User Playlist', () => (
+    <PlaylistProvider>
+      <UserPlaylist setRoomState={() => {}} />
+    </PlaylistProvider>
+  ))
