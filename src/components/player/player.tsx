@@ -6,6 +6,7 @@ import { useSpotifyPlayer } from './spotify-web-player'
 import { Progress } from './track-progress'
 import { VolumeSlider } from './volume-controls'
 import { TrackChanged, TrackChangedPayload } from '../../pusher-events'
+import { playbackInSync } from './check-playback-drift'
 
 // TODO: empty, skeleton state
 export const Player = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => {
@@ -14,6 +15,17 @@ export const Player = ({ className, ...props }: React.HTMLAttributes<HTMLElement
   const { play } = useSpotifyPlayer()
   const playlist = useRoom().room?.playlist
   const { channel } = useRoomChannel()
+
+  // Check if we're still in sync, every time we get a playback status update from the spotify player
+  React.useEffect(() => {
+    if (!playbackState?.track_window) return
+    const inSync = playbackInSync(playlist!, {
+      trackOffset: playbackState?.position!,
+      track: playbackState?.track_window.current_track!,
+    })
+
+    console.log({ playbackState, inSync })
+  }, [playbackState])
 
   // play initial track
   React.useEffect(() => {
