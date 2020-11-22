@@ -8,7 +8,7 @@ import { TrackChanged, TrackChangedPayload } from '../../../pusher-events'
 
 const client = makeClient()
 
-export default async function (req: NextApiRequest, res: NextApiResponse) {
+export default async function workTask(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).send('Method not allowed.')
   }

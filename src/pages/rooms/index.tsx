@@ -8,7 +8,7 @@ import { Button } from '../../components/button'
 import { useApiRequest, fetcher } from '../../hooks/use-api-request'
 import { LoadingSpinner } from '../../components/loading'
 
-export default () => {
+export default function ShowAllRoomsPage() {
   const { rooms, loadMore, error } = useRoomData()
 
   return (

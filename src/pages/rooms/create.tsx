@@ -8,7 +8,7 @@ import { AuthenticatedOnly } from '../../components/auth'
 import { Button } from '../../components/button'
 import { Room } from '../../types'
 
-export default () => {
+export default function CreateRoomPage() {
   const router = useRouter()
 
   const handleCreated = (room: Room) => {
