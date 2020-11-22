@@ -1,5 +1,6 @@
+import { o } from 'ramda'
 import { Playlist } from '../../types'
-import { playbackInSync } from './check-playback-drift'
+import { playbackInSync, playbackOffset } from './playback-control'
 
 describe('playbackInSync()', () => {
   const playlist: Playlist = {
@@ -41,6 +42,10 @@ describe('playbackInSync()', () => {
 
     expect(isInSync).toBe(false)
   })
+})
+
+describe('playbackOffset()', () => {
+  it.todo('finds the offset to the current position inside the playlist tracks')
 })
 
 function addSeconds(date: Date, seconds: number): Date {

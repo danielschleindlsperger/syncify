@@ -1,11 +1,10 @@
 import { NowResponse } from '@now/node'
 import { withAuth, AuthenticatedNowRequest } from '../../../../auth'
 import { findRoom, makeClient, updateRoom } from '../../../../db'
-import { Room } from '../../../../types'
-import { TrackChangedPayload, TrackChanged } from '../../../../pusher-events'
+import { Playlist, Room } from '../../../../types'
+import { TrackChanged } from '../../../../pusher-events'
 import { pusher } from '../../../../pusher'
 import { dropWhile } from 'ramda'
-import { scheduleTrackChange } from '../../../../queue'
 
 const client = makeClient()
 
@@ -24,45 +23,41 @@ export default withAuth(async (req: AuthenticatedNowRequest, res: NowResponse) =
     return res.status(403).json({ msg: 'User is not a room admin.' })
   }
 
-  const currentTrackId = room.playlist.playback?.currentTrackId
+  // Current strategy: Since the playback is based off the createdAt date of the room, we can skip
+  // tracks by manipulating this date. This ugly but should work for now.
+  // We should probably have some sort of "skipped ms" counter that influences the calculation
 
-  if (!currentTrackId) {
-    return res.status(500).json({ msg: 'No current track found' })
-  }
-
-  const [currentTrack, nextTrack, trackToSchedule] = dropWhile<Room['playlist']['tracks'][0]>(
-    (t) => t.id !== currentTrackId,
-  )(room.playlist.tracks)
-
-  if (!nextTrack) {
-    console.info(`Playlist changed or playlist over`, { roomId, currentTrackId })
-    return res.json({ msg: 'Playlist changed or playlist over' })
-  }
-
-  const payload: TrackChangedPayload = {
-    trackId: nextTrack.id,
-  }
-  pusher.trigger(`presence-${room.id}`, TrackChanged, payload)
-  console.log(`Playing track "${nextTrack.id}" in room "${roomId}".`)
+  const skipped = skippedMs(room.playlist)
 
   await updateRoom(client, {
     ...room,
     playlist: {
       ...room.playlist,
-      playback: { currentTrackId: nextTrack.id, currentTrackStartedAt: new Date().toISOString() },
+      createdAt: new Date(new Date(room.playlist.createdAt).getTime() - skipped).toISOString(),
     },
   })
 
-  if (trackToSchedule) {
-    await scheduleTrackChange(client, {
-      delaySeconds: currentTrack.duration_ms / 1000,
-      roomId: room.id,
-      trackId: trackToSchedule.id,
-    })
-  }
+  pusher.trigger(`presence-${room.id}`, TrackChanged, {})
+  console.log(`Skipped a track in room "${roomId}".`)
 
   return res.json({ success: true })
 })
 
 const isRoomAdmin = (room: Pick<Room, 'admins'>, userId: string): boolean =>
   room.admins.find((a) => a.id === userId) !== undefined
+
+// Returns the amount of milliseconds forwarded when the current track is skipped
+function skippedMs(playlist: Playlist): number {
+  let offset = Date.now() - Date.parse(playlist.createdAt)
+
+  const [nextTrack] = dropWhile((t) => {
+    const trackIsOver = offset > t.duration_ms
+    if (trackIsOver) {
+      offset = offset - t.duration_ms
+      return true
+    }
+    return false
+  }, playlist.tracks)
+
+  return nextTrack.duration_ms - offset
+}

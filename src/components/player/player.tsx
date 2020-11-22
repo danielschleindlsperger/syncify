@@ -6,7 +6,7 @@ import { useSpotifyPlayer } from './spotify-web-player'
 import { Progress } from './track-progress'
 import { VolumeSlider } from './volume-controls'
 import { TrackChanged, TrackChangedPayload } from '../../pusher-events'
-import { playbackInSync } from './check-playback-drift'
+import { playbackInSync, playbackOffset } from './playback-control'
 
 // TODO: empty, skeleton state
 export const Player = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => {
@@ -14,6 +14,7 @@ export const Player = ({ className, ...props }: React.HTMLAttributes<HTMLElement
   const isPlaying = usePlayerState((state) => state.isPlaying)
   const { play } = useSpotifyPlayer()
   const playlist = useRoom().room?.playlist
+  const revalidate = useRoom().revalidate
   const { channel } = useRoomChannel()
 
   // Check if we're still in sync, every time we get a playback status update from the spotify player
@@ -27,23 +28,26 @@ export const Player = ({ className, ...props }: React.HTMLAttributes<HTMLElement
     console.log({ playbackState, inSync })
   }, [playbackState])
 
-  // play initial track
+  // (Re)start playback with current offset
   React.useEffect(() => {
     if (play && playlist) {
-      if (!playlist.playback) return
-      const initialTrackId = playlist.playback.currentTrackId
-      const offset = Date.now() - Date.parse(playlist.playback.currentTrackStartedAt)
-      play([`spotify:track:${initialTrackId}`], offset)
+      const { remainingTracks, offset } = playbackOffset(playlist)
+      const ids = remainingTracks.map((t) => `spotify:track:${t.id}`)
+
+      console.log({ ids, offset })
+
+      play(ids, offset)
     }
   }, [playlist, play])
 
   // change track after event
   React.useEffect(() => {
-    if (!channel || !play) return
+    if (!channel || !revalidate) return
     channel.bind(TrackChanged, (data: TrackChangedPayload) => {
-      play([`spotify:track:${data.trackId}`])
+      // When a playback change event is coming in we just refetch the playlist from the server and start again
+      revalidate()
     })
-  }, [channel, play])
+  }, [channel, revalidate])
 
   if (!playbackState) return null
 
