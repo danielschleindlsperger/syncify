@@ -12,7 +12,7 @@ export const Playlist = React.memo(({ playlist, ...props }: PlaylistProps) => {
   if (playlist.tracks.length === 0) return null
 
   return (
-    <ul className="overflow-scroll" {...props}>
+    <ul className="overflow-auto" {...props}>
       {playlist.tracks.map((t) => (
         // TODO: This check does not work all the time: IDs are not consistent and names sometimes change as well
         <li key={t.id} className={t.id === currentTrack?.id ? 'font-bold' : undefined}>
