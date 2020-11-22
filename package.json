@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "debug": "NODE_OPTIONS='--inspect' next",
     "dev": "next",
     "build": "next build",
     "start": "vercel dev",
