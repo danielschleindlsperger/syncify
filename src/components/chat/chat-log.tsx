@@ -13,7 +13,7 @@ type ChatlogProps = React.HTMLAttributes<HTMLElement> & { log: ChatLogEntry[] }
 export const Chatlog = ({ log, className, ...props }: ChatlogProps) => {
   if (log.length === 0) return null
   return (
-    <ul className={cx(className, 'overflow-scroll')} {...props}>
+    <ul className={cx(className, 'overflow-auto')} {...props}>
       {log.map((entry) => (
         <li key={entry.id} className="mt-2">
           <div className="text-gray-500 font-semibold text-xs">
