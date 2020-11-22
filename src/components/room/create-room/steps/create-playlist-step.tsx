@@ -73,7 +73,6 @@ export const UserPlaylist = ({ setRoomState }: { setRoomState: SetRoomState }) =
               onClick={() => selectPlaylist(p.id)}
             />
           ))}
-          {playlists.length === 0 && <LoadingSpinner />}
           {loading && <LoadingSpinner />}
           {error && (
             <div className="text-red-500">
