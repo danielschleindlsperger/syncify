@@ -106,16 +106,26 @@ exports.config = {
       'selenium-standalone',
       {
         logPath: 'logs',
+
+        // releases: https://sites.google.com/a/chromium.org/chromedriver/downloads
         installArgs: {
+          version: '3.141.59',
+          baseURL: 'https://selenium-release.storage.googleapis.com',
           drivers: {
-            // releases: https://sites.google.com/a/chromium.org/chromedriver/downloads
-            chrome: { version: '83.0.4103.14' },
+            chrome: {
+              version: '86.0.4240.22',
+              arch: process.arch,
+              baseURL: 'https://chromedriver.storage.googleapis.com',
+            },
           },
         },
         args: {
+          version: '3.141.59',
           drivers: {
-            // releases: https://sites.google.com/a/chromium.org/chromedriver/downloads
-            chrome: { version: '83.0.4103.14' },
+            chrome: {
+              version: '86.0.4240.22',
+              arch: process.arch,
+            },
           },
         },
       },
