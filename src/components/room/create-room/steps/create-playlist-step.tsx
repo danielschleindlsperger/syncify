@@ -68,9 +68,9 @@ export const UserPlaylist = ({ setRoomState }: { setRoomState: SetRoomState }) =
           {playlists.map((p) => (
             <PlaylistItem
               key={p.id}
-              {...p}
               isActive={activePlaylist?.id === p.id}
               onClick={() => selectPlaylist(p.id)}
+              {...p}
             />
           ))}
           {loading && <LoadingSpinner />}
@@ -92,7 +92,15 @@ export const UserPlaylist = ({ setRoomState }: { setRoomState: SetRoomState }) =
 type PlaylistItemProps = SpotifyPlaylist & {
   isActive: boolean
 } & React.ButtonHTMLAttributes<HTMLButtonElement>
-const PlaylistItem = ({ id, name, image, isActive, className, ...props }: PlaylistItemProps) => {
+const PlaylistItem = ({
+  id,
+  name,
+  image,
+  trackCount,
+  isActive,
+  className,
+  ...props
+}: PlaylistItemProps) => {
   return (
     <button
       className={cx(
@@ -167,7 +175,7 @@ const PlaylistStore = createContextStore<CreatePlaylistFromUserPlaylistStore>(
     settleWithError: action((state, error) => ({ ...state, error, loading: false })),
     addPlaylists: action((state, playlists) => ({
       ...state,
-      playlists,
+      playlists: playlists.filter((p) => p.trackCount > 0),
       error: undefined,
       loading: false,
     })),
@@ -218,13 +226,13 @@ const NotImplemented = () => null
 const spotify = new SpotifyWebApi()
 
 type SpotifyPlaylistTrack = SpotifyApi.PlaylistTrackObject['track']
-type SpotifyPlaylist = { name: string; id: string; image?: string }
+type SpotifyPlaylist = { name: string; id: string; image?: string; trackCount: number }
 const limit = 50
 
 const getUserPlaylists = async (
   accessToken: string,
   offset = 0,
-): Promise<{ id: string; name: string; image?: string }[]> => {
+): Promise<{ id: string; name: string; image?: string; trackCount: number }[]> => {
   spotify.setAccessToken(accessToken)
   const { items, next, offset: oldOffset } = await spotify.getUserPlaylists({
     limit,
@@ -235,6 +243,7 @@ const getUserPlaylists = async (
     id: playlist.id,
     name: playlist.name,
     image: playlist.images[0]?.url,
+    trackCount: playlist.tracks.total,
   }))
 
   return next
