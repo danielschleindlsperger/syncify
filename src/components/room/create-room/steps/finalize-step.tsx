@@ -47,7 +47,7 @@ export const FinalizeStep = ({ roomState, setRoomState, onSubmit }: FinalizeStep
             type="checkbox"
             checked={roomState.publiclyListed}
             onChange={handleListPubliclyChange}
-            className="block w-full max-w-xs p-2 bg-gray-300 rounded-sm"
+            className="block p-2 bg-gray-300 rounded-sm"
           />
         </label>
       </form>
