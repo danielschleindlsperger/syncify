@@ -1,10 +1,12 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { Playlist } from './playlist'
+import { PlayerStoreProvider } from '../player'
 
 type Playlist = import('../../types').Playlist
 
 storiesOf('Playlist', module)
+  .addDecorator((Story) => <PlayerStoreProvider>{Story()}</PlayerStoreProvider>)
   .add('Five songs', () => <Playlist playlist={mkPlaylist(upcomingTracks.slice(0, 5))} />)
   .add('One song', () => <Playlist playlist={mkPlaylist(upcomingTracks.slice(0, 1))} />)
   .add('No songs', () => <Playlist playlist={mkPlaylist([])} />)
