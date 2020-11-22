@@ -105,7 +105,9 @@ const PlaylistItem = ({ id, name, image, isActive, className, ...props }: Playli
       {...props}
     >
       <img src={image} className="w-16" />
-      <h3 className="ml-4 font-bold text-lg">{name}</h3>
+      <h3 className="ml-4 font-bold text-lg whitespace-nowrap whitespace-nowrap overflow-x-hidden overflow-ellipsis">
+        {name}
+      </h3>
     </button>
   )
 }
