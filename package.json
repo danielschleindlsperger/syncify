@@ -64,7 +64,7 @@
     "@types/slonik": "^22.1.4",
     "@types/spotify-web-api-node": "^4.0.2",
     "@types/spotify-web-playback-sdk": "^0.1.7",
-    "@types/yup": "^0.29.9",
+    "@types/yup": "^0.28.3",
     "@wdio/cli": "^6.9.1",
     "@wdio/local-runner": "^6.9.1",
     "@wdio/mocha-framework": "^6.8.0",

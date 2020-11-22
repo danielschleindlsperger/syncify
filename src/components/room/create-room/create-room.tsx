@@ -1,7 +1,7 @@
 import React from 'react'
 import { Wizard } from './create-room-wizard'
 import { PickModeStep } from './steps/pick-mode-step'
-import { CreatePlaylistStep } from './steps/create-playlist-step'
+import { CreatePlaylistStep, PlaylistProvider } from './steps/create-playlist-step'
 import { FinalizeStep } from './steps/finalize-step'
 import { CreateRoomPayload } from '../../../pages/api/rooms'
 import { Room } from '../../../types'
@@ -64,7 +64,11 @@ export const CreateRoom: React.FC<CreateRoomProps> = ({ onCreated, ...props }) =
 
   return (
     <div {...props}>
-      <Wizard steps={steps} onSubmit={handleSubmit} />
+      <PlaylistProvider>
+        {' '}
+        <Wizard steps={steps} onSubmit={handleSubmit} />
+      </PlaylistProvider>
+
       {!idle && (
         <div className="mt-4 flex justify-center">
           {isLoading && <LoadingSpinner />}

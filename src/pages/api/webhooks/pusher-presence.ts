@@ -1,12 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import Pusher, { Event } from 'pusher'
+import Pusher, { WebHook } from 'pusher'
 import { makeClient, query } from '../../../db'
 
-declare module 'pusher' {
-  interface Event {
-    user_id: string
-  }
-}
+type Event = ReturnType<WebHook['getEvents']>[0]
 
 const client = makeClient()
 const pusher = new Pusher({
@@ -30,16 +26,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   return res.send('all good!')
 }
 
-const handleEvents = (events: Event[]): Promise<any> => {
+const handleEvents = async (events: Event[]): Promise<void> => {
   const promises = events.map((event) => {
     if (event.name === 'member_added') {
-      return addMember({ userId: event.user_id, roomId: parseRoomId(event.channel) })
+      return addMember({ userId: event.socket_id, roomId: parseRoomId(event.channel) })
     }
     if (event.name === 'member_removed') {
-      return removeMember({ userId: event.user_id, roomId: parseRoomId(event.channel) })
+      return removeMember({ userId: event.socket_id, roomId: parseRoomId(event.channel) })
     }
   })
-  return Promise.all(promises)
+  await Promise.all(promises)
 }
 
 const parseRoomId = (s: string) => s.replace(/^presence-/, '')

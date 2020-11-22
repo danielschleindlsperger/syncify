@@ -66,20 +66,22 @@ async function handleUpdateRoom(req: AuthenticatedNowRequest, res: NowResponse) 
 
 // TODO: this is a duplicate from room creation
 const UpdateRoomSchema = Yup.object({
-  room: Yup.object().shape({
-    id: Yup.string().required(),
-    name: Yup.string().trim().min(3).max(255).required(),
-    cover_image: Yup.string().notRequired(),
-    publiclyListed: Yup.boolean().required(),
-    playlist: Yup.object({
-      createdAt: Yup.string().required(),
-      tracks: Yup.array<any>().required(),
-    }).required(),
-    admins: Yup.array()
-      .of(Yup.object({ id: Yup.string().required() }).required())
-      .required(),
-  }),
-})
+  room: Yup.object()
+    .shape({
+      id: Yup.string().required(),
+      name: Yup.string().trim().min(3).max(255).required(),
+      cover_image: Yup.string().notRequired(),
+      publiclyListed: Yup.boolean().required(),
+      playlist: Yup.object({
+        createdAt: Yup.string().required(),
+        tracks: Yup.array<any>().required(),
+      }).required(),
+      admins: Yup.array()
+        .of(Yup.object({ id: Yup.string().required() }).required())
+        .required(),
+    })
+    .required(),
+}).required()
 
 export type UpdateRoomPayload = Yup.InferType<typeof UpdateRoomSchema>
 

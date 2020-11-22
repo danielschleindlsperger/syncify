@@ -1,6 +1,6 @@
 import React from 'react'
 import cx from 'classnames'
-import { action, Action, Thunk, thunk, createComponentStore } from 'easy-peasy'
+import { action, Action, Thunk, thunk, createContextStore } from 'easy-peasy'
 import SpotifyWebApi from 'spotify-web-api-js'
 import { CreatePlaylistMode, SetRoomState } from '../create-room'
 import { UnreachableError } from '../../../../utils/errors'
@@ -25,10 +25,9 @@ export const CreatePlaylistStep = ({ activeMode, setRoomState }: CreatePlaylistS
 }
 
 export const UserPlaylist = ({ setRoomState }: { setRoomState: SetRoomState }) => {
-  const [state, actions] = usePlaylistState()
+  const { playlists, activePlaylist, loading, error } = usePlaylistState((state) => state)
+  const actions = usePlaylistActions((actions) => actions)
   const accessToken = useAuth().user?.access_token
-
-  const { playlists, activePlaylist, loading, error } = state
 
   // Initially fetch user playlists
   React.useEffect(() => {
@@ -91,9 +90,9 @@ export const UserPlaylist = ({ setRoomState }: { setRoomState: SetRoomState }) =
   )
 }
 
-type PlaylistItemProps = SpotifyPlaylist & { isActive: boolean } & React.ButtonHTMLAttributes<
-    HTMLButtonElement
-  >
+type PlaylistItemProps = SpotifyPlaylist & {
+  isActive: boolean
+} & React.ButtonHTMLAttributes<HTMLButtonElement>
 const PlaylistItem = ({ id, name, image, isActive, className, ...props }: PlaylistItemProps) => {
   return (
     <button
@@ -156,7 +155,7 @@ type CreatePlaylistFromUserPlaylistStore = Readonly<{
   >
 }>
 
-const usePlaylistState = createComponentStore<CreatePlaylistFromUserPlaylistStore>(
+const PlaylistStore = createContextStore<CreatePlaylistFromUserPlaylistStore>(
   {
     playlists: [],
     activePlaylist: undefined,
@@ -208,6 +207,10 @@ const usePlaylistState = createComponentStore<CreatePlaylistFromUserPlaylistStor
   },
   { name: 'Create Playlist from User Playlist', disableImmer: true },
 )
+
+const usePlaylistState = PlaylistStore.useStoreState
+const usePlaylistActions = PlaylistStore.useStoreActions
+export const PlaylistProvider = PlaylistStore.Provider
 
 const NotImplemented = () => null
 

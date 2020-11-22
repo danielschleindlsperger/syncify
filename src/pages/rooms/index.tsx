@@ -56,7 +56,7 @@ const useRoomData = (): UseRoomData => {
         return {
           nextOffset: nextPage.nextOffset,
           hasMore: nextPage.hasMore,
-          data: [...prevData.data, ...nextPage.data],
+          data: [...(prevData?.data ?? []), ...nextPage.data],
         }
       }, false)
     }

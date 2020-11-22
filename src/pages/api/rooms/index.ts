@@ -34,11 +34,11 @@ export type GetRoomsResponse = {
   data: Rooms
 }
 
-const getRoomsSchema = Yup.object()
-  .shape({
-    offset: Yup.number().min(0).max(10000).notRequired(),
-  })
+const getRoomsSchema = Yup.object({
+  offset: Yup.number().min(0).max(10000).notRequired(),
+})
   .default({})
+  .required()
 
 async function handleGetRooms(req: NowRequest, res: NowResponse) {
   const limit = 24
@@ -150,13 +150,13 @@ RETURNING *
   }
 }
 
-const createRoomSchema = Yup.object().shape({
+const createRoomSchema = Yup.object({
   name: Yup.string().trim().min(3).max(255).required(),
   // TODO: Can we make this required?
   cover_image: Yup.string().notRequired(),
   publiclyListed: Yup.boolean().notRequired(),
   trackIds: Yup.array().of(Yup.string().required()).max(1000).required(),
-})
+}).required()
 
 export type CreateRoomPayload = Yup.InferType<typeof createRoomSchema>
 
