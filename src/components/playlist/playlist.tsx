@@ -1,4 +1,5 @@
 import React from 'react'
+import { notNil } from '../../utils/type-guards'
 import { usePlayerState } from '../player/player-store'
 
 type Playlist = import('../../types').Playlist
@@ -14,11 +15,15 @@ export const Playlist = React.memo(({ playlist, ...props }: PlaylistProps) => {
   return (
     <ul className="overflow-auto" {...props}>
       {playlist.tracks.map((t) => (
-        // TODO: This check does not work all the time: IDs are not consistent and names sometimes change as well
-        <li key={t.id} className={t.id === currentTrack?.id ? 'font-bold' : undefined}>
+        <li key={t.id} className={isCurrentTrack(t, currentTrack) ? 'font-bold' : undefined}>
           <span>{t.name}</span>
         </li>
       ))}
     </ul>
   )
 })
+
+function isCurrentTrack(track: { id: string }, currentTrack: Spotify.Track | undefined): boolean {
+  const currentTrackId = currentTrack?.linked_from?.id ?? currentTrack?.id
+  return notNil(currentTrackId) && currentTrackId === track.id
+}
