@@ -1,4 +1,3 @@
-import { o } from 'ramda'
 import { Playlist } from '../../types'
 import { playbackInSync, playbackOffset } from './playback-control'
 
