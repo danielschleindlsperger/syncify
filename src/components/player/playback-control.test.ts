@@ -44,7 +44,42 @@ describe('playbackInSync()', () => {
 })
 
 describe('playbackOffset()', () => {
-  it.todo('finds the offset to the current position inside the playlist tracks')
+  const playlist: Playlist = {
+    createdAt: '2020-11-22T18:10:06.431Z',
+    tracks: [
+      // Each track is 10 seconds long
+      { id: 'one', name: 'One', duration_ms: 10000, artists: [] },
+      { id: 'two', name: 'Two', duration_ms: 10000, artists: [] },
+      { id: 'three', name: 'Three', duration_ms: 10000, artists: [] },
+    ],
+  }
+
+  it('returns the remaining tracks and the offset into the current track', () => {
+    const { offset, remainingTracks } = playbackOffset(
+      playlist,
+      addSeconds(new Date(playlist.createdAt), 15),
+    )
+
+    expect(remainingTracks).toEqual(playlist.tracks.slice(1))
+    expect(offset).toBe(5000)
+  })
+
+  it('returns all tracks and 0 offset initially', () => {
+    const { offset, remainingTracks } = playbackOffset(playlist, new Date(playlist.createdAt))
+
+    expect(remainingTracks).toEqual(playlist.tracks)
+    expect(offset).toBe(0)
+  })
+
+  it('returns no remaining tracks and any offset when playback is over', () => {
+    const { offset, remainingTracks } = playbackOffset(
+      playlist,
+      addSeconds(new Date(playlist.createdAt), 31),
+    )
+
+    expect(remainingTracks).toEqual([])
+    expect(offset).toBe(1000)
+  })
 })
 
 function addSeconds(date: Date, seconds: number): Date {

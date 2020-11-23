@@ -45,8 +45,8 @@ export type PlaybackOffset = {
   offset: number
 }
 
-export const playbackOffset = (playlist: Playlist): PlaybackOffset => {
-  let offset = Date.now() - Date.parse(playlist.createdAt)
+export const playbackOffset = (playlist: Playlist, now = new Date()): PlaybackOffset => {
+  let offset = now.getTime() - Date.parse(playlist.createdAt)
 
   const remainingTracks = dropWhile((t) => {
     const trackIsOver = offset > t.duration_ms
