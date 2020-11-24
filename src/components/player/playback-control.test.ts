@@ -10,6 +10,10 @@ describe('playbackInSync()', () => {
       { id: 'two', name: 'Two', duration_ms: 10000, artists: [] },
       { id: 'three', name: 'Three', duration_ms: 10000, artists: [] },
     ],
+    playback: {
+      playbackStartedAt: '2020-11-22T18:10:06.431Z',
+      skippedMs: 0,
+    },
   }
 
   const playbackState = (position: number, current_track: Spotify.Track): Spotify.PlaybackState =>
@@ -23,6 +27,23 @@ describe('playbackInSync()', () => {
     const now = addSeconds(new Date(playlist.createdAt), 10)
 
     const isInSync = playbackInSync(playlist, playbackState(200, track), now)
+
+    expect(isInSync).toBe(true)
+  })
+
+  it('works when tracks have been skipped before', () => {
+    // we're on the second track
+    const track = { id: 'two' } as Spotify.Track
+    // 10 seconds have past since starting the playback
+    const now = addSeconds(new Date(playlist.createdAt), 10)
+
+    // but we've also skipped five seconds (maybe we skipped the first track five seconds before the end)
+    const skippedPlaylist: Playlist = {
+      ...playlist,
+      playback: { ...playlist.playback, skippedMs: 5000 },
+    }
+
+    const isInSync = playbackInSync(skippedPlaylist, playbackState(5000, track), now)
 
     expect(isInSync).toBe(true)
   })
@@ -58,6 +79,10 @@ describe('playbackOffset()', () => {
       { id: 'two', name: 'Two', duration_ms: 10000, artists: [] },
       { id: 'three', name: 'Three', duration_ms: 10000, artists: [] },
     ],
+    playback: {
+      playbackStartedAt: '2020-11-22T18:10:06.431Z',
+      skippedMs: 0,
+    },
   }
 
   it('returns the remaining tracks and the offset into the current track', () => {
@@ -85,6 +110,22 @@ describe('playbackOffset()', () => {
 
     expect(remainingTracks).toEqual([])
     expect(offset).toBe(1000)
+  })
+
+  it('returns correct amount when some time has been skipped forward', () => {
+    const skippedPlaylist: Playlist = {
+      ...playlist,
+      // We've skipped 5 seconds forward
+      playback: { ...playlist.playback, skippedMs: 5000 },
+    }
+    const { offset, remainingTracks } = playbackOffset(
+      skippedPlaylist,
+      // Ten seconds after the playback started
+      addSeconds(new Date(playlist.createdAt), 10),
+    )
+
+    expect(remainingTracks).toEqual(playlist.tracks.slice(1))
+    expect(offset).toBe(5000)
   })
 })
 

@@ -101,8 +101,9 @@ async function handleCreateRoom(req: AuthenticatedNowRequest, res: NowResponse) 
       createdAt: new Date().toISOString(),
       tracks,
       playback: {
-        currentTrackId: tracks[0]?.id,
-        currentTrackStartedAt: new Date().toISOString(),
+        playbackStartedAt: new Date().toISOString(),
+        // playlist is just getting created so nothing has been skipped yet
+        skippedMs: 0,
       },
     }
 

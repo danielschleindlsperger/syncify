@@ -5,6 +5,7 @@ import { findRoom, makeClient, updateRoom } from '../../../../db'
 import { Playlist, Room } from '../../../../types'
 import { TrackChanged } from '../../../../pusher-events'
 import { pusher } from '../../../../pusher'
+import { playbackOffset } from '../../../../components/player/playback-control'
 
 const client = makeClient()
 
@@ -23,20 +24,22 @@ export default withAuth(async (req: AuthenticatedNowRequest, res: NowResponse) =
     return res.status(403).json({ msg: 'User is not a room admin.' })
   }
 
-  // Current strategy: Since the playback is based off the createdAt date of the room, we can skip
-  // tracks by manipulating this date. This ugly but should work for now.
-  // We should probably have some sort of "skipped ms" counter that influences the calculation
-
+  // To skip forward we keep track of the total amount of skipped milliseconds during a playback
+  // and use that in all offset calculations
   const skipped = skippedMs(room.playlist)
 
   await updateRoom(client, {
     ...room,
     playlist: {
       ...room.playlist,
-      createdAt: new Date(new Date(room.playlist.createdAt).getTime() - skipped).toISOString(),
+      playback: {
+        ...room.playlist.playback,
+        skippedMs: room.playlist.playback.skippedMs + skipped,
+      },
     },
   })
 
+  // TODO: payload is not needed anymore
   pusher.trigger(`presence-${room.id}`, TrackChanged, {})
   console.log(`Skipped a track in room "${roomId}".`)
 
@@ -46,18 +49,11 @@ export default withAuth(async (req: AuthenticatedNowRequest, res: NowResponse) =
 const isRoomAdmin = (room: Pick<Room, 'admins'>, userId: string): boolean =>
   room.admins.find((a) => a.id === userId) !== undefined
 
-// Returns the amount of milliseconds forwarded when the current track is skipped
+/**
+ * Determine the amount of milliseconds forwarded when the current track is skipped
+ */
 function skippedMs(playlist: Playlist): number {
-  let offset = Date.now() - Date.parse(playlist.createdAt)
-
-  const [nextTrack] = dropWhile((t) => {
-    const trackIsOver = offset > t.duration_ms
-    if (trackIsOver) {
-      offset = offset - t.duration_ms
-      return true
-    }
-    return false
-  }, playlist.tracks)
-
-  return nextTrack.duration_ms - offset
+  const { remainingTracks, offset } = playbackOffset(playlist, new Date())
+  const [currentTrack] = remainingTracks
+  return currentTrack.duration_ms - offset
 }

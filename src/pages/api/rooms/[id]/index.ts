@@ -75,6 +75,10 @@ const UpdateRoomSchema = Yup.object({
       playlist: Yup.object({
         createdAt: Yup.string().required(),
         tracks: Yup.array<any>().required(),
+        playback: Yup.object({
+          playbackStartedAt: Yup.string().required(),
+          skippedMs: Yup.number().integer().default(0),
+        }).required(),
       }).required(),
       admins: Yup.array()
         .of(Yup.object({ id: Yup.string().required() }).required())

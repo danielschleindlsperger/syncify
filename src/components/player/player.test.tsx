@@ -32,5 +32,9 @@ const room: Room = {
   playlist: {
     createdAt: '2020-01-01T12:00:00.000Z',
     tracks: [{ id: '1', duration_ms: 1000, name: 'First Track', artists: ['First Artist'] }],
+    playback: {
+      playbackStartedAt: '2020-01-01T12:00:00.000Z',
+      skippedMs: 0,
+    },
   },
 }

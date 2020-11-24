@@ -21,7 +21,8 @@ export function playbackInSync(
   if (!currentTrackId) return false
 
   // Check what the current offset (in millis) should be
-  const start = new Date(playlist.createdAt)
+  const start = new Date(playlist.playback.playbackStartedAt)
+  // TODO: incorporate skippedMs
   const plannedOffset = now.getTime() - start.getTime()
 
   // Check what the actual offset is
@@ -55,7 +56,7 @@ export type PlaybackOffset = {
  * as well as the offset in the current track.
  */
 export const playbackOffset = (playlist: Playlist, now = new Date()): PlaybackOffset => {
-  let offset = now.getTime() - Date.parse(playlist.createdAt)
+  let offset = now.getTime() - Date.parse(playlist.createdAt) + playlist.playback.skippedMs
 
   const remainingTracks = dropWhile((t) => {
     const trackIsOver = offset > t.duration_ms
