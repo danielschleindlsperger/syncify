@@ -20,9 +20,8 @@ export const Player = ({ className, ...props }: React.HTMLAttributes<HTMLElement
 
   // TODO: extract this stuff into custom hooks
 
-  const [measurements, setMeasurements] = React.useState<boolean[]>([])
-
   // Keep a rolling window of "is in sync?" measurements
+  const [measurements, setMeasurements] = React.useState<boolean[]>([])
   React.useEffect(() => {
     if (playbackState && playlist) {
       const inSync = playbackInSync(playlist!, playbackState)
