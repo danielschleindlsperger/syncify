@@ -1,7 +1,14 @@
 export type Room = Readonly<{
   id: string
   name: string
+  /**
+   * Absolute URL to the rooms title image.
+   */
   cover_image: string | undefined
+  /**
+   * Determines whether this room is listed on overview pages, renders search engine information.
+   * In general: If this room can be found without knowing the exact URL.
+   */
   publiclyListed: boolean
   playlist: Playlist
   admins: { id: string }[]
@@ -9,14 +16,24 @@ export type Room = Readonly<{
 
 export type Playlist = Readonly<{
   tracks: PlaylistTrack[]
-  // ISO-8601 date string
-  // This timestamp is expecially important here since it allows us to compute the current time offset in the playlist.
+  /**
+   * ISO-8601 date string
+   */
   createdAt: string
-  playback?: {
-    currentTrackId: string
-    // ISO-8601 date string
-    currentTrackStartedAt: string
-  }
+  playback: Readonly<{
+    /**
+     * ISO-8601 date string. Marks the point in time when playback started.
+     * This MIGHT be the same date as the `createdAt` timestamp of the playlist (or the room)
+     * Used to compute the current offset in the playback for people joining the room, etc
+     */
+    playbackStartedAt: string
+    /**
+     * Number of milliseconds that have been forwarded (i.e. when skipping the current track)
+     * In conjunction with the current date, the `playbackStartedAt` date and the tracks of the playlist
+     * this can be used to implement stateless playback management.
+     */
+    skippedMs: number
+  }>
 }>
 
 export type PlaylistTrack = Readonly<{
@@ -32,5 +49,5 @@ export type User = Readonly<{
   avatar: string | undefined
 }>
 
-// what a user get when they retrieve their account info
+// What a user gets when they retrieve their account info
 export type ClientAuthUser = User & Readonly<{ access_token: string }>
