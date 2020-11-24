@@ -3,7 +3,6 @@ import Link from 'next/link'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import cx from 'classnames'
-import { dropWhile } from 'ramda'
 import { Playlist } from '../../components/playlist'
 import { Chat } from '../../components/chat'
 import { Player } from '../../components/player'
@@ -15,9 +14,9 @@ import { useApiRequest } from '../../hooks/use-api-request'
 import { LoadingSpinner } from '../../components/loading'
 import { RoomProvider, RoomControls } from '../../components/room'
 import { RoomReactions } from '../../components/room/room-reactions'
+import { playbackOffset } from '../../components/player/playback-control'
+import { Room } from '../../types'
 
-type Room = import('../../types').Room
-type PlaylistTrack = import('../../types').PlaylistTrack
 type Playlist = import('../../types').Playlist
 
 export default withPlayerStore(() => {
@@ -32,7 +31,7 @@ export default withPlayerStore(() => {
 
   if (error) return <div>Whoopps, something bad happened!</div>
   if (!room) return <LoadingSpinner size="lg" absoluteCentered />
-  const remainingTracks = dropPlayedTracks(room.playlist)
+  const { remainingTracks } = playbackOffset(room.playlist, new Date())
 
   return (
     <RoomProvider room={room} revalidate={revalidate}>
@@ -99,15 +98,3 @@ const PlaylistIsOver = ({ className, ...props }: React.HTMLAttributes<HTMLElemen
     </p>
   </div>
 )
-
-const dropPlayedTracks = (playlist: Playlist): PlaylistTrack[] => {
-  let offset = Date.now() - Date.parse(playlist.createdAt)
-  return dropWhile((t) => {
-    const trackIsOver = offset > t.duration_ms
-    if (trackIsOver) {
-      offset = offset - t.duration_ms
-      return true
-    }
-    return false
-  }, playlist.tracks)
-}

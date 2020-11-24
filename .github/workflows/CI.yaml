@@ -1,6 +1,6 @@
 name: CI
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   checks:
@@ -39,7 +39,6 @@ jobs:
           SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
           SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
           SPOTIFY_REFRESH_TOKEN_A: ${{ secrets.SPOTIFY_REFRESH_TOKEN_A }}
-          GCLOUD_CREDENTIALS: ${{ secrets.GCLOUD_CREDENTIALS}}
         run: cp .env.test .env.build && npm run migrate up && npm run e2e:ci
 
   # Deploy job only runs on master after checks are successful

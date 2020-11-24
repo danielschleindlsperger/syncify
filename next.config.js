@@ -20,7 +20,6 @@ module.exports = (phase, { defaultConfig }) => {
       PUSHER_APP_ID: process.env.PUSHER_APP_ID,
       PUSHER_APP_KEY: process.env.PUSHER_APP_KEY,
       PUSHER_SECRET: process.env.PUSHER_SECRET,
-      GCLOUD_CREDENTIALS: process.env.GCLOUD_CREDENTIALS,
     },
   }
 }
