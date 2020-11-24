@@ -39,8 +39,6 @@ export function playbackInSync(
 
   const diff = Math.abs(plannedOffset - actualOffset)
 
-  console.log('diff', diff / 1000)
-
   return diff <= ACCEPTABLE_OFFSET_MS
 }
 

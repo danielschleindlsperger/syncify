@@ -6,7 +6,6 @@ import { withAuth, AuthenticatedNowRequest } from '../../../auth'
 import { SpotifyConfig } from '../../../config'
 import { PlaylistTrack, Playlist, Room } from '../../../types'
 import { makeClient, query, many } from '../../../db'
-import { scheduleTrackChange } from '../../../queue'
 
 const client = makeClient()
 
@@ -122,22 +121,6 @@ RETURNING *
       `Inserting the new room into pg took ${tRoomInsert - tFetchTracks}ms. Total ${
         tRoomInsert - start
       }`,
-    )
-
-    // EXPERIMENTAL
-    if (room.playlist.tracks.length > 0) {
-      const [first, second] = room.playlist.tracks
-      await scheduleTrackChange(client, {
-        delaySeconds: first.duration_ms / 1000,
-        roomId: room.id,
-        trackId: second.id,
-      })
-    }
-    // EXPERIMENTAL
-
-    const tSchedule = Date.now()
-    console.log(
-      `Scheduling the next track took ${tSchedule - tRoomInsert}ms. Total ${tSchedule - start}`,
     )
 
     return res.json(room)

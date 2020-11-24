@@ -12,9 +12,6 @@ export type Playlist = Readonly<{
   // ISO-8601 date string
   // This timestamp is expecially important here since it allows us to compute the current time offset in the playlist.
   createdAt: string
-  // The id of the task that is scheduled to change to the next track.
-  // Used to cancel obsolete track changes.
-  nextTrackChangeTaskId?: string
   playback?: {
     currentTrackId: string
     // ISO-8601 date string
