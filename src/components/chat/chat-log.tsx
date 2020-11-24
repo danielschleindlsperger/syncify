@@ -16,12 +16,25 @@ export const Chatlog = ({ log, className, ...props }: ChatlogProps) => {
     <ul className={cx(className, 'overflow-auto')} {...props}>
       {log.map((entry) => (
         <li key={entry.id} className="mt-2">
-          <div className="text-gray-500 font-semibold text-xs">
-            {new Date(entry.timestamp).toLocaleTimeString().slice(0, 5)}
-          </div>
+          <time
+            className="block text-gray-500 font-semibold text-xs"
+            dateTime={format.toISOString(entry.timestamp)}
+            title={`${format.toDateString(entry.timestamp)} ${format.toTimeString(
+              entry.timestamp,
+            )}`}
+          >
+            {format.toTimeString(entry.timestamp)}
+          </time>
           <div className="text-sm">{entry.message}</div>
         </li>
       ))}
     </ul>
   )
+}
+
+const format = {
+  toTimeString: (timestamp: number): string =>
+    new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+  toDateString: (timestamp: number): string => new Date(timestamp).toLocaleDateString(),
+  toISOString: (timestamp: number): string => new Date(timestamp).toISOString(),
 }
