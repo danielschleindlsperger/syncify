@@ -5,13 +5,18 @@ import { Playlist, PlaylistTrack } from '../../types'
 // five seconds it's considered unacceptable and we have to resync
 const ACCEPTABLE_OFFSET_MS = 5000
 
+/**
+ * Given a playlist object and the Spotify player's current playback object, determine if the playback
+ * is still in sync (within a margin).
+ */
 export function playbackInSync(
   playlist: Playlist,
-  currentPlayback: { trackOffset: number; track: Spotify.Track },
+  playbackState: Spotify.PlaybackState,
   now = new Date(),
 ): boolean {
-  const { trackOffset, track } = currentPlayback
-  const currentTrackId = track.linked_from?.id ?? track.id
+  const { position, track_window } = playbackState
+  const { current_track } = track_window
+  const currentTrackId = current_track.linked_from?.id ?? current_track.id
 
   if (!currentTrackId) return false
 
@@ -24,7 +29,7 @@ export function playbackInSync(
     (offset, t) => {
       if (t.id === currentTrackId) {
         // we found the current track
-        return reduced<number>(offset + trackOffset)
+        return reduced<number>(offset + position)
       }
       return offset + t.duration_ms
     },
@@ -34,17 +39,23 @@ export function playbackInSync(
 
   const diff = Math.abs(plannedOffset - actualOffset)
 
+  console.log('diff', diff / 1000)
+
   return diff <= ACCEPTABLE_OFFSET_MS
 }
 
 export type PlaybackOffset = {
   remainingTracks: PlaylistTrack[]
   /**
-   * Playback offset in the currently playing track
+   * Playback offset in the currently playing track in milliseconds.
    */
   offset: number
 }
 
+/**
+ * Given the static playlist of a room determine the remaining tracks (including the current track)
+ * as well as the offset in the current track.
+ */
 export const playbackOffset = (playlist: Playlist, now = new Date()): PlaybackOffset => {
   let offset = now.getTime() - Date.parse(playlist.createdAt)
 

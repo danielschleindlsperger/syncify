@@ -1,5 +1,6 @@
 import React from 'react'
 import cx from 'classnames'
+import { equals } from 'ramda'
 import { usePlayerState } from './player-store'
 import { useRoom, useRoomChannel } from '../room'
 import { useSpotifyPlayer } from './spotify-web-player'
@@ -17,24 +18,45 @@ export const Player = ({ className, ...props }: React.HTMLAttributes<HTMLElement
   const revalidate = useRoom().revalidate
   const { channel } = useRoomChannel()
 
-  // Check if we're still in sync, every time we get a playback status update from the spotify player
-  React.useEffect(() => {
-    if (!playbackState?.track_window) return
-    const inSync = playbackInSync(playlist!, {
-      trackOffset: playbackState?.position!,
-      track: playbackState?.track_window.current_track!,
-    })
+  // TODO: extract this stuff into custom hooks
 
-    console.log({ playbackState, inSync })
-  }, [playbackState])
+  const [measurements, setMeasurements] = React.useState<boolean[]>([])
+
+  // Keep a rolling window of "is in sync?" measurements
+  React.useEffect(() => {
+    if (playbackState && playlist) {
+      const inSync = playbackInSync(playlist!, playbackState)
+      setMeasurements((s) => [...s, inSync].slice(-3))
+    }
+  }, [playbackState, playlist])
+
+  // Whenever a new measurement comes in, check if we need to re-synchronize playback
+  // This compares the last three measuring points and only runs when they are [true, false, false]
+  // This means:
+  // a) there were at least three measurements
+  // b) playback was in sync at some point
+  // c) it's not in sync for the second time in a row - i.e. it's not a fluke
+  // d) the effect only runs once and not for every failure
+  React.useEffect(() => {
+    if (!playlist || !play) return
+
+    if (equals(measurements, [true, false, false])) {
+      const { remainingTracks, offset } = playbackOffset(playlist)
+      const ids = remainingTracks.map((t) => `spotify:track:${t.id}`)
+
+      console.info('re-syncing playback', { ids, offset })
+
+      play(ids, offset)
+    }
+  }, [measurements, playlist, play])
 
   // (Re)start playback with current offset
+  // This runs every time the playlist changes. This means we can skip tracks and add tracks to the
+  // playlist simply by updating it.
   React.useEffect(() => {
     if (play && playlist) {
       const { remainingTracks, offset } = playbackOffset(playlist)
       const ids = remainingTracks.map((t) => `spotify:track:${t.id}`)
-
-      console.log({ ids, offset })
 
       play(ids, offset)
     }

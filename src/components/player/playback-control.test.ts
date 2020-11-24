@@ -12,11 +12,17 @@ describe('playbackInSync()', () => {
     ],
   }
 
+  const playbackState = (position: number, current_track: Spotify.Track): Spotify.PlaybackState =>
+    ({
+      position,
+      track_window: { current_track },
+    } as Spotify.PlaybackState)
+
   it('returns true if the playback is inside acceptable boundary', () => {
     const track = { id: 'two' } as Spotify.Track
     const now = addSeconds(new Date(playlist.createdAt), 10)
 
-    const isInSync = playbackInSync(playlist, { trackOffset: 200, track }, now)
+    const isInSync = playbackInSync(playlist, playbackState(200, track), now)
 
     expect(isInSync).toBe(true)
   })
@@ -27,7 +33,7 @@ describe('playbackInSync()', () => {
     // Even though 10 seconds have already past
     const now = addSeconds(new Date(playlist.createdAt), 10)
 
-    const isInSync = playbackInSync(playlist, { trackOffset: 200, track }, now)
+    const isInSync = playbackInSync(playlist, playbackState(200, track), now)
 
     expect(isInSync).toBe(false)
   })
@@ -37,7 +43,7 @@ describe('playbackInSync()', () => {
     const track = { id: 'not-in-the-playlist' } as Spotify.Track
     const now = addSeconds(new Date(playlist.createdAt), 0)
 
-    const isInSync = playbackInSync(playlist, { trackOffset: 0, track }, now)
+    const isInSync = playbackInSync(playlist, playbackState(0, track), now)
 
     expect(isInSync).toBe(false)
   })
