@@ -40,7 +40,7 @@ export default withAuth(async (req: AuthenticatedNowRequest, res: NowResponse) =
   })
 
   // TODO: payload is not needed anymore
-  pusher.trigger(`presence-${room.id}`, TrackChanged, {})
+  await pusher.trigger(`presence-${room.id}`, TrackChanged, {})
   console.log(`Skipped a track in room "${roomId}".`)
 
   return res.json({ success: true })
