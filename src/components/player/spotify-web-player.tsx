@@ -38,6 +38,10 @@ export const SpotifyPlayerProvider: React.FC = ({ children }) => {
   // Creating a new closure would re-execute every React "useEffect" that uses the `play` function
   // and breaking lots of stuff, since the Spotify player is a very stateful issue.
   const accessTokenRef = React.useRef<string | undefined>(accessToken)
+  React.useEffect(() => {
+    accessTokenRef.current = accessToken
+  }, [accessToken])
+
   const play = React.useCallback(
     async (uris: string[], offsetMs = 0): Promise<void> => {
       if (player && accessTokenRef.current && state.deviceId) {
