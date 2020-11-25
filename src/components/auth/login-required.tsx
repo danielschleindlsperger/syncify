@@ -7,7 +7,8 @@ export const LoginRequired = ({ className, ...props }: React.HTMLAttributes<HTML
   <div className={cx(className, 'p-4 mt-8 max-w-screen-lg mx-auto')} {...props}>
     <h1 className="text-3xl font-bold">Login required</h1>
     <h2 className="text-l font-bold mt-4">
-      It seems you're not logged in. Either your session has run out or you're new to Syncify!
+      It seems you&apos;re not logged in. Either your session has run out or you&apos;re new to
+      Syncify!
     </h2>
     <p className="mt-4">
       Anyway, to use Syncify you have to log in with by clicking the button below. This will take

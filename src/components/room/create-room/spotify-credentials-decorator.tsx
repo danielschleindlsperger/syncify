@@ -6,6 +6,7 @@ import SpotifyWebApi from 'spotify-web-api-js'
 export const withSpotifyCredentials = makeDecorator({
   name: 'withSpotifyCredentials',
   parameterName: 'spotify',
+  // eslint-disable-next-line react/display-name
   wrapper: (storyFn, context) => {
     return <Wrapper>{storyFn(context)}</Wrapper>
   },

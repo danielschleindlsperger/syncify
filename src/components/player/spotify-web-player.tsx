@@ -76,7 +76,7 @@ export const SpotifyPlayerProvider: React.FC = ({ children }) => {
         unsubscribe(player)
       }
     }
-  }, [player])
+  }, [player, subscribe, unsubscribe])
 
   return (
     <SpotifyPlayerContext.Provider value={{ ...state, player, play }}>

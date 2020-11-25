@@ -78,10 +78,10 @@ export default withPlayerStore(() => {
 
 const PlaylistIsOver = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
   <div className={cx(className, 'mt-8')} {...props}>
-    <h1 className="text-4xl font-bold">The party's over!</h1>
+    <h1 className="text-4xl font-bold">The party&apos;s over!</h1>
     <p className="mt-4">
       The guests are gone and the music stopped playing. <br />
-      But don't fret, there's still hope!
+      But don&apos;t fret, there&apos;s still hope!
     </p>
     <p className="mt-4">
       <Link href="/rooms/create">

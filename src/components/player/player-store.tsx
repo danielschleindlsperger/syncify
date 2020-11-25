@@ -66,8 +66,16 @@ export const PlayerStoreProvider = store.Provider
 export const usePlayerActions = store.useStoreActions
 export const usePlayerState = store.useStoreState
 
-export const withPlayerStore = <P extends {}>(Component: React.ComponentType<P>) => (props: P) => (
-  <PlayerStoreProvider>
-    <Component {...props} />
-  </PlayerStoreProvider>
-)
+export const withPlayerStore = <P extends Record<string, unknown>>(
+  Component: React.ComponentType<P>,
+) => {
+  const comp = (props: P) => (
+    <PlayerStoreProvider>
+      <Component {...props} />
+    </PlayerStoreProvider>
+  )
+
+  comp.displayName = Component.displayName
+
+  return comp
+}

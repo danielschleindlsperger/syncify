@@ -31,6 +31,8 @@ jobs:
         run: npm t
       - name: Typecheck
         run: npm run typecheck
+      - name: Lint
+        run: npm run lint
       - name: E2E Tests
         env:
           PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}

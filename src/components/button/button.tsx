@@ -20,6 +20,8 @@ export const Button = React.forwardRef(
   },
 )
 
+Button.displayName = 'Button'
+
 const sharedClasses = 'inline-block text-center whitespace-no-wrap rounded-sm'
 const variants: Record<CustomProps['variant'], string> = {
   primary: cx(sharedClasses, 'bg-gray-700 text-gray-100 px-3 py-1'),

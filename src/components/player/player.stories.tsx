@@ -50,7 +50,7 @@ const PlayTrack: React.FC<{ uris: string[]; offset?: number }> = ({ uris, offset
     if (play && uris.length > 0) {
       play(uris, offset)
     }
-  }, [play])
+  }, [play, uris, offset])
 
   return null
 }

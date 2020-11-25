@@ -41,7 +41,6 @@ const handleEvents = async (events: Event[]): Promise<void> => {
 const parseRoomId = (s: string) => s.replace(/^presence-/, '')
 
 const addMember = async (ids: { userId: string; roomId: string }): Promise<void> => {
-  const { userId, roomId } = ids
   await query(client)`
 UPDATE users
 SET room_id = ${ids.roomId}

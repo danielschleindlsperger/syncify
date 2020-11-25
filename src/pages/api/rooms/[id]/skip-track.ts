@@ -1,5 +1,4 @@
 import { NowResponse } from '@now/node'
-import { dropWhile } from 'ramda'
 import { withAuth, AuthenticatedNowRequest } from '../../../../auth'
 import { findRoom, makeClient, updateRoom } from '../../../../db'
 import { Playlist, Room } from '../../../../types'

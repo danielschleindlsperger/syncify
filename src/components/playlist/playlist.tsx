@@ -23,6 +23,8 @@ export const Playlist = React.memo(({ playlist, ...props }: PlaylistProps) => {
   )
 })
 
+Playlist.displayName = 'Playlist'
+
 function isCurrentTrack(track: { id: string }, currentTrack: Spotify.Track | undefined): boolean {
   const currentTrackId = currentTrack?.linked_from?.id ?? currentTrack?.id
   return notNil(currentTrackId) && currentTrackId === track.id

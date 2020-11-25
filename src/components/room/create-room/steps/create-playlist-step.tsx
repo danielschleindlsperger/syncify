@@ -38,7 +38,7 @@ export const UserPlaylist = ({ setRoomState }: { setRoomState: SetRoomState }) =
           actions.selectActivePlaylist({ accessToken, playlistId: playlists[0]?.id }),
         )
     }
-  }, [accessToken])
+  }, [actions, accessToken])
 
   // update create room state when active playlist changes
   React.useEffect(() => {
@@ -50,7 +50,7 @@ export const UserPlaylist = ({ setRoomState }: { setRoomState: SetRoomState }) =
         trackIds: activePlaylist.tracks.map((t) => t.id),
       }))
     }
-  }, [activePlaylist])
+  }, [actions, activePlaylist, setRoomState])
 
   const selectPlaylist = async (playlistId: string) => {
     if (accessToken) {
@@ -155,7 +155,7 @@ type CreatePlaylistFromUserPlaylistStore = Readonly<{
     CreatePlaylistFromUserPlaylistStore,
     { accessToken: string },
     void,
-    {},
+    Record<string, never>,
     Promise<SpotifyPlaylist[]>
   >
   selectActivePlaylist: Thunk<
