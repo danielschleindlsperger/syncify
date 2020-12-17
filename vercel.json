@@ -11,6 +11,5 @@
       "PUSHER_APP_KEY": "@syncify-pusher-app-key",
       "PUSHER_SECRET": "@syncify-pusher-secret"
     }
-  },
-  "redirects": [{ "source": "/", "destination": "/rooms", "statusCode": 307 }]
+  }
 }

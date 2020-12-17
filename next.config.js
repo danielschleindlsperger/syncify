@@ -1,5 +1,4 @@
 const { PHASE_DEVELOPMENT_SERVER } = require('next/constants')
-const dotenv = require('dotenv')
 
 module.exports = (phase, { defaultConfig }) => {
   if (phase === PHASE_DEVELOPMENT_SERVER) {
@@ -20,6 +19,16 @@ module.exports = (phase, { defaultConfig }) => {
       PUSHER_APP_ID: process.env.PUSHER_APP_ID,
       PUSHER_APP_KEY: process.env.PUSHER_APP_KEY,
       PUSHER_SECRET: process.env.PUSHER_SECRET,
+    },
+    async redirects() {
+      return [
+        {
+          // we don't have a landing page yet so redirect to rooms for now
+          source: '/',
+          destination: '/rooms',
+          permanent: false,
+        },
+      ]
     },
   }
 }
