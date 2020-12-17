@@ -7,7 +7,7 @@
     "debug": "NODE_OPTIONS='--inspect' next",
     "dev": "next",
     "build": "next build",
-    "start": "vercel dev",
+    "start": "next start",
     "migrate": "node database/migrate",
     "test": "jest",
     "e2e": "TS_NODE_PROJECT=tsconfig.e2e.json DOTENV_CONFIG_PATH=.env.build wdio",
