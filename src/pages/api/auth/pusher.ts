@@ -1,4 +1,4 @@
-import { NowRequest, NowResponse } from '@now/node'
+import { NowRequest, NowResponse } from '@vercel/node'
 import Pusher from 'pusher'
 import { AuthCookieName, verifyToken } from '../../../auth'
 import { User } from '../../../types'

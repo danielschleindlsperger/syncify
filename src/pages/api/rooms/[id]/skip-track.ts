@@ -1,4 +1,4 @@
-import { NowResponse } from '@now/node'
+import { NowResponse } from '@vercel/node'
 import { withAuth, AuthenticatedNowRequest } from '../../../../auth'
 import { findRoom, makeClient, updateRoom } from '../../../../db'
 import { Playlist, Room } from '../../../../types'
