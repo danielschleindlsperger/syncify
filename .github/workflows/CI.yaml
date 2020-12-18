@@ -20,7 +20,7 @@ jobs:
           --health-retries 5
     steps:
       - name: Checkout source
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       - name: Setting up Node.js
         uses: actions/setup-node@v1
         with:
@@ -49,13 +49,17 @@ jobs:
     # TODO: re-enable
     # needs: checks
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v1
       - name: Determine version
         id: version
         uses: ./.github/actions/version-commit
-      - name: Checkout
+      - name: Checkout source
         uses: actions/checkout@v2
+      - name: Setting up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - name: Install dependencies
+        run: npm ci --prefer-offline
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
