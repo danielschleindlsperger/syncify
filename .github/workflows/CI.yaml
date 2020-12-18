@@ -74,7 +74,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: 'latest,${{ steps.version.outputs.version }}'
+          tags: 'syncify/app:${{ steps.version.outputs.version }}'
 
   # Deploy existing container: job only runs on master after checks are successful
   # TODO: adjust deployment, migrations
