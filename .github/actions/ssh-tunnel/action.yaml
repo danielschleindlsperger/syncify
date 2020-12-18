@@ -1,0 +1,23 @@
+name: 'SSH Tunnel'
+description: 'Open an SSH tunnel to a remote machine, for example to run database migrations.'
+inputs:
+  ssh_tunnel_destination:
+    description: 'Username/host combination, for example `root@123.123.123.123`'
+    required: true
+  ssh_tunnel_password:
+    description: 'SSH password'
+    required: true
+  ssh_tunnel_port:
+    description: 'SSH port on the target host. Usually 22.'
+    required: true
+  ssh_tunnel_mapping:
+    description: 'Mapping in the form `$LOCAL_PORT:$REMOTE_HOST:$REMOTE_PORT`.'
+    required: false
+outputs: {}
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args: []
+# branding:
+#   icon: database
+#   color: blue
