@@ -1,7 +1,5 @@
 FROM node:12-alpine
 
-ENV NODE_ENV=production
-
 RUN mkdir -p /app
 WORKDIR /app
 
@@ -9,7 +7,9 @@ WORKDIR /app
 COPY . /app
 
 # install dependencies
-RUN npm install
+RUN npm ci
+
+ENV NODE_ENV=production
 
 # build app
 RUN npm run build
