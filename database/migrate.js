@@ -1,7 +1,11 @@
 const { resolve } = require('path')
 
-// source environment variables when executed locally, noop in CI
-require('dotenv').config({ path: resolve(__dirname, '../.env.build') })
+try {
+  // source environment variables when executed locally, noop in CI
+  require('dotenv').config({ path: resolve(__dirname, '../.env.build') })
+} catch (e) {
+  console.log('Running in production: Ignoring local environment file')
+}
 
 const { createPool } = require('slonik')
 const { setupSlonikMigrator } = require('@slonik/migrator')
