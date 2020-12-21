@@ -1,4 +1,6 @@
 const { resolve } = require('path')
+
+// source environment variables when executed locally, noop in CI
 require('dotenv').config({ path: resolve(__dirname, '../.env.build') })
 
 const { createPool } = require('slonik')
