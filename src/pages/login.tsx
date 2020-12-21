@@ -1,7 +1,7 @@
 import React from 'react'
-import { AppUrl } from '../config'
 
-const LoginUrl = AppUrl + '/api/auth/login'
+// TODO: unused page: delete
+const LoginUrl = '/api/auth/login'
 
 export default function Login() {
   return (
