@@ -1,4 +1,4 @@
-import { NowRequest, NowResponse } from '@now/node'
+import { NowRequest, NowResponse } from '@vercel/node'
 import Spotify from 'spotify-web-api-node'
 import { User } from '../../../types'
 import { AppUrl, SpotifyConfig } from '../../../config'

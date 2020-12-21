@@ -1,7 +1,6 @@
 import React from 'react'
-import { AppUrl } from '../../config'
 
-const RefreshURL = `${AppUrl}/api/auth/refresh`
+const RefreshURL = `/api/auth/refresh`
 const RefreshInterval = 1000 * 60 * 10 // 10 minutes
 
 export type AuthUser = {

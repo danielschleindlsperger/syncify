@@ -1,15 +1,16 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { PHASE_DEVELOPMENT_SERVER } = require('next/constants')
-const dotenv = require('dotenv')
 
 module.exports = (phase, { defaultConfig }) => {
-  if (phase === PHASE_DEVELOPMENT_SERVER) {
-    require('dotenv').config({ path: '.env.build' })
-  }
+  /**
+   * Use environment variables from the local file in development only
+   */
+  let env = {}
 
-  return {
-    ...defaultConfig,
-    env: {
-      ...defaultConfig.env,
+  if (phase === PHASE_DEVELOPMENT_SERVER) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    require('dotenv').config({ path: '.env.build' })
+    env = {
       JWT_SECRET: process.env.JWT_SECRET,
       APP_URL: process.env.APP_URL,
       WEBHOOK_BASE_URL: process.env.WEBHOOK_BASE_URL,
@@ -20,6 +21,24 @@ module.exports = (phase, { defaultConfig }) => {
       PUSHER_APP_ID: process.env.PUSHER_APP_ID,
       PUSHER_APP_KEY: process.env.PUSHER_APP_KEY,
       PUSHER_SECRET: process.env.PUSHER_SECRET,
+    }
+  }
+
+  return {
+    ...defaultConfig,
+    env: {
+      ...defaultConfig.env,
+      ...env,
+    },
+    async redirects() {
+      return [
+        {
+          // we don't have a landing page yet so redirect to rooms for now
+          source: '/',
+          destination: '/rooms',
+          permanent: false,
+        },
+      ]
     },
   }
 }

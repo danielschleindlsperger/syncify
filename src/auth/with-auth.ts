@@ -1,6 +1,6 @@
 import { verifyToken } from './jwt'
 import { AuthCookieName } from './auth-cookie'
-import { NowRequest, NowResponse } from '@now/node'
+import { NowRequest, NowResponse } from '@vercel/node'
 
 export type AuthenticatedNowRequest = NowRequest & {
   auth: {
