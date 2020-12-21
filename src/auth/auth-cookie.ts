@@ -1,6 +1,6 @@
 import Cookie from 'cookie'
 
-export const AuthCookieName = 'syncify_token'
+export const AuthCookieName = 'syncify_token_v2'
 
 export const authCookie = (token: string): string => {
   return Cookie.serialize(AuthCookieName, token, {
