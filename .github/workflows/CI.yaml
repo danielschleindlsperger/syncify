@@ -93,18 +93,18 @@ jobs:
       - name: Determine version
         id: version
         uses: ./.github/actions/version-commit
-      - name: Open SSH Tunnel
-        uses: ./.github/actions/ssh-tunnel
-        with:
-          ssh_tunnel_destination: ${{ secrets.CAPROVER_SSH_DEST }}
-          ssh_tunnel_password: ${{ secrets.CAPROVER_SSH_PASSWORD }}
-          ssh_tunnel_port: ${{ secrets.CAPROVER_SSH_PORT }}
-          ssh_tunnel_mapping: '5432:srv-captain--postgres-db:5432'
-      - name: Migrate database
-        run: npm run migrate up
-        env:
-          NODE_OPTIONS: '--unhandled-rejections=strict'
-          DATABASE_URL: ${{ secrets.CAPROVER_DATABASE_URL }}
+      # - name: Open SSH Tunnel
+      #   uses: ./.github/actions/ssh-tunnel
+      #   with:
+      #     ssh_tunnel_destination: ${{ secrets.CAPROVER_SSH_DEST }}
+      #     ssh_tunnel_password: ${{ secrets.CAPROVER_SSH_PASSWORD }}
+      #     ssh_tunnel_port: ${{ secrets.CAPROVER_SSH_PORT }}
+      #     ssh_tunnel_mapping: '5432:srv-captain--postgres-db:5432'
+      # - name: Migrate database
+      #   run: npm run migrate up
+      #   env:
+      #     NODE_OPTIONS: '--unhandled-rejections=strict'
+      #     DATABASE_URL: ${{ secrets.CAPROVER_DATABASE_URL }}
       - name: Deploy to CapRover
         uses: ./.github/actions/caprover-deploy
         with:
