@@ -12,8 +12,7 @@ Syncify is a web application that lets users listen to the same music in synchro
 ## Commands
 
 ```sh
-npm start # with Vercel account
-npm run dev # with vanilla Next.js: Some functionality might not work as expected, e.g. the redirect from /
+npm run dev
 
 npm run debug # same as the dev script, but starts a Node.js debug server
 
@@ -27,6 +26,10 @@ docker-compose up -d
 npm run migrate up
 npm run migrate down
 npm run migrate create my-new-migration
+
+# run app in production
+npm run build
+npm start
 ```
 
 ## Nomenclature (Domain Language)
