@@ -4,16 +4,19 @@ import { AppProps } from 'next/app'
 import '../styles.css'
 import { AuthProvider } from '../components/auth'
 import { AppErrorBoundary } from '../components/app-error-boundary'
+import { ConfigProvider } from '../hooks/use-config'
 
 function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Analytics />
-      <AuthProvider>
-        <AppErrorBoundary>
-          <Component {...pageProps} />
-        </AppErrorBoundary>
-      </AuthProvider>
+      <AppErrorBoundary>
+        <AuthProvider>
+          <ConfigProvider>
+            <Component {...pageProps} />
+          </ConfigProvider>
+        </AuthProvider>
+      </AppErrorBoundary>
     </>
   )
 }

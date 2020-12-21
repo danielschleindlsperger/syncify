@@ -2,13 +2,7 @@ import React from 'react'
 import Pusher, { Members, Channel } from 'pusher-js'
 import { User } from '../../types'
 import { useRoom } from '.'
-
-const PusherAppKey = process.env.PUSHER_APP_KEY!
-const pusherOptions = {
-  cluster: 'eu',
-  forceTLS: true,
-  authEndpoint: '/api/auth/pusher',
-}
+import { useConfig } from '../../hooks/use-config'
 
 type PusherMember = {
   id: string
@@ -21,12 +15,17 @@ type PusherMember = {
 // returns the members of the
 export const useRoomChannel = () => {
   const { room, revalidate } = useRoom()
+  const pusherConfig = useConfig()?.pusher
   const [members, setMembers] = React.useState<User[]>([])
   const [channel, setChannel] = React.useState<Channel | undefined>()
 
   React.useEffect(() => {
-    if (!room || !revalidate) return
-    const pusher = new Pusher(PusherAppKey, pusherOptions)
+    if (!room || !revalidate || !pusherConfig) return
+    const pusher = new Pusher(pusherConfig.key, {
+      cluster: pusherConfig.cluster,
+      forceTLS: pusherConfig.forceTLS,
+      authEndpoint: pusherConfig.authEndpoint,
+    })
 
     pusher.connect()
 
@@ -62,7 +61,7 @@ export const useRoomChannel = () => {
       channel.disconnect()
       pusher.disconnect()
     }
-  }, [room, revalidate])
+  }, [room, pusherConfig, revalidate])
 
   return { members, channel }
 }
