@@ -56,17 +56,9 @@ In the future we might want to take advantage of the now Github Integration and 
 
 We use Pusher's "presence rooms" feature for user interactions.
 
-### [DigitalOcean Managed Postgres](https://www.digitalocean.com/products/managed-databases/)
-
-Managed Postgres with PGBouncer to allow for more client connections. This is useful because serverless functions can scale horizontally very well and don't work well with the traditional connection pool model. Instead each function will hold a database connection that will be frozen until another request comes in.
-
 ### Spotify Web Playback SDK
 
 Allows creation of a Spotify Connect device in the browser that can then subsequently be controlled with the Spotify API.
-
-### [Vercel](https://vercel.com/) (Zeit)
-
-Serverless paas.
 
 ### [LogDNA](https://logdna.com/)
 
