@@ -1,6 +1,8 @@
 {
-  "name": "syncify-now",
+  "name": "syncify",
+  "author": "Daniel Schleindlsperger",
   "version": "1.0.0",
+  "license": "ISC",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -19,13 +21,11 @@
     "build-storybook": "build-storybook",
     "webhook-proxy": "ssh -R syncify-${USER}.serveo.net:80:localhost:3000 serveo.net"
   },
-  "author": "Daniel Schleindlsperger",
   "husky": {
     "hooks": {
       "pre-commit": "pretty-quick --staged"
     }
   },
-  "license": "ISC",
   "dependencies": {
     "@slonik/migrator": "^0.7.0",
     "autoprefixer": "^9.8.6",
