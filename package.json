@@ -9,7 +9,7 @@
     "build": "next build",
     "prestart": "npm run migrate up",
     "start": "next start",
-    "migrate": "node database/migrate",
+    "migrate": "NODE_OPTIONS='--unhandled-rejections=strict' node database/migrate",
     "test": "jest",
     "e2e": "TS_NODE_PROJECT=tsconfig.e2e.json DOTENV_CONFIG_PATH=.env.build wdio",
     "e2e:ci": "CI=true start-server-and-test dev http://localhost:3000/rooms e2e",
