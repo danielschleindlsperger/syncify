@@ -4,8 +4,10 @@ import { User } from '../../../types'
 import { AppUrl, SpotifyConfig } from '../../../config'
 import { authCookie, signToken } from '../../../auth'
 import { makeClient, query } from '../../../db'
+import { createLogger } from '../../../utils/logger'
 
 const spotifyApi = new Spotify(SpotifyConfig)
+const log = createLogger()
 const client = makeClient()
 
 export default async (req: NowRequest, res: NowResponse) => {
@@ -40,7 +42,7 @@ export default async (req: NowRequest, res: NowResponse) => {
     res.status(307).setHeader('Location', Location)
     return res.end()
   } catch (e) {
-    console.error(e)
+    log.error('Error during authentication with Spotify.', e)
     return res.status(500).send('Error during authentication with Spotify.')
   }
 }

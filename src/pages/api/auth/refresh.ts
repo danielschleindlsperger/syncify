@@ -4,8 +4,10 @@ import { SpotifyConfig } from '../../../config'
 import { User } from '../../../types'
 import { AuthCookieName, verifyToken, authCookie, signToken } from '../../../auth'
 import { makeClient, first } from '../../../db'
+import { createLogger } from '../../../utils/logger'
 
 const spotifyApi = new Spotify(SpotifyConfig)
+const log = createLogger()
 const client = makeClient()
 
 // this endpoint is called by a user to
@@ -15,19 +17,19 @@ export default async (req: NowRequest, res: NowResponse) => {
   const token = req.cookies[AuthCookieName]
 
   if (typeof token !== 'string') {
-    console.log('No cookie value given.')
+    log.info('No cookie value given.')
     return res.status(401).json({ msg: 'No cookie value given.' })
   }
 
   const result = verifyToken(token)
 
   if (result.status === 'rejected') {
-    console.log('token rejected', result.reason)
+    log.info('token rejected', result.reason)
     return res.status(401).json({ reason: result.reason })
   }
 
   if (result.status === 'failed') {
-    console.error('token verification failed', result.error)
+    log.error('token verification failed', result.error)
     return res.status(500).json({ error: result.error })
   }
 

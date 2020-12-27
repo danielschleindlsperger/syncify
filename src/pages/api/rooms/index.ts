@@ -5,8 +5,10 @@ import { splitEvery } from 'ramda'
 import { withAuth, AuthenticatedNowRequest } from '../../../auth'
 import { SpotifyConfig } from '../../../config'
 import { PlaylistTrack, Playlist, Room } from '../../../types'
-import { makeClient, query, many } from '../../../db'
+import { makeClient, many, first } from '../../../db'
+import { createLogger } from '../../../utils/logger'
 
+const log = createLogger()
 const client = makeClient()
 
 export default withAuth(async (req: AuthenticatedNowRequest, res: NowResponse) => {
@@ -64,7 +66,7 @@ LIMIT ${limit + 1}
     })
   } catch (e) {
     if (e instanceof Yup.ValidationError) {
-      console.warn('validation error', e.errors)
+      log.info('Invalid query parameters', { error: e.errors })
       return res.status(422).json({ msg: 'Invalid payload.', errors: e.errors })
     }
     throw e
@@ -74,7 +76,6 @@ LIMIT ${limit + 1}
 const spotify = new Spotify(SpotifyConfig)
 
 async function handleCreateRoom(req: AuthenticatedNowRequest, res: NowResponse) {
-  const start = Date.now()
   try {
     const { name, cover_image = null, publiclyListed, trackIds } = await createRoomSchema.validate(
       req.body,
@@ -82,21 +83,8 @@ async function handleCreateRoom(req: AuthenticatedNowRequest, res: NowResponse) 
         stripUnknown: true,
       },
     )
-
-    const tValidation = Date.now()
-    console.log(`Validation took ${tValidation - start}ms. Total ${tValidation - start}`)
-
     const { access_token } = await spotify.clientCredentialsGrant().then((x) => x.body)
-    const tAccessToken = Date.now()
-    console.log(
-      `Getting access token took ${tAccessToken - tValidation}ms. Total ${tAccessToken - start}`,
-    )
     const tracks = await fetchTracks(access_token, uniqueNonNull(trackIds))
-    const tFetchTracks = Date.now()
-    console.log(
-      `Fetching tracks took ${tFetchTracks - tAccessToken}ms. Total ${tFetchTracks - start}`,
-    )
-
     const playlist: Playlist = {
       createdAt: new Date().toISOString(),
       tracks,
@@ -109,25 +97,16 @@ async function handleCreateRoom(req: AuthenticatedNowRequest, res: NowResponse) 
 
     const admins: Room['admins'] = [{ id: req.auth.id }]
 
-    const { rows } = await query<Room>(client)`
+    const room = await first<Room>(client)`
 INSERT INTO rooms (name, cover_image, publicly_listed, playlist, admins)
 VALUES (${name}, ${cover_image}, ${publiclyListed}, ${playlist}, ${JSON.stringify(admins)})
 RETURNING *
 `
 
-    const room = rows[0]
-
-    const tRoomInsert = Date.now()
-    console.log(
-      `Inserting the new room into pg took ${tRoomInsert - tFetchTracks}ms. Total ${
-        tRoomInsert - start
-      }`,
-    )
-
     return res.json(room)
   } catch (e) {
     if (e instanceof Yup.ValidationError) {
-      console.warn('validation error', e.errors)
+      log.info('Validation error', e.errors)
       return res.status(422).json({ msg: 'Invalid payload.', errors: e.errors })
     }
     throw e

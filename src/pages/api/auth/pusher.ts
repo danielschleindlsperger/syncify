@@ -1,6 +1,6 @@
-import { NowRequest, NowResponse } from '@vercel/node'
+import { NowResponse } from '@vercel/node'
 import Pusher from 'pusher'
-import { AuthCookieName, verifyToken } from '../../../auth'
+import { AuthenticatedNowRequest, withAuth } from '../../../auth'
 import { User } from '../../../types'
 import { makeClient, first } from '../../../db'
 
@@ -14,34 +14,14 @@ const pusher = new Pusher({
 
 const client = makeClient()
 
-export default async (req: NowRequest, res: NowResponse) => {
+export default withAuth(async (req: AuthenticatedNowRequest, res: NowResponse) => {
   if (req.method !== 'POST') return res.status(405).send('Method not allowed.')
-
-  const token = req.cookies[AuthCookieName]
-
-  if (typeof token !== 'string') {
-    console.log('No cookie value given.')
-    return res.status(401).json({ msg: 'No cookie value given.' })
-  }
-
-  const result = verifyToken(token)
-
-  if (result.status === 'rejected') {
-    console.log('token rejected', result.reason)
-    // pusher expects a 403 status code for failed authorization
-    return res.status(403).json({ reason: result.reason })
-  }
-
-  if (result.status === 'failed') {
-    console.error('token verification failed', result.error)
-    return res.status(500).json({ error: result.error })
-  }
 
   // channel_name is actually the id
   // TODO: validate the channel actually exists
   const { socket_id, channel_name } = req.body
 
-  const user = await findUser(result.user.id)
+  const user = await findUser(req.auth.id)
 
   if (!user) {
     return res.status(400).json({ msg: 'user does not exist.' })
@@ -56,7 +36,7 @@ export default async (req: NowRequest, res: NowResponse) => {
   }
 
   return res.json(pusher.authenticate(socket_id, channel_name, presenceData))
-}
+})
 
 const findUser = async (id: string) => first<User>(client)`
 SELECT id, name, avatar

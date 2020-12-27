@@ -5,7 +5,9 @@ import { Playlist, Room } from '../../../../types'
 import { TrackChanged } from '../../../../pusher-events'
 import { pusher } from '../../../../pusher'
 import { playbackOffset } from '../../../../components/player/playback-control'
+import { createLogger } from '../../../../utils/logger'
 
+const log = createLogger()
 const client = makeClient()
 
 export default withAuth(async (req: AuthenticatedNowRequest, res: NowResponse) => {
@@ -40,7 +42,7 @@ export default withAuth(async (req: AuthenticatedNowRequest, res: NowResponse) =
 
   // TODO: payload is not needed anymore
   await pusher.trigger(`presence-${room.id}`, TrackChanged, {})
-  console.log(`Skipped a track in room "${roomId}".`)
+  log.info(`Skipped a track in room "${roomId}".`, { roomId, roomName: room.name })
 
   return res.json({ success: true })
 })

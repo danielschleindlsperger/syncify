@@ -40,6 +40,11 @@ This is how we name certain things:
 
 Always use the name **track**. Spotify uses this naming scheme in all their APIs and doing it differently would increase complexity.
 
+## Logging
+
+Syncify uses the logging library [https://github.com/winstonjs/winston](winston).  
+To create a pre-configured instance, use the `createLogger()` function in `utils/logger.ts`.
+
 ## Release (Deployment)
 
 The application is continuously deployed on every master push to [zeit now](https://zeit.co) via Github Actions.

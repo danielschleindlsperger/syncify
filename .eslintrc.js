@@ -18,6 +18,7 @@ module.exports = {
     'plugin:react-hooks/recommended',
   ],
   rules: {
+    'no-console': 'error',
     '@typescript-eslint/no-empty-function': 'off',
     // Seems broken with TS sum types
     'react/prop-types': 'off',

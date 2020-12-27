@@ -43,6 +43,7 @@ export const Player = ({ className, ...props }: React.HTMLAttributes<HTMLElement
       const { remainingTracks, offset } = playbackOffset(playlist)
       const ids = remainingTracks.map((t) => `spotify:track:${t.id}`)
 
+      // eslint-disable-next-line no-console
       console.info('re-syncing playback', { ids, offset })
 
       play(ids, offset)

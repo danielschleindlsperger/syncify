@@ -43,6 +43,7 @@ export const CreateRoom: React.FC<CreateRoomProps> = ({ onCreated, ...props }) =
       if (onCreated) onCreated(room)
       settle()
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error(e)
       fail('Could not create room. Try again.')
     }

@@ -4,7 +4,9 @@ import { Room } from '../../../../types'
 import { withAuth, AuthenticatedNowRequest } from '../../../../auth'
 import { makeClient } from '../../../../db'
 import { findRoom, updateRoom } from '../../../../db/room'
+import { createLogger } from '../../../../utils/logger'
 
+const log = createLogger()
 const client = makeClient()
 
 export default withAuth(async (req: AuthenticatedNowRequest, res: NowResponse) => {
@@ -57,7 +59,7 @@ async function handleUpdateRoom(req: AuthenticatedNowRequest, res: NowResponse) 
     return res.json({ msg: 'Successfully updated room.' })
   } catch (e) {
     if (e instanceof Yup.ValidationError) {
-      console.warn('validation error', e.errors)
+      log.info('Validation error during room update', { errors: e.errors })
       return res.status(422).json({ msg: 'Invalid payload.', errors: e.errors })
     }
     throw e

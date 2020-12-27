@@ -44,8 +44,8 @@ export const useRoomChannel = () => {
     })
 
     channel.bind('pusher:subscription_error', (statusCode: number) => {
-      alert('pusher error: ' + statusCode)
-      console.error(statusCode)
+      // eslint-disable-next-line no-console
+      console.error('Pusher error, status code: ', statusCode)
     })
 
     channel.bind('pusher:member_added', (member: PusherMember) => {
