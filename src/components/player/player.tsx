@@ -65,7 +65,7 @@ export const Player = ({ className, ...props }: React.HTMLAttributes<HTMLElement
   // change track after event
   React.useEffect(() => {
     if (!channel || !revalidate) return
-    channel.bind(TrackChanged, (data: TrackChangedPayload) => {
+    channel.bind(TrackChanged, (_data: TrackChangedPayload) => {
       // When a playback change event is coming in we just refetch the playlist from the server and start again
       revalidate()
     })

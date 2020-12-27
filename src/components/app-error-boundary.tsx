@@ -20,7 +20,7 @@ export class AppErrorBoundary extends React.Component<
     return { error }
   }
 
-  componentDidCatch(error: any, info: any) {
+  componentDidCatch(error: any) {
     if (!(error instanceof AppError)) {
       throw error
     }

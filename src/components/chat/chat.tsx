@@ -13,11 +13,9 @@ type PusherMember = {
   }
 }
 
-type ChatProps = React.HTMLAttributes<HTMLElement> & {
-  roomId: string
-}
+type ChatProps = React.HTMLAttributes<HTMLElement>
 
-export const Chat = ({ roomId, className, ...props }: ChatProps) => {
+export const Chat = ({ className, ...props }: ChatProps) => {
   const { members, channel } = useRoomChannel()
   const [log, setLog] = React.useState<ChatLogEntry[]>([])
 

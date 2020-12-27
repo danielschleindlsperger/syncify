@@ -61,7 +61,7 @@ export default withPlayerStore(() => {
                 </div>
 
                 <div className="flex-grow min-h-0 grid grid-cols-2 gap-8  mt-8">
-                  <Chat roomId={room.id} className="pr-8 border-r-2" />
+                  <Chat className="pr-8 border-r-2" />
                   <Playlist playlist={room.playlist} />
                 </div>
                 <Player className="mt-8" />

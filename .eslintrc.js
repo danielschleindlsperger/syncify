@@ -19,6 +19,14 @@ module.exports = {
   ],
   rules: {
     'no-console': 'error',
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      {
+        // ignore function arguments and variables that are explicitly ignored with a "_" prefix
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+      },
+    ],
     '@typescript-eslint/no-empty-function': 'off',
     // Seems broken with TS sum types
     'react/prop-types': 'off',
