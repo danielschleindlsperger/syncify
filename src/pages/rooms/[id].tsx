@@ -60,8 +60,8 @@ export default withPlayerStore(() => {
                   </div>
                 </div>
 
-                <div className="flex-grow min-h-0 grid grid-cols-2 gap-8  mt-8">
-                  <Chat className="pr-8 border-r-2" />
+                <div className="flex-grow min-h-0 grid grid-cols-2 gap-8 mt-8">
+                  {/* <Chat className="pr-8" /> */}
                   <Playlist playlist={room.playlist} />
                 </div>
                 <Player className="mt-8" />
