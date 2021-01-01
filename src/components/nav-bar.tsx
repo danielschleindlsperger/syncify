@@ -10,10 +10,7 @@ export const Navbar = ({ children, className, ...props }: NavbarProps) => {
   const { user } = useAuth()
 
   return (
-    <nav
-      className={cx(className, 'flex justify-end items-center border-b-2 border-gray-100 p-3')}
-      {...props}
-    >
+    <nav className={cx(className, 'flex justify-end items-center p-3')} {...props}>
       {children && <div className="mr-auto">{children}</div>}
       {user && (
         <>
