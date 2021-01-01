@@ -12,12 +12,7 @@ export const Navbar = ({ children, className, ...props }: NavbarProps) => {
   return (
     <nav className={cx(className, 'flex justify-end items-center p-3')} {...props}>
       {children && <div className="mr-auto">{children}</div>}
-      {user && (
-        <>
-          {user.name && <span>Hello, {user.name}</span>}
-          {user.avatar && <Avatar avatar={user.avatar} className="ml-4" />}
-        </>
-      )}
+      {user && <>{user.avatar && <Avatar avatar={user.avatar} className="ml-4" />}</>}
     </nav>
   )
 }
