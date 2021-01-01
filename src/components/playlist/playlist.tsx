@@ -48,6 +48,7 @@ export function Playlist2({ items }: Playlist2Props) {
     >
       {items
         .map((item, i) => (
+          // TODO: clicking a track should skip to it
           <PlaylistItem
             key={item.id}
             item={item}
@@ -80,7 +81,10 @@ type PlaylistItemProps = React.HTMLAttributes<HTMLDivElement> & {
 export function PlaylistItem({ item, showDetails, className, ...props }: PlaylistItemProps) {
   return (
     <div className={cx(className, 'max-w-xs')} {...props}>
-      <img src={item.coverArt} className="shadow-2xl rounded-lg" />
+      <div
+        className="w-80 pb-80 shadow-2xl rounded-lg bg-cover bg-center"
+        style={{ backgroundImage: `url(${item.coverArt})` }}
+      />
       {showDetails && (
         <div className="mt-4 flex flex-col justify-start">
           <span className="text-xl text-gray-800 font-bold leading-tight">{item.name}</span>
