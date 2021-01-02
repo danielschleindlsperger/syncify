@@ -12,10 +12,12 @@ type PlaylistProps = React.HTMLAttributes<HTMLElement> & { playlist: Playlist }
 export const Playlist = React.memo(({ playlist, ...props }: PlaylistProps) => {
   const currentTrack = usePlayerState((s) => s.playbackState?.track_window.current_track)
 
+  // Show the current track plus the next 9
+  // TODO: make this more dynamic and scrollable
   const items = dropWhile(
     (t) => t.id !== (currentTrack?.linked_from?.id ?? currentTrack?.id),
     playlist.tracks,
-  ).slice(1, 11)
+  ).slice(0, 10)
 
   const tracks = useSpotifyTracks(items.map((item) => item.id))
 
@@ -23,7 +25,6 @@ export const Playlist = React.memo(({ playlist, ...props }: PlaylistProps) => {
 
   return (
     <div {...props}>
-      <h2 className="text-xl text-gray-800 font-bold leading-tight mb-4">Upcoming Tracks</h2>
       <Playlist2 items={tracks} />
     </div>
   )
