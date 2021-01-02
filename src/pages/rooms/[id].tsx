@@ -64,7 +64,7 @@ export default withPlayerStore(() => {
               </div>
             </div>
           ) : (
-            <PlaylistIsOver className="mt-8" />
+            <PlaylistIsOver className="mt-8 mx-auto" />
           )}
         </div>
       </SpotifyPlayerProvider>
@@ -72,8 +72,8 @@ export default withPlayerStore(() => {
   )
 })
 
-const PlaylistIsOver = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
-  <div className={cx(className, 'mt-8')} {...props}>
+const PlaylistIsOver = (props: React.HTMLAttributes<HTMLElement>) => (
+  <div {...props}>
     <h1 className="text-4xl font-bold">The party&apos;s over!</h1>
     <p className="mt-4">
       The guests are gone and the music stopped playing. <br />
