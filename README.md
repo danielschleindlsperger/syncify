@@ -122,4 +122,6 @@ By manually declaring the loader for the import we don't convert all svgs to Rea
 
 The type declarations in `@types/index.d.ts` make sure that the generated React components are correctly typed.
 
-TODO: How does this work with jest? https://react-svgr.com/docs/testing/
+#### Testing with SVG Icons
+
+The generated Icons are mocked in tests automatically.
