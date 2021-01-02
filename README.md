@@ -107,3 +107,19 @@ Wrap part of your component tree in `<AuthenticatedOnly />`. It will only render
 ### Making an API Request
 
 Use the `useApiRequest` hook. It uses `useSWR` under the hook and automatically handles `401` error responses. All other errors must be handled manually.
+
+### SVG Icons
+
+We're using [SVGRs webpack loader](https://react-svgr.com/docs/webpack/) to automatically convert `.svg` files to React components.
+
+The icons are placed in `src/icons` and should be imported with the loader specified in the import path. For a clickable icon button use Chakras `<IconButton />` component.
+
+```ts
+import Heart from '@svgr/webpack!../../icons/heart.svg'
+```
+
+By manually declaring the loader for the import we don't convert all svgs to React components and could import some with the `file-loader`.
+
+The type declarations in `@types/index.d.ts` make sure that the generated React components are correctly typed.
+
+TODO: How does this work with jest? https://react-svgr.com/docs/testing/
