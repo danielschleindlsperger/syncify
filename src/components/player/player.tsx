@@ -87,7 +87,7 @@ export const Player = ({ className, ...props }: React.HTMLAttributes<HTMLElement
         {/* TODO: Show playback status, especially when playback is stopped */}
         {room && <RoomControls room={room} />}
         <ShareButton />
-        <VolumeSlider className="ml-auto" />
+        <VolumeSlider ml="auto" />
       </div>
       {/* Bottom: Song progress */}
       {isPlaying && <Progress className="w-full mt-4" duration={duration} position={position} />}
