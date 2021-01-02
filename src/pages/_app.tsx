@@ -5,18 +5,21 @@ import '../styles.css'
 import { AuthProvider } from '../components/auth'
 import { AppErrorBoundary } from '../components/app-error-boundary'
 import { ConfigProvider } from '../hooks/use-config'
+import { ChakraProvider } from '@chakra-ui/react'
 
 function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Analytics />
-      <AppErrorBoundary>
-        <AuthProvider>
-          <ConfigProvider>
-            <Component {...pageProps} />
-          </ConfigProvider>
-        </AuthProvider>
-      </AppErrorBoundary>
+      <ChakraProvider>
+        <AppErrorBoundary>
+          <AuthProvider>
+            <ConfigProvider>
+              <Component {...pageProps} />
+            </ConfigProvider>
+          </AuthProvider>
+        </AppErrorBoundary>
+      </ChakraProvider>
     </>
   )
 }

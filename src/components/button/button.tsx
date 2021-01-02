@@ -27,3 +27,21 @@ const variants: Record<CustomProps['variant'], string> = {
   primary: cx(sharedClasses, 'bg-gray-700 text-gray-100 px-3 py-1'),
   secondary: cx(sharedClasses, 'bg-gray-100 text-gray-600 px-3 py-1'),
 }
+
+type IconButtonProps = React.HTMLAttributes<HTMLButtonElement> & {
+  size?: number
+  /**
+   * An explaining string for users using screen readers
+   */
+  description: string
+  children: JSX.Element
+}
+
+export function IconButton({ className, children, description, ...props }: IconButtonProps) {
+  return (
+    <button className={cx(className, 'p-2')} title={description} {...props}>
+      {children}
+      <span className="sr-only">{description}</span>
+    </button>
+  )
+}

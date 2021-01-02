@@ -1,13 +1,14 @@
 import React from 'react'
-import cx from 'classnames'
+import { IconButton, IconButtonProps } from '@chakra-ui/react'
 import { useAuth } from '../auth'
 import { useRoomChannel } from './use-room-channel'
 import { UserLiked, UserLikedPayload } from '../../pusher-events'
 import { usePlayerState } from '../player/player-store'
+import Heart from '@svgr/webpack!../../icons/heart.svg'
 
-type LikeCurrentTrackProps = React.HTMLAttributes<HTMLButtonElement>
+type LikeCurrentTrackProps = Partial<IconButtonProps>
 
-export const LikeCurrentTrack = ({ className, ...props }: LikeCurrentTrackProps) => {
+export const LikeCurrentTrack = (props: LikeCurrentTrackProps) => {
   const { channel } = useRoomChannel()
   const auth = useAuth()
   const playbackState = usePlayerState((state) => state.playbackState)
@@ -23,14 +24,12 @@ export const LikeCurrentTrack = ({ className, ...props }: LikeCurrentTrackProps)
   }
 
   return (
-    <button
-      className={cx(className, 'p-4')}
-      title="Like current track"
-      {...props}
+    <IconButton
+      variant="ghost"
+      aria-label="Like the current track"
       onClick={triggerLike}
-    >
-      {/* TODO: Use icon instead of UTF-8 character */}
-      ❤️
-    </button>
+      icon={<Heart className="fill-current" />}
+      {...props}
+    />
   )
 }

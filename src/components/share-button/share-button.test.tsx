@@ -12,6 +12,7 @@ describe('<ShareButton />', () => {
       writeText: copySpy,
     },
   })
+
   it('copy current url to clipboard on click, shows a success icon and reverts to default icon after a while', async () => {
     copySpy.mockResolvedValue(undefined)
 

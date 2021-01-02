@@ -95,7 +95,9 @@ export function PlaylistItem({
         className="relative w-80 pb-80 shadow-2xl rounded-lg bg-cover bg-center"
         style={{ backgroundImage: `url(${item.coverArt})` }}
       >
-        {isCurrentTrack && <LikeCurrentTrack className="absolute right-0 bottom-0" />}
+        {isCurrentTrack && (
+          <LikeCurrentTrack position="absolute" mr={4} mb={4} bottom={0} right={0} />
+        )}
       </div>
       {showDetails && (
         <div className="mt-4 flex flex-col justify-start">
