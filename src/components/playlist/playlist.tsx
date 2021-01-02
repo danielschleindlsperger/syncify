@@ -44,7 +44,7 @@ export function Playlist2({ items }: Playlist2Props) {
 
   return (
     <div
-      className="grid overflow-hidden"
+      className="grid"
       style={{ gridTemplateRows: '1fr', gridTemplateColumns: '1fr' }}
       onMouseLeave={() => setActiveItem(0)}
     >
