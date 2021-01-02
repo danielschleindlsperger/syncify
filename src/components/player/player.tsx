@@ -84,6 +84,7 @@ export const Player = ({ className, ...props }: React.HTMLAttributes<HTMLElement
     >
       {/* Top: Controls */}
       <div className="flex gap-4">
+        {/* TODO: Show playback status, especially when playback is stopped */}
         {room && <RoomControls room={room} />}
         <ShareButton />
         <VolumeSlider className="ml-auto" />
