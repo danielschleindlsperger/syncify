@@ -114,6 +114,8 @@ We're using [SVGRs webpack loader](https://react-svgr.com/docs/webpack/) to auto
 
 The icons are placed in `src/icons` and should be imported with the loader specified in the import path. For a clickable icon button use Chakras `<IconButton />` component.
 
+Most of the current icons are from [Steve Schogers Zondicons](https://www.zondicons.com/icons.html).
+
 ```ts
 import Heart from '@svgr/webpack!../../icons/heart.svg'
 ```
