@@ -48,10 +48,11 @@ export default withPlayerStore(() => {
               </Button>
             </Link>
           </Navbar>
-          <div className="mt-16 px-8 max-w-5xl w-full mx-auto flex-grow flex flex-col min-h-0">
-            {remainingTracks.length > 0 ? (
-              <>
-                <div className="flex items-end">
+          {remainingTracks.length > 0 ? (
+            <div className="mt-16 px-8 w-full flex-grow grid grid-cols-3 gap-4">
+              <div className="col-start-1">{/* <Chat className="pr-8" /> */}</div>
+              <div className="col-start-2 col-span-2">
+                <div className="flex items-end col-start-2">
                   <h1 className="text-4xl font-bold">{room.name}</h1>
                   <div className="ml-auto flex space-x-3">
                     <RoomReactions />
@@ -61,15 +62,15 @@ export default withPlayerStore(() => {
                 </div>
 
                 <div className="flex-grow min-h-0 grid grid-cols-2 gap-8 mt-8">
-                  {/* <Chat className="pr-8" /> */}
                   <Playlist playlist={room.playlist} />
                 </div>
+
                 <Player className="mt-8" />
-              </>
-            ) : (
-              <PlaylistIsOver className="mt-8" />
-            )}
-          </div>
+              </div>
+            </div>
+          ) : (
+            <PlaylistIsOver className="mt-8" />
+          )}
         </div>
       </SpotifyPlayerProvider>
     </RoomProvider>
