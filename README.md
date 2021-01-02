@@ -112,7 +112,7 @@ Use the `useApiRequest` hook. It uses `useSWR` under the hook and automatically 
 
 We're using [SVGRs webpack loader](https://react-svgr.com/docs/webpack/) to automatically convert `.svg` files to React components.
 
-The icons are placed in `src/icons` and should be imported with the loader specified in the import path. For a clickable icon button use Chakras `<IconButton />` component.
+The icons are placed in `src/icons` and should be imported with the loader specified in the import path. For a clickable icon button use [Chakra's `<IconButton />`](https://chakra-ui.com/docs/form/icon-button) component.
 
 Most of the current icons are from [Steve Schogers Zondicons](https://www.zondicons.com/icons.html).
 
