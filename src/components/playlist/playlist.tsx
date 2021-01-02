@@ -127,7 +127,7 @@ function useSpotifyTracks(ids: string[]): PlaylistTrack[] {
           id: track.id,
           name: track.name,
           artists: track.artists.map((a) => a.name),
-          coverArt: track.album.images[0].url,
+          coverArt: track.album.images[0]?.url,
         })),
       )
       .then(setTracks)
