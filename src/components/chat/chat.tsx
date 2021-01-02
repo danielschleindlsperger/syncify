@@ -54,7 +54,7 @@ export const Chat = ({ className, ...props }: ChatProps) => {
   }, [channel])
 
   return (
-    <div className={cx(className, 'flex flex-col min-h-0')} {...props}>
+    <div className={cx(className, 'flex flex-col')} {...props}>
       <Userlist users={members} />
       <Chatlog log={log} className="mt-2" />
     </div>

@@ -13,6 +13,7 @@ import { LoadingSpinner } from '../../components/loading'
 import { RoomProvider } from '../../components/room'
 import { playbackOffset } from '../../components/player/playback-control'
 import { Room } from '../../types'
+import { Chat } from '../../components/chat'
 
 type Playlist = import('../../types').Playlist
 
@@ -46,8 +47,10 @@ export default withPlayerStore(() => {
             </Link>
           </Navbar>
           {remainingTracks.length > 0 ? (
-            <div className="mt-16 px-8 w-full flex-grow grid grid-cols-3 gap-4">
-              <div className="col-start-1">{/* <Chat className="pr-8" /> */}</div>
+            <div className="mt-16 px-8 w-full min-h-0 flex-grow grid grid-cols-3 grid-rows-1 gap-4">
+              <div className="col-start-1 row-start-1 row-end-1 min-h-0">
+                <Chat className="min-h-0 h-full" />
+              </div>
               <div className="col-start-2 col-span-2 flex flex-col justify-between">
                 <div className="flex items-end col-start-2">
                   <h1 className="text-4xl font-bold">{room.name}</h1>
