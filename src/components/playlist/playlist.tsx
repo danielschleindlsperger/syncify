@@ -4,6 +4,7 @@ import cx from 'classnames'
 import SpotifyWebApi from 'spotify-web-api-js'
 import { usePlayerState } from '../player/player-store'
 import { useAuth } from '../auth'
+import { LikeCurrentTrack } from '../room/like-current-track'
 
 type Playlist = import('../../types').Playlist
 
@@ -43,7 +44,7 @@ export function Playlist2({ items }: Playlist2Props) {
 
   return (
     <div
-      className="grid"
+      className="grid overflow-hidden"
       style={{ gridTemplateRows: '1fr', gridTemplateColumns: '1fr' }}
       onMouseLeave={() => setActiveItem(0)}
     >
@@ -58,6 +59,7 @@ export function Playlist2({ items }: Playlist2Props) {
               transition: 'transform .1s ease-out',
               transform: trans(activeItem, i),
             }}
+            isCurrentTrack={i === 0}
             showDetails={i === activeItem}
             onMouseOver={() => setActiveItem(i)}
           />
@@ -75,17 +77,26 @@ function trans(activeItem: number, i: number) {
 }
 
 type PlaylistItemProps = React.HTMLAttributes<HTMLDivElement> & {
+  isCurrentTrack: boolean
   showDetails: boolean
   item: PlaylistTrack
 }
 
-export function PlaylistItem({ item, showDetails, className, ...props }: PlaylistItemProps) {
+export function PlaylistItem({
+  item,
+  isCurrentTrack,
+  showDetails,
+  className,
+  ...props
+}: PlaylistItemProps) {
   return (
     <div className={cx(className, 'max-w-xs')} {...props}>
       <div
-        className="w-80 pb-80 shadow-2xl rounded-lg bg-cover bg-center"
+        className="relative w-80 pb-80 shadow-2xl rounded-lg bg-cover bg-center"
         style={{ backgroundImage: `url(${item.coverArt})` }}
-      />
+      >
+        {isCurrentTrack && <LikeCurrentTrack className="absolute right-0 bottom-0" />}
+      </div>
       {showDetails && (
         <div className="mt-4 flex flex-col justify-start">
           <span className="text-xl text-gray-800 font-bold leading-tight">{item.name}</span>

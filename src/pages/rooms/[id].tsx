@@ -4,16 +4,13 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import cx from 'classnames'
 import { Playlist } from '../../components/playlist'
-import { Chat } from '../../components/chat'
 import { Player } from '../../components/player'
 import { SpotifyPlayerProvider, withPlayerStore } from '../../components/player'
 import { Navbar } from '../../components/nav-bar'
-import { ShareButton } from '../../components/share-button'
 import { Button } from '../../components/button'
 import { useApiRequest } from '../../hooks/use-api-request'
 import { LoadingSpinner } from '../../components/loading'
-import { RoomProvider, RoomControls } from '../../components/room'
-import { RoomReactions } from '../../components/room/room-reactions'
+import { RoomProvider } from '../../components/room'
 import { playbackOffset } from '../../components/player/playback-control'
 import { Room } from '../../types'
 
@@ -51,21 +48,16 @@ export default withPlayerStore(() => {
           {remainingTracks.length > 0 ? (
             <div className="mt-16 px-8 w-full flex-grow grid grid-cols-3 gap-4">
               <div className="col-start-1">{/* <Chat className="pr-8" /> */}</div>
-              <div className="col-start-2 col-span-2">
+              <div className="col-start-2 col-span-2 flex flex-col justify-between">
                 <div className="flex items-end col-start-2">
                   <h1 className="text-4xl font-bold">{room.name}</h1>
-                  <div className="ml-auto flex space-x-3">
-                    <RoomReactions />
-                    <RoomControls room={room} />
-                    <ShareButton />
-                  </div>
                 </div>
 
-                <div className="flex-grow min-h-0 grid grid-cols-2 gap-8 mt-8">
-                  <Playlist playlist={room.playlist} />
-                </div>
+                <Playlist playlist={room.playlist} />
 
-                <Player className="mt-8" />
+                <div className="grid grid-cols-2 mb-2">
+                  <Player className="mt-8 col-start-1 col-end-1" />
+                </div>
               </div>
             </div>
           ) : (

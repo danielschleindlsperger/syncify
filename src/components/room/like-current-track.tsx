@@ -1,11 +1,13 @@
-import { Button } from '../button'
+import React from 'react'
+import cx from 'classnames'
 import { useAuth } from '../auth'
 import { useRoomChannel } from './use-room-channel'
-import React from 'react'
 import { UserLiked, UserLikedPayload } from '../../pusher-events'
 import { usePlayerState } from '../player/player-store'
 
-export const RoomReactions = () => {
+type LikeCurrentTrackProps = React.HTMLAttributes<HTMLButtonElement>
+
+export const LikeCurrentTrack = ({ className, ...props }: LikeCurrentTrackProps) => {
   const { channel } = useRoomChannel()
   const auth = useAuth()
   const playbackState = usePlayerState((state) => state.playbackState)
@@ -21,10 +23,14 @@ export const RoomReactions = () => {
   }
 
   return (
-    <div>
-      <Button title="Like current track" onClick={triggerLike} variant="primary">
-        ❤️
-      </Button>
-    </div>
+    <button
+      className={cx(className, 'p-4')}
+      title="Like current track"
+      {...props}
+      onClick={triggerLike}
+    >
+      {/* TODO: Use icon instead of UTF-8 character */}
+      ❤️
+    </button>
   )
 }

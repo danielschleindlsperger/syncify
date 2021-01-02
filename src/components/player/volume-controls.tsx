@@ -37,7 +37,7 @@ export const VolumeSlider = ({ className, ...props }: VolumeSliderProps) => {
 
   return (
     <input
-      className={cx(className, 'w-10')}
+      className={cx(className, 'w-32')}
       type="range"
       disabled={!player}
       aria-label="Player volume"
@@ -48,8 +48,6 @@ export const VolumeSlider = ({ className, ...props }: VolumeSliderProps) => {
       onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
         setVolume(parseFloat(event.target.value))
       }
-      orient="vertical"
-      style={{ WebkitAppearance: 'slider-vertical' }}
       {...props}
     />
   )
