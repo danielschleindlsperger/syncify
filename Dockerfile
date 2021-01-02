@@ -1,7 +1,4 @@
-FROM node:12-alpine
-
-# Install dependencies for node-gyp to work (to compile native extensions)
-RUN apk update && apk add python g++ make && rm -rf /var/cache/apk/*
+FROM node:12
 
 RUN mkdir -p /app
 WORKDIR /app
