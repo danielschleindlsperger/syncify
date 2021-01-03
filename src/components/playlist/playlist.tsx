@@ -123,6 +123,7 @@ const spotify = new SpotifyWebApi()
 function useSpotifyTracks(ids: string[]): PlaylistTrack[] {
   const accessToken = useAuth().user?.access_token
   const [tracks, setTracks] = React.useState<PlaylistTrack[]>([])
+  const idCacheKey = ids.join(',')
 
   React.useEffect(() => {
     if (!accessToken) return
@@ -140,8 +141,8 @@ function useSpotifyTracks(ids: string[]): PlaylistTrack[] {
         })),
       )
       .then(setTracks)
-    // TODO: deps
-  }, [ids, accessToken])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idCacheKey, accessToken])
 
   return tracks
 }
