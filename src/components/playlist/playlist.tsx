@@ -64,7 +64,7 @@ export function Playlist2({ items }: Playlist2Props) {
               gridArea: '1 / 1',
               transition: `transform .15s ${easeOutSine}, opacity .15s ease-out`,
               // TODO: don't fade albums for the last items of the playlist
-              opacity: 1 - (i - activeItem - 2) * 0.4,
+              opacity: Math.pow(1 - (i - activeItem) * 0.05, 5),
               transform: trans(activeItem, i),
             }}
             isCurrentTrack={i === 0}
