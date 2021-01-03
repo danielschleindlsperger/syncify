@@ -1,6 +1,7 @@
 import React from 'react'
+import { Box } from '@chakra-ui/react'
 import { storiesOf } from '@storybook/react'
-import { Playlist } from './playlist'
+import { Playlist, Playlist2 } from './playlist'
 import { PlayerStoreProvider } from '../player'
 
 type Playlist = import('../../types').Playlist
@@ -11,8 +12,46 @@ storiesOf('Playlist', module)
   .add('One song', () => <Playlist playlist={mkPlaylist(upcomingTracks.slice(0, 1))} />)
   .add('No songs', () => <Playlist playlist={mkPlaylist([])} />)
   .add('50 songs', () => <Playlist playlist={mkPlaylist(upcomingTracks.slice(0, 50))} />)
+  .add('Foo', () => (
+    <Box mx="auto" maxWidth="800px">
+      <Playlist2 items={tracks} />
+    </Box>
+  ))
 
 const mkPlaylist = (tracks: any[]): Playlist => ({ tracks } as Playlist)
+
+const tracks = [
+  {
+    id: '10ViidwjGLCfVtGPfdcszR',
+    name: 'Home',
+    artists: ['Edward Sharpe & The Magnetic Zeros'],
+    coverArt: 'https://i.scdn.co/image/ab67616d0000b273905758fa52845a4b2dc6ffe3',
+  },
+  {
+    id: '72NC9kHkFA7k98dE0t4xEX',
+    name: 'Caroline',
+    artists: ['High Tropics'],
+    coverArt: 'https://i.scdn.co/image/ab67616d0000b273f2c11620d87212dc8c851cbd',
+  },
+  {
+    id: '6lFZbCc7pn6Lme1NP7qQqQ',
+    name: "You Can't Always Get What You Want",
+    artists: ['The Rolling Stones'],
+    coverArt: 'https://i.scdn.co/image/ab67616d0000b2732af30c881bb23cfb82a8cf99',
+  },
+  {
+    id: '7oiZRx7OZbUAYUiYeFTXrf',
+    name: 'Warm Animal',
+    artists: ['Sure Sure'],
+    coverArt: 'https://i.scdn.co/image/ab67616d0000b2733f9de2a1db5213ff8e3c0517',
+  },
+  {
+    id: '5c3yxzuAvro7iJGABJppFm',
+    name: 'Upside Down',
+    artists: ['Jack Johnson'],
+    coverArt: 'https://i.scdn.co/image/ab67616d0000b273f5c91b650e743cc514fb5288',
+  },
+]
 
 const upcomingTracks = [
   {

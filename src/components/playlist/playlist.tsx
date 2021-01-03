@@ -1,6 +1,6 @@
 import React from 'react'
+import { Box, BoxProps } from '@chakra-ui/react'
 import { dropWhile } from 'ramda'
-import cx from 'classnames'
 import SpotifyWebApi from 'spotify-web-api-js'
 import { usePlayerState } from '../player/player-store'
 import { useAuth } from '../auth'
@@ -13,12 +13,12 @@ type PlaylistProps = React.HTMLAttributes<HTMLElement> & { playlist: Playlist }
 export const Playlist = React.memo(({ playlist, ...props }: PlaylistProps) => {
   const currentTrack = usePlayerState((s) => s.playbackState?.track_window.current_track)
 
-  // Show the current track plus the next 9
-  // TODO: make this more dynamic and scrollable
+  // Show the current track plus the next 4
+  // TODO: make this more dynamic and scrollable, i.e. "load more"
   const items = dropWhile(
     (t) => t.id !== (currentTrack?.linked_from?.id ?? currentTrack?.id),
     playlist.tracks,
-  ).slice(0, 10)
+  ).slice(0, 5)
 
   const tracks = useSpotifyTracks(items.map((item) => item.id))
 
@@ -39,8 +39,14 @@ type Playlist2Props = {
   items: PlaylistTrack[]
 }
 
+/**
+ * An album cover based playlist component without I/O.
+ * TODO: rename
+ */
 export function Playlist2({ items }: Playlist2Props) {
   const [activeItem, setActiveItem] = React.useState(0)
+
+  const albumCoverSize = 480
 
   return (
     <div
@@ -56,12 +62,15 @@ export function Playlist2({ items }: Playlist2Props) {
             item={item}
             style={{
               gridArea: '1 / 1',
-              transition: 'transform .1s ease-out',
+              transition: `transform .15s ${easeOutSine}, opacity .15s ${easeOutSine}`,
+              // TODO: don't fade albums for the last items of the playlist
+              opacity: 1 - (i - activeItem - 2) * 0.4,
               transform: trans(activeItem, i),
             }}
             isCurrentTrack={i === 0}
             showDetails={i === activeItem}
             onMouseOver={() => setActiveItem(i)}
+            width={albumCoverSize}
           />
         ))
         .reverse()}
@@ -69,31 +78,31 @@ export function Playlist2({ items }: Playlist2Props) {
   )
 }
 
+// https://easings.net/#easeOutSine
+const easeOutSine = 'cubic-bezier(0.61, 1, 0.88, 1)'
+
 function trans(activeItem: number, i: number) {
+  // The part of the cover that is visible when the album is beneath another
   const step = `${i * 30}%`
-  const active = activeItem > 0 && i >= activeItem ? '60%' : `0%`
+  // move items left by this amount when it before the active item to uncover it
+  const active = i < activeItem ? '-60%' : '0%'
   const translate = `translateX(calc(${step} + ${active}))`
+
   return translate
 }
 
-type PlaylistItemProps = React.HTMLAttributes<HTMLDivElement> & {
+type PlaylistItemProps = BoxProps & {
   isCurrentTrack: boolean
   showDetails: boolean
   item: PlaylistTrack
 }
 
-export function PlaylistItem({
-  item,
-  isCurrentTrack,
-  showDetails,
-  className,
-  ...props
-}: PlaylistItemProps) {
+export function PlaylistItem({ item, isCurrentTrack, showDetails, ...props }: PlaylistItemProps) {
   return (
-    <div className={cx(className, 'max-w-xs')} {...props}>
+    <Box {...props}>
       <div
-        className="relative w-80 pb-80 shadow-2xl rounded-lg bg-cover bg-center"
-        style={{ backgroundImage: `url(${item.coverArt})` }}
+        className="relative w-full shadow-2xl rounded-lg bg-cover bg-center"
+        style={{ backgroundImage: `url(${item.coverArt})`, paddingBottom: '100%' }}
       >
         {isCurrentTrack && (
           <LikeCurrentTrack position="absolute" mr={4} mb={4} bottom={0} right={0} />
@@ -105,7 +114,7 @@ export function PlaylistItem({
           <span className="text-gray-800 font-semibold mt-2">{item.artists.join(', ')}</span>
         </div>
       )}
-    </div>
+    </Box>
   )
 }
 
