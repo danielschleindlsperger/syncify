@@ -8,7 +8,7 @@ import { LikeCurrentTrack } from '../room/like-current-track'
 
 type Playlist = import('../../types').Playlist
 
-type PlaylistProps = React.HTMLAttributes<HTMLElement> & { playlist: Playlist }
+type PlaylistProps = BoxProps & { playlist: Playlist }
 
 export const Playlist = React.memo(({ playlist, ...props }: PlaylistProps) => {
   const currentTrack = usePlayerState((s) => s.playbackState?.track_window.current_track)
@@ -25,9 +25,9 @@ export const Playlist = React.memo(({ playlist, ...props }: PlaylistProps) => {
   if (playlist.tracks.length === 0) return null
 
   return (
-    <div {...props}>
+    <Box {...props}>
       <Playlist2 items={tracks} />
-    </div>
+    </Box>
   )
 })
 

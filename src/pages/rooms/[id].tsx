@@ -50,14 +50,14 @@ export default withPlayerStore(() => {
               <div className="col-start-1 row-start-1 row-end-1 min-h-0">
                 <Chat className="min-h-0 h-full" />
               </div>
-              <div className="col-start-2 col-span-2 flex flex-col justify-between">
+              <div className="col-start-2 col-span-2 flex flex-col">
                 <div className="flex items-end col-start-2">
                   <h1 className="text-4xl font-bold">{room.name}</h1>
                 </div>
 
-                <Playlist playlist={room.playlist} />
+                <Playlist playlist={room.playlist} mt="15%" />
 
-                <div className="grid grid-cols-2 mb-2">
+                <div className="grid grid-cols-2 mt-auto mb-2">
                   <Player className="mt-8 col-start-1 col-end-1" />
                 </div>
               </div>
