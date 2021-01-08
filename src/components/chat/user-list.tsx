@@ -1,14 +1,21 @@
 import React from 'react'
 import cx from 'classnames'
+import { Flex, BoxProps } from '@chakra-ui/react'
 import { User } from '../../types'
+import { useRoomChannel } from '../room'
 
-type UserlistProps = React.HTMLAttributes<HTMLElement> & {
+type UserlistProps = BoxProps & {
   users: readonly User[]
 }
 
-export const Userlist = ({ users, className, ...props }: UserlistProps) => {
+export function UserlistContainer(props: BoxProps) {
+  const { members } = useRoomChannel()
+  return <Userlist users={members} {...props} />
+}
+
+export const Userlist = ({ users, ...props }: UserlistProps) => {
   return users.length > 0 ? (
-    <ul className={cx(className, 'flex flex-row-reverse justify-end')} {...props}>
+    <Flex direction="row-reverse" justify="flex-end" {...props} as="ul">
       {users
         .map((u, i) => (
           <li
@@ -32,7 +39,7 @@ export const Userlist = ({ users, className, ...props }: UserlistProps) => {
         // Reversal is necessary since we use flex-reverse layout for styling.
         // .reverse comes after .map since .reverse() is not immutable
         .reverse()}
-    </ul>
+    </Flex>
   ) : null
 }
 

@@ -12,7 +12,7 @@ import { LoadingSpinner } from '../../components/loading'
 import { RoomProvider } from '../../components/room'
 import { playbackOffset } from '../../components/player/playback-control'
 import { Room } from '../../types'
-import { Chat } from '../../components/chat'
+import { Chat, UserlistContainer } from '../../components/chat'
 
 type Playlist = import('../../types').Playlist
 
@@ -55,7 +55,8 @@ export default withPlayerStore(() => {
                   <h1 className="text-4xl font-bold">{room.name}</h1>
                 </div>
 
-                <Playlist playlist={room.playlist} mt="15%" />
+                <UserlistContainer mt={8} />
+                <Playlist playlist={room.playlist} mt="10%" />
 
                 <div className="grid grid-cols-2 mt-auto">
                   <Player className="mt-8 col-start-1 col-end-1" />

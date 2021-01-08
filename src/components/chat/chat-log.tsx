@@ -1,5 +1,5 @@
 import React from 'react'
-import cx from 'classnames'
+import { Box, BoxProps } from '@chakra-ui/react'
 
 export type ChatLogEntry = {
   id: string
@@ -8,12 +8,12 @@ export type ChatLogEntry = {
   message: string
 }
 
-type ChatlogProps = React.HTMLAttributes<HTMLElement> & { log: ChatLogEntry[] }
+type ChatlogProps = BoxProps & { log: ChatLogEntry[] }
 
-export const Chatlog = ({ log, className, ...props }: ChatlogProps) => {
+export const Chatlog = ({ log, ...props }: ChatlogProps) => {
   if (log.length === 0) return null
   return (
-    <ul className={cx(className, 'overflow-auto')} {...props}>
+    <Box overflow="auto" {...props} as="ul">
       {log.map((entry) => (
         <li key={entry.id} className="mt-2">
           <time
@@ -28,7 +28,7 @@ export const Chatlog = ({ log, className, ...props }: ChatlogProps) => {
           <div className="text-sm">{entry.message}</div>
         </li>
       ))}
-    </ul>
+    </Box>
   )
 }
 

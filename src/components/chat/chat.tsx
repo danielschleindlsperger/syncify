@@ -1,5 +1,5 @@
 import React from 'react'
-import cx from 'classnames'
+import { BoxProps, Flex } from '@chakra-ui/react'
 import { Userlist } from './user-list'
 import { ChatLogEntry, Chatlog } from './chat-log'
 import { useRoomChannel } from '../room'
@@ -13,9 +13,9 @@ type PusherMember = {
   }
 }
 
-type ChatProps = React.HTMLAttributes<HTMLElement>
+type ChatProps = BoxProps
 
-export const Chat = ({ className, ...props }: ChatProps) => {
+export const Chat = (props: ChatProps) => {
   const { members, channel } = useRoomChannel()
   const [log, setLog] = React.useState<ChatLogEntry[]>([])
 
@@ -53,10 +53,5 @@ export const Chat = ({ className, ...props }: ChatProps) => {
     })
   }, [channel])
 
-  return (
-    <div className={cx(className, 'flex flex-col')} {...props}>
-      <Userlist users={members} />
-      <Chatlog log={log} className="mt-2" />
-    </div>
-  )
+  return <Chatlog log={log} {...props} />
 }
