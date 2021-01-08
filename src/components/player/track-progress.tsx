@@ -18,7 +18,7 @@ export const Progress = React.memo(({ duration, position, ...props }: ProgressPr
     <Box {...props}>
       <div className={'flex justify-between text-sm text-gray-600'}>
         <span>{timings.byGone}</span>
-        <span>{timings.remaining}</span>
+        <span>{timings.end}</span>
       </div>
       <ProgressLine duration={duration} position={position} mt={2} />
     </Box>
@@ -52,7 +52,7 @@ function ProgressLine({ duration, position, ...props }: ProgressLineProps) {
   )
 }
 
-const useTimings = ({ position, duration }: TimeProps): { byGone: string; remaining: string } => {
+const useTimings = ({ position, duration }: TimeProps): { byGone: string; end: string } => {
   const [progressedPosition, setProgressedPosition] = React.useState(position)
 
   // update when props update
@@ -76,7 +76,7 @@ const useTimings = ({ position, duration }: TimeProps): { byGone: string; remain
 
   return {
     byGone: format(progressedPosition),
-    remaining: format(duration - progressedPosition),
+    end: format(duration),
   }
 }
 
