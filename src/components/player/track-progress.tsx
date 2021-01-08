@@ -1,25 +1,56 @@
 import React from 'react'
 import { pipe, clamp } from 'ramda'
-import cx from 'classnames'
+import { Box, BoxProps } from '@chakra-ui/react'
+import { keyframes } from '@emotion/react'
 
 type TimeProps = {
   duration: number
   position: number
 }
 
-type ProgressProps = React.HTMLAttributes<HTMLElement> & TimeProps
+type ProgressProps = BoxProps & TimeProps
 
 // wrap in memo to prevent useless rerenders that imply recalculating animations, etc
-export const Progress = React.memo(({ duration, position, className, ...props }: ProgressProps) => {
+export const Progress = React.memo(({ duration, position, ...props }: ProgressProps) => {
   const timings = useTimings({ duration, position })
 
   return (
-    <div className={cx(className, 'flex justify-between text-sm text-gray-600')} {...props}>
-      <span>{timings.byGone}</span>
-      <span>{timings.remaining}</span>
-    </div>
+    <Box {...props}>
+      <div className={'flex justify-between text-sm text-gray-600'}>
+        <span>{timings.byGone}</span>
+        <span>{timings.remaining}</span>
+      </div>
+      <ProgressLine duration={duration} position={position} mt={2} />
+    </Box>
   )
 })
+
+type ProgressLineProps = Omit<BoxProps, 'position'> & TimeProps
+
+function ProgressLine({ duration, position, ...props }: ProgressLineProps) {
+  const current = (1 - position / duration) * 100
+  const remaining = duration - position
+  const slideIn = keyframes`
+  from {
+    transform: translateX(-${current}%);
+  }
+  to {
+    transform: translateX(0);
+  }
+`
+
+  return (
+    <Box overflow="hidden" {...props}>
+      <Box
+        h={1}
+        w="100%"
+        // TODO: use design tokens here
+        bgGradient="linear(to-l, #7928CA, #FF0080)"
+        sx={{ animation: `${slideIn} ${remaining}ms linear` }}
+      />
+    </Box>
+  )
+}
 
 const useTimings = ({ position, duration }: TimeProps): { byGone: string; remaining: string } => {
   const [progressedPosition, setProgressedPosition] = React.useState(position)
