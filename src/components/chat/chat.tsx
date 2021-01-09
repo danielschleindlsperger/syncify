@@ -1,6 +1,5 @@
 import React from 'react'
-import { BoxProps, Flex } from '@chakra-ui/react'
-import { Userlist } from './user-list'
+import { BoxProps } from '@chakra-ui/react'
 import { ChatLogEntry, Chatlog } from './chat-log'
 import { useRoomChannel } from '../room'
 import { UserLikedPayload, UserLiked } from '../../pusher-events'
@@ -16,7 +15,7 @@ type PusherMember = {
 type ChatProps = BoxProps
 
 export const Chat = (props: ChatProps) => {
-  const { members, channel } = useRoomChannel()
+  const { channel } = useRoomChannel()
   const [log, setLog] = React.useState<ChatLogEntry[]>([])
 
   const appendLog = (log: Pick<ChatLogEntry, 'type' | 'message'>) => {

@@ -8,11 +8,11 @@ type TimeProps = {
   position: number
 }
 
-type ProgressProps = BoxProps & TimeProps
+type ProgressProps = BoxProps & { timing: TimeProps }
 
 // wrap in memo to prevent useless rerenders that imply recalculating animations, etc
-export const Progress = React.memo(({ duration, position, ...props }: ProgressProps) => {
-  const timings = useTimings({ duration, position })
+export const Progress = React.memo(({ timing, ...props }: ProgressProps) => {
+  const timings = useTimings(timing)
 
   return (
     <Box {...props}>
@@ -20,14 +20,17 @@ export const Progress = React.memo(({ duration, position, ...props }: ProgressPr
         <span>{timings.byGone}</span>
         <span>{timings.end}</span>
       </div>
-      <ProgressLine duration={duration} position={position} mt={2} />
+      <ProgressLine timing={timing} mt={2} />
     </Box>
   )
 })
 
-type ProgressLineProps = Omit<BoxProps, 'position'> & TimeProps
+Progress.displayName = 'Progress'
 
-function ProgressLine({ duration, position, ...props }: ProgressLineProps) {
+type ProgressLineProps = BoxProps & { timing: TimeProps }
+
+function ProgressLine({ timing, ...props }: ProgressLineProps) {
+  const { duration, position } = timing
   const current = (1 - position / duration) * 100
   const remaining = duration - position
   const slideIn = keyframes`

@@ -90,7 +90,7 @@ export const Player = ({ className, ...props }: React.HTMLAttributes<HTMLElement
         <VolumeSlider ml="auto" />
       </div>
       {/* Bottom: Song progress */}
-      {isPlaying && <Progress className="w-full mt-4" duration={duration} position={position} />}
+      {isPlaying && <Progress className="w-full mt-4" timing={{ duration, position }} />}
     </div>
   )
 }
