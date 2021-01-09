@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, BoxProps } from '@chakra-ui/react'
+import { Box, BoxProps, Grid } from '@chakra-ui/react'
 import { dropWhile } from 'ramda'
 import SpotifyWebApi from 'spotify-web-api-js'
 import { usePlayerState } from '../player/player-store'
@@ -24,18 +24,14 @@ export const Playlist = React.memo(({ playlist, ...props }: PlaylistProps) => {
 
   if (playlist.tracks.length === 0) return null
 
-  return (
-    <Box {...props}>
-      <Playlist2 items={tracks} />
-    </Box>
-  )
+  return <Playlist2 items={tracks} {...props} />
 })
 
 Playlist.displayName = 'Playlist'
 
 type PlaylistTrack = { id: string; name: string; coverArt: string; artists: string[] }
 
-type Playlist2Props = {
+type Playlist2Props = BoxProps & {
   items: PlaylistTrack[]
 }
 
@@ -43,17 +39,13 @@ type Playlist2Props = {
  * An album cover based playlist component without I/O.
  * TODO: rename
  */
-export function Playlist2({ items }: Playlist2Props) {
+export function Playlist2({ items, ...props }: Playlist2Props) {
   const [activeItem, setActiveItem] = React.useState(0)
 
   const albumCoverSize = 480
 
   return (
-    <div
-      className="grid"
-      style={{ gridTemplateRows: '1fr', gridTemplateColumns: '1fr' }}
-      onMouseLeave={() => setActiveItem(0)}
-    >
+    <Grid templateRows="1fr" templateColumns="1fr" onMouseLeave={() => setActiveItem(0)} {...props}>
       {items
         .map((item, i) => (
           // TODO: clicking a track should skip to it
@@ -74,7 +66,7 @@ export function Playlist2({ items }: Playlist2Props) {
           />
         ))
         .reverse()}
-    </div>
+    </Grid>
   )
 }
 
