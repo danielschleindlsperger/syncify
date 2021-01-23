@@ -4,6 +4,7 @@ import { IconButton } from '@chakra-ui/react'
 import { Room } from '../../types'
 import { useAuthorization } from '../../hooks/use-authorization'
 import Skip from '@svgr/webpack!../../icons/skip-forward.svg'
+import { skipTrack } from '../player/playback-control'
 
 type RoomControlsProps = React.HTMLAttributes<HTMLElement> & { room: Room }
 export const RoomControls = ({ room, className, ...props }: RoomControlsProps) => {
@@ -12,7 +13,7 @@ export const RoomControls = ({ room, className, ...props }: RoomControlsProps) =
   if (!isAdmin) return null
 
   const skip = async () => {
-    await window.fetch(`/api/rooms/${room.id}/skip-track`, { method: 'POST' })
+    await skipTrack(room)
   }
 
   return (

@@ -14,7 +14,7 @@ storiesOf('Playlist', module)
   .add('50 songs', () => <Playlist playlist={mkPlaylist(upcomingTracks.slice(0, 50))} />)
   .add('Foo', () => (
     <Box mx="auto" maxWidth="800px">
-      <Playlist2 items={tracks} />
+      <Playlist2 items={tracks} skipToTrack={(id) => alert(`Skipping to track ${id}`)} />
     </Box>
   ))
 
