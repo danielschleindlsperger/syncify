@@ -32,11 +32,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return () => window.clearInterval(interval)
   }, [])
 
-  if (authState.user === undefined) {
-    // TODO: Add a "Logging you in.." UI
-    return null
-  }
-
   return <AuthContext.Provider value={authState}>{children}</AuthContext.Provider>
 }
 

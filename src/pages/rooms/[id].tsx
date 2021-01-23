@@ -13,6 +13,7 @@ import { RoomProvider } from '../../components/room'
 import { playbackOffset } from '../../components/player/playback-control'
 import { Room } from '../../types'
 import { Chat, UserlistContainer } from '../../components/chat'
+import { AuthenticatedOnly } from '../../components/auth'
 
 type Playlist = import('../../types').Playlist
 
@@ -38,34 +39,36 @@ export default withPlayerStore(() => {
           {!room.publiclyListed && <meta name="robots" content="noindex, follow" />}
         </Head>
         <div className="h-screen flex flex-col">
-          <Navbar>
-            <Link href="/rooms" passHref>
-              <Button as="a" variant="secondary">
-                Join a different room
-              </Button>
-            </Link>
-          </Navbar>
-          {remainingTracks.length > 0 ? (
-            <div className="mt-16 px-8 w-full min-h-0 flex-grow grid grid-cols-3 grid-rows-1 gap-4">
-              <div className="col-start-1 row-start-1 row-end-1 min-h-0">
-                <Chat className="min-h-0 h-full" />
-              </div>
-              <div className="col-start-2 col-span-2 flex flex-col">
-                <div className="flex items-end col-start-2">
-                  <h1 className="text-4xl font-bold">{room.name}</h1>
+          <AuthenticatedOnly>
+            <Navbar>
+              <Link href="/rooms" passHref>
+                <Button as="a" variant="secondary">
+                  Join a different room
+                </Button>
+              </Link>
+            </Navbar>
+            {remainingTracks.length > 0 ? (
+              <div className="mt-16 px-8 w-full min-h-0 flex-grow grid grid-cols-3 grid-rows-1 gap-4">
+                <div className="col-start-1 row-start-1 row-end-1 min-h-0">
+                  <Chat className="min-h-0 h-full" />
                 </div>
+                <div className="col-start-2 col-span-2 flex flex-col">
+                  <div className="flex items-end col-start-2">
+                    <h1 className="text-4xl font-bold">{room.name}</h1>
+                  </div>
 
-                <UserlistContainer mt={8} />
-                <Playlist playlist={room.playlist} mt="10%" />
+                  <UserlistContainer mt={8} />
+                  <Playlist playlist={room.playlist} mt="10%" />
 
-                <div className="grid grid-cols-2 mt-auto">
-                  <Player className="mt-8 col-start-1 col-end-1" />
+                  <div className="grid grid-cols-2 mt-auto">
+                    <Player className="mt-8 col-start-1 col-end-1" />
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            <PlaylistIsOver className="mt-8 mx-auto" />
-          )}
+            ) : (
+              <PlaylistIsOver className="mt-8 mx-auto" />
+            )}
+          </AuthenticatedOnly>
         </div>
       </SpotifyPlayerProvider>
     </RoomProvider>

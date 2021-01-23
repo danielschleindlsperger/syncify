@@ -7,6 +7,7 @@ import { GetRoomsResponse } from '../api/rooms'
 import { Button } from '../../components/button'
 import { useApiRequest, fetcher } from '../../hooks/use-api-request'
 import { LoadingSpinner } from '../../components/loading'
+import { AuthenticatedOnly } from '../../components/auth'
 
 export default function ShowAllRoomsPage() {
   const { rooms, loadMore, error } = useRoomData()
@@ -16,26 +17,28 @@ export default function ShowAllRoomsPage() {
       <Head>
         <title key="title">Find a Room - Syncify</title>
       </Head>
-      <Navbar>
-        <Link href="/rooms/create" passHref>
-          <Button as="a" variant="secondary">
-            Create a new Room
-          </Button>
-        </Link>
-      </Navbar>
-      <main className="mt-16 px-8 pb-16 max-w-5xl mx-auto">
-        {rooms && <Roomlist rooms={rooms} />}
-        {/* TODO: this "loading state" does not work for loading more rooms, as rooms will be defined */}
-        {!rooms && <LoadingSpinner size="md" absoluteCentered />}
-        {error && <div>Error fetching the rooms</div>}
-        {loadMore && (
-          <div className="mt-8 flex justify-center">
-            <Button variant="secondary" onClick={loadMore}>
-              Load more
+      <AuthenticatedOnly>
+        <Navbar>
+          <Link href="/rooms/create" passHref>
+            <Button as="a" variant="secondary">
+              Create a new Room
             </Button>
-          </div>
-        )}
-      </main>
+          </Link>
+        </Navbar>
+        <main className="mt-16 px-8 pb-16 max-w-5xl mx-auto">
+          {rooms && <Roomlist rooms={rooms} />}
+          {/* TODO: this "loading state" does not work for loading more rooms, as rooms will be defined */}
+          {!rooms && <LoadingSpinner size="md" absoluteCentered />}
+          {error && <div>Error fetching the rooms</div>}
+          {loadMore && (
+            <div className="mt-8 flex justify-center">
+              <Button variant="secondary" onClick={loadMore}>
+                Load more
+              </Button>
+            </div>
+          )}
+        </main>
+      </AuthenticatedOnly>
     </>
   )
 }
