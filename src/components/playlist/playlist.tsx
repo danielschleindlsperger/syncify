@@ -5,12 +5,15 @@ import SpotifyWebApi from 'spotify-web-api-js'
 import { usePlayerState } from '../player/player-store'
 import { useAuth } from '../auth'
 import { LikeCurrentTrack } from '../room/like-current-track'
+import { useRoom } from '../room'
+import { skipTrack } from '../player/playback-control'
 
 type Playlist = import('../../types').Playlist
 
 type PlaylistProps = BoxProps & { playlist: Playlist }
 
 export const Playlist = React.memo(({ playlist, ...props }: PlaylistProps) => {
+  const { room } = useRoom()
   const currentTrack = usePlayerState((s) => s.playbackState?.track_window.current_track)
 
   // Show the current track plus the next 4
@@ -22,9 +25,14 @@ export const Playlist = React.memo(({ playlist, ...props }: PlaylistProps) => {
 
   const tracks = useSpotifyTracks(items.map((item) => item.id))
 
+  const skipToTrack = async (id: string) => {
+    if (!room) return
+    await skipTrack(room, id)
+  }
+
   if (playlist.tracks.length === 0) return null
 
-  return <Playlist2 items={tracks} {...props} />
+  return <Playlist2 items={tracks} skipToTrack={skipToTrack} {...props} />
 })
 
 Playlist.displayName = 'Playlist'
@@ -33,13 +41,14 @@ type PlaylistTrack = { id: string; name: string; coverArt: string; artists: stri
 
 type Playlist2Props = BoxProps & {
   items: PlaylistTrack[]
+  skipToTrack: (id: string) => void | Promise<void>
 }
 
 /**
  * An album cover based playlist component without I/O.
  * TODO: rename
  */
-export function Playlist2({ items, ...props }: Playlist2Props) {
+export function Playlist2({ items, skipToTrack, ...props }: Playlist2Props) {
   const [activeItem, setActiveItem] = React.useState(0)
 
   const albumCoverSize = 480
@@ -48,10 +57,10 @@ export function Playlist2({ items, ...props }: Playlist2Props) {
     <Grid templateRows="1fr" templateColumns="1fr" onMouseLeave={() => setActiveItem(0)} {...props}>
       {items
         .map((item, i) => (
-          // TODO: clicking a track should skip to it
-          <PlaylistItem
+          <Box
             key={item.id}
-            item={item}
+            onClick={() => skipToTrack(item.id)}
+            onMouseOver={() => setActiveItem(i)}
             style={{
               gridArea: '1 / 1',
               transition: `transform .15s ${easeOutSine}, opacity .15s ease-out`,
@@ -59,11 +68,12 @@ export function Playlist2({ items, ...props }: Playlist2Props) {
               opacity: Math.pow(1 - (i - activeItem) * 0.05, 5),
               transform: trans(activeItem, i),
             }}
-            isCurrentTrack={i === 0}
-            showDetails={i === activeItem}
-            onMouseOver={() => setActiveItem(i)}
             width={albumCoverSize}
-          />
+            height={albumCoverSize}
+            as="button"
+          >
+            <PlaylistItem item={item} isCurrentTrack={i === 0} showDetails={i === activeItem} />
+          </Box>
         ))
         .reverse()}
     </Grid>

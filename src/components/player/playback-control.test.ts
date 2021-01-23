@@ -1,5 +1,5 @@
-import { Playlist } from '../../types'
-import { playbackInSync, playbackOffset } from './playback-control'
+import { Playlist, Room } from '../../types'
+import { playbackInSync, playbackOffset, skipTrack } from './playback-control'
 
 describe('playbackInSync()', () => {
   const playlist: Playlist = {
@@ -126,6 +126,32 @@ describe('playbackOffset()', () => {
 
     expect(remainingTracks).toEqual(playlist.tracks.slice(1))
     expect(offset).toBe(5000)
+  })
+})
+
+describe('skipTrack()', () => {
+  afterEach(jest.restoreAllMocks)
+
+  const room = { id: 'room-id' } as Room
+  global.fetch = jest.fn().mockResolvedValue({} as Response)
+
+  it('calls API with correct parameters', async () => {
+    await skipTrack(room, 'skipped-to-track-id')
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      '/api/rooms/room-id/skip-track?to-track=skipped-to-track-id',
+      {
+        method: 'POST',
+      },
+    )
+  })
+
+  it('omits next track id', async () => {
+    await skipTrack(room)
+
+    expect(global.fetch).toHaveBeenCalledWith('/api/rooms/room-id/skip-track?', {
+      method: 'POST',
+    })
   })
 })
 

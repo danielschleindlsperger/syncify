@@ -6,6 +6,7 @@ import { TrackChanged } from '../../../../pusher-events'
 import { pusher } from '../../../../pusher'
 import { playbackOffset } from '../../../../components/player/playback-control'
 import { createLogger } from '../../../../utils/logger'
+import { takeWhile } from 'ramda'
 
 const log = createLogger()
 const client = makeClient()
@@ -13,8 +14,14 @@ const client = makeClient()
 export default withAuth(async (req: AuthenticatedNowRequest, res: NowResponse) => {
   if (req.method !== 'POST') return res.status(405).send('Method not allowed.')
 
+  // TODO: do all of this stuff in a transaction to avoid errors in offset addition when multiple writes happen
+  // at the same time
+
+  // TODO: validate query and path parameters
+
   const userId = req.auth.id
   const roomId = req.query.id as string
+
   const room = await findRoom(client, roomId)
 
   if (!room) {
@@ -25,9 +32,11 @@ export default withAuth(async (req: AuthenticatedNowRequest, res: NowResponse) =
     return res.status(403).json({ msg: 'User is not a room admin.' })
   }
 
+  const targetTrackId = req.query['to-track'] as string | undefined
+
   // To skip forward we keep track of the total amount of skipped milliseconds during a playback
   // and use that in all offset calculations
-  const skipped = skippedMs(room.playlist)
+  const skipped = skippedMs(room.playlist, targetTrackId)
 
   await updateRoom(client, {
     ...room,
@@ -41,6 +50,7 @@ export default withAuth(async (req: AuthenticatedNowRequest, res: NowResponse) =
   })
 
   // TODO: payload is not needed anymore
+  // Notify the track change to all connected clients
   await pusher.trigger(`presence-${room.id}`, TrackChanged, {})
   log.info(`Skipped a track in room "${roomId}".`, { roomId, roomName: room.name })
 
@@ -51,10 +61,14 @@ const isRoomAdmin = (room: Pick<Room, 'admins'>, userId: string): boolean =>
   room.admins.find((a) => a.id === userId) !== undefined
 
 /**
- * Determine the amount of milliseconds forwarded when the current track is skipped
+ * Determine the amount of milliseconds skipped forward.
+ * When target track id `toTrackId` is omitted, playback is skipped to the next track.
  */
-function skippedMs(playlist: Playlist): number {
+function skippedMs(playlist: Playlist, toTrackId?: string): number {
   const { remainingTracks, offset } = playbackOffset(playlist, new Date())
   const [currentTrack] = remainingTracks
-  return currentTrack.duration_ms - offset
+  const tracksToSkip = toTrackId
+    ? takeWhile((track) => track.id !== toTrackId, remainingTracks)
+    : [currentTrack]
+  return tracksToSkip.reduce((acc, track) => acc + track.duration_ms, 0) - offset
 }

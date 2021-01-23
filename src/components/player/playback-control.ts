@@ -1,8 +1,8 @@
 import { dropWhile, reduce, reduced } from 'ramda'
-import { Playlist, PlaylistTrack } from '../../types'
+import { Playlist, PlaylistTrack, Room } from '../../types'
 
 // If the current playback is before (for whatever reason) or behind the real playback by more than
-// five seconds it's considered unacceptable and we have to resync
+// five seconds it's considered out-of-sync and we have to resync
 const ACCEPTABLE_OFFSET_MS = 5000
 
 /**
@@ -68,4 +68,21 @@ export const playbackOffset = (playlist: Playlist, now = new Date()): PlaybackOf
   }, playlist.tracks)
 
   return { remainingTracks, offset }
+}
+
+/**
+ * Send API request to skip the playback for all users in a room to a track.
+ *
+ * @param room
+ * @param toTrackId Track to skip to. If omitted, skips to next track.
+ */
+export const skipTrack = async (room: Room, toTrackId?: string) => {
+  const query = { 'to-track': toTrackId }
+  const queryString = Object.entries(query)
+    .filter(([_param, value]) => value !== undefined)
+    .map(([param, value]) => `${param}=${value}`)
+    .join('&')
+  const url = `/api/rooms/${room.id}/skip-track?${queryString}`
+
+  await window.fetch(url.toString(), { method: 'POST' })
 }
