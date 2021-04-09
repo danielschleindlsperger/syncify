@@ -1,9 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import Pusher, { WebHook } from 'pusher'
 import { makeClient, query } from '../../../db'
+import { createLogger } from '../../../utils/logger'
 
 type Event = ReturnType<WebHook['getEvents']>[0]
 
+const log = createLogger()
 const client = makeClient()
 const pusher = new Pusher({
   appId: process.env.PUSHER_APP_ID!,
@@ -29,10 +31,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 const handleEvents = async (events: Event[]): Promise<void> => {
   const promises = events.map((event) => {
     if (event.name === 'member_added') {
-      return addMember({ userId: event.socket_id, roomId: parseRoomId(event.channel) })
+      const payload = { userId: event.socket_id, roomId: parseRoomId(event.channel) }
+      log.info('User joined room', payload)
+      return addMember(payload)
     }
     if (event.name === 'member_removed') {
-      return removeMember({ userId: event.socket_id, roomId: parseRoomId(event.channel) })
+      const payload = { userId: event.socket_id, roomId: parseRoomId(event.channel) }
+      log.info('User left room', payload)
+      return removeMember(payload)
     }
   })
   await Promise.all(promises)
