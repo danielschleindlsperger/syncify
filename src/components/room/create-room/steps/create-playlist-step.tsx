@@ -261,5 +261,6 @@ const fetchPlaylistTracks = async (
   const tracks = items.map((item) => item.track)
   return next
     ? tracks.concat(await fetchPlaylistTracks(accessToken, id, oldOffset + limit))
-    : tracks
+    : // Apparently we can get `null`s here
+      tracks.filter(Boolean)
 }
