@@ -1,0 +1,40 @@
+{:deps    {org.clojure/clojure                 {:mvn/version "1.10.3"}
+
+           ;; logging
+           com.taoensso/timbre                 {:mvn/version "5.1.2"}
+           com.fzakaria/slf4j-timbre           {:mvn/version "0.3.21"}
+
+           ;; system/config management
+           integrant/integrant                 {:mvn/version "0.8.0"}
+           integrant/repl                      {:mvn/version "0.3.2"}
+           aero/aero                           {:mvn/version "1.1.6"}
+
+           ;; HTTP
+           http-kit/http-kit                   {:mvn/version "2.5.3"}
+           metosin/reitit                      {:mvn/version "0.5.12"}
+           ring/ring-core                      {:mvn/version "1.9.2"}
+           ring/ring-headers                   {:mvn/version "0.3.0"}
+           martian/martian                     {:mvn/version "0.1.16"}
+
+           ;; JSON
+           metosin/jsonista                    {:mvn/version "0.3.1"}
+           camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.2"}
+
+           ;; async
+           funcool/promesa                     {:mvn/version "6.0.0"}}
+ :paths   ["src" "resources"]
+ :aliases {:run-m   {:main-opts ["-m" "co.syncify.api.main"]}
+           :dev     {:extra-paths ["dev/src" "dev/resources" "test"]}
+           :test    {:extra-paths ["test"]
+                     :extra-deps  {org.clojure/test.check {:mvn/version "1.1.0"}}}
+           :runner  {:extra-deps {com.cognitect/test-runner
+                                  {:git/url "https://github.com/cognitect-labs/test-runner"
+                                   :sha     "b6b3193fcc42659d7e46ecd1884a228993441182"}}
+                     :main-opts  ["-m" "cognitect.test-runner"
+                                  "-d" "test"]}
+           :uberjar {:replace-deps {com.github.seancorfield/depstar {:mvn/version "2.0.211"}}
+                     :exec-fn      hf.depstar/uberjar
+                     :exec-args    {:aot        true
+                                    :jar        "syncify-api.jar"
+                                    :main-class "co.syncify.api.main"
+                                    :sync-pom   true}}}}

@@ -1,36 +1,13 @@
 (ns dev
   (:require [taoensso.timbre]
-            [clojure.tools.namespace.repl :refer [refresh-all]]
-            [api.components.system :as system]))
+            [integrant.repl :refer [clear go halt prep init reset reset-all]]
+            [co.syncify.api.system :refer [system-config]]))
 
-(def system nil)
+(integrant.repl/set-prep! (constantly system-config))
 
-(defn init
-  "Constructs the current development system."
-  []
-  (alter-var-root #'system
-                  (constantly (system/new-system :dev))))
+(comment
+  (go))
 
-(defn start
-  "Starts the current development system."
-  []
-  (alter-var-root #'system system/start)
-  :started)
-
-(defn stop
-  "Shuts down and destroys the current development system."
-  []
-  (alter-var-root #'system
-                  (fn [s] (when s (system/stop s)))))
-
-(defn go
-  "Initializes the current development system and starts it running."
-  []
-  (init)
-  (start)
-  :started)
-
-(defn reset
-  []
-  (stop)
-  (refresh-all :after 'dev/go))
+(comment
+  (reset)
+  (halt))

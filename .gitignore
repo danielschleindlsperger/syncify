@@ -7,3 +7,7 @@ node_modules
 .env.build
 /logs
 .vercel
+*.iml
+.idea
+.nrepl-port
+.cpcache
