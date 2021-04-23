@@ -40,7 +40,7 @@
 
 (def m (martian/bootstrap-openapi base-url openapi-spec))
 
-;; auth-is an atom of shape {:access-token String :refresh-token String :expires-at java.util.time.Instant}
+;; auth-state is an atom of shape {:access-token String :refresh-token String :expires-at java.util.time.Instant}
 (defrecord Spotify [client-id client-secret auth-state])
 
 (defn create-spotify-client [{:keys [client-id client-secret]}]
