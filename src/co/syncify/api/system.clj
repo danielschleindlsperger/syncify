@@ -3,8 +3,10 @@
             [taoensso.timbre :as log]
             [org.httpkit.server :refer [run-server]]
             [crux.api :as crux]
+            [co.syncify.api.util.json :as json]
             [co.syncify.api.config :refer [load-config]]
-            [co.syncify.api.modules.spotify :as spotify :refer [create-spotify-client]]))
+            [co.syncify.api.modules.spotify :as spotify :refer [create-spotify-client]]
+            [co.syncify.api.database :as db]))
 
 (defn ->system-config [profile]
   {:http/server      {:config  (ig/ref :system/config)
@@ -40,8 +42,9 @@
 (defmethod ig/init-key :http/app-handler [_ system]
   (fn [req]
     (let [{:keys [:spotify :db/crux]} system]
-      (spotify/request spotify :get-track {:id "1VbsSYNXKBpjPvqddk8zjs"})
-      {:status 200 :body "hello syncify"})))
+      (let [track (spotify/request spotify :get-track {:id "1VbsSYNXKBpjPvqddk8zjs"})
+            entity (db/put-one! crux :track track)]
+        {:status 200 :body (json/stringify-camel entity) :headers {"Content-Type" "application/json"}}))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spotify API client ;;
