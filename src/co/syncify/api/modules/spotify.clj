@@ -7,17 +7,12 @@
             [org.httpkit.client :as http]
             [martian.core :as martian]
             [clojure.java.io :as io]
-            [jsonista.core :as jsonista]
-            [camel-snake-kebab.core :refer [->kebab-case-keyword]]
+            [co.syncify.api.util.json :refer [parse-json parse-json-as-is]]
             [co.syncify.api.util.string :refer [->base64]])
   (:import [java.time Instant]))
 
 ;; Enable SNI client
 (alter-var-root #'org.httpkit.client/*default-client* (fn [_] sni-client/default-client))
-
-(def ^:private json-keyword-mapper
-  (jsonista/object-mapper
-    {:decode-key-fn ->kebab-case-keyword}))
 
 (defn- remove-superfluous-endpoint-str
   "The provided Spotify API spec has a prefix of \"endpoint-\" before every operationId, e.g. endpoint-get-multiple-albums.
@@ -33,7 +28,7 @@
 
 (def openapi-spec (-> (io/resource "spotify.json")
                       (slurp)
-                      (jsonista/read-value)
+                      (parse-json-as-is)
                       (remove-superfluous-endpoint-str)))
 
 (def base-url (get-in openapi-spec ["servers" 0 "url"]))
@@ -65,7 +60,7 @@
                                          :headers     {"Authorization" auth-header
                                                        "Content-Type"  "application/x-www-form-urlencoded"}})]
     (-> resp
-        (update :body #(jsonista/read-value % json-keyword-mapper))
+        (update :body parse-json)
         (throw-when-unsuccessful!)
         (resp->token))))
 
@@ -95,7 +90,7 @@
                                             {:authorization bearer-token}))
         resp @(http/request req-map)]
     (-> resp
-        (update :body #(jsonista/read-value % json-keyword-mapper))
+        (update :body parse-json)
         (throw-when-unsuccessful!)
         :body)))
 
