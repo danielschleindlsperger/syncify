@@ -75,7 +75,6 @@
   (let [^Instant expires-at (-> spotify :auth-state deref :expires-at)
         safety-margin 5000
         expired? (or (nil? expires-at) (.isBefore (.plusMillis expires-at safety-margin) (Instant/now)))]
-    (println expired?)
     (when expired?
       (swap! (:auth-state spotify) merge (client-credentials-flow! spotify)))))
 

@@ -36,7 +36,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defmethod ig/init-key :http/app-handler [_ {:keys [config spotify]}]
   (fn [req]
-    (clojure.pprint/pprint (spotify/request spotify :get-track {:id "1VbsSYNXKBpjPvqddk8zjs"}))
+    (spotify/request spotify :get-track {:id "1VbsSYNXKBpjPvqddk8zjs"})
     {:status 200 :body "hello syncify"}))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
