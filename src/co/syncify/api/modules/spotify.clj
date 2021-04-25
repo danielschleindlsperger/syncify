@@ -19,7 +19,7 @@
   (jsonista/object-mapper
     {:decode-key-fn ->kebab-case-keyword}))
 
-(defn remove-superfluous-endpoint-str
+(defn- remove-superfluous-endpoint-str
   "The provided Spotify API spec has a prefix of \"endpoint-\" before every operationId, e.g. endpoint-get-multiple-albums.
    This seems useless and since this will be the main entrypoint for our api, we'll remove it."
   [openapi-spec]
@@ -43,8 +43,6 @@
 ;; auth-state is an atom of shape {:access-token String :refresh-token String :expires-at java.util.time.Instant}
 (defrecord Spotify [client-id client-secret auth-state])
 
-(defn create-spotify-client [{:keys [client-id client-secret]}]
-  (->Spotify client-id client-secret (atom {})))
 
 (defn- throw-when-unsuccessful!
   [resp]
@@ -78,6 +76,15 @@
     (when expired?
       (swap! (:auth-state spotify) merge (client-credentials-flow! spotify)))))
 
+;;;;;;;;;;;;;;;;
+;; PUBLIC API ;;
+;;;;;;;;;;;;;;;;
+
+(def explore (partial martian/explore m))
+
+(defn create-spotify-client [{:keys [client-id client-secret]}]
+  (->Spotify client-id client-secret (atom {})))
+
 (defn request [spotify route-name params]
   (update-access-token-if-expired! spotify)
   (let [access-token (-> spotify :auth-state deref :access-token)
@@ -97,8 +104,8 @@
   (martian/explore m :get-track)
 
   (def credentials (-> (slurp (io/resource "secrets.edn")) (read-string) :spotify))
-  (client-credentials-flow credentials)
-  (client-credentials-flow {})                              ;; error
+  (client-credentials-flow! credentials)
+  (client-credentials-flow! {})                              ;; error
   (def spotify (create-spotify-client credentials))
   (update-access-token-if-expired! spotify)
   (request spotify :get-track {:id "1VbsSYNXKBpjPvqddk8zjs"})

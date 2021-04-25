@@ -26,7 +26,8 @@
  :aliases {:run-m   {:main-opts ["-m" "co.syncify.api.main"]}
            :dev     {:extra-paths ["dev/src" "dev/resources" "test"]}
            :test    {:extra-paths ["test"]
-                     :extra-deps  {org.clojure/test.check {:mvn/version "1.1.0"}}}
+                     :extra-deps  {org.clojure/test.check      {:mvn/version "1.1.0"}
+                                   http-kit.fake/http-kit.fake {:mvn/version "0.2.2"}}}
            :runner  {:extra-deps {com.cognitect/test-runner
                                   {:git/url "https://github.com/cognitect-labs/test-runner"
                                    :sha     "b6b3193fcc42659d7e46ecd1884a228993441182"}}
