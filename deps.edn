@@ -20,6 +20,9 @@
            metosin/jsonista                    {:mvn/version "0.3.1"}
            camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.2"}
 
+           ;; validation/modelling
+           metosin/malli                       {:mvn/version "0.4.0"}
+
            ;; async
            funcool/promesa                     {:mvn/version "6.0.0"}}
  :paths   ["src" "resources"]
