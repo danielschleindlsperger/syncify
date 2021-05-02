@@ -42,6 +42,5 @@
            :uberjar {:replace-deps {com.github.seancorfield/depstar {:mvn/version "2.0.211"}}
                      :exec-fn      hf.depstar/uberjar
                      :exec-args    {:aot        true
-                                    :jar        "syncify-api.jar"
-                                    :main-class "co.syncify.api.main"
-                                    :sync-pom   true}}}}
+                                    :jar        "target/syncify-api.jar"
+                                    :main-class "co.syncify.api.main"}}}}

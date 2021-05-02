@@ -30,6 +30,14 @@ npm run migrate create my-new-migration
 # run app in production
 npm run build
 npm start
+
+# Clojure API
+
+# Run tests outside the REPL
+clj -M:test:runner
+
+# Build uberjar
+clj -X:uberjar
 ```
 
 ## Nomenclature (Domain Language)

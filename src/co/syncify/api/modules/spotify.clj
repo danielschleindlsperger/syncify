@@ -98,7 +98,7 @@
   (martian/explore m)
   (martian/explore m :get-track)
 
-  (def credentials (-> (slurp (io/resource "secrets.edn")) (read-string) :spotify))
+  (def credentials (-> (slurp (io/resource "dev_secrets.edn")) (read-string) :spotify))
   (client-credentials-flow! credentials)
   (client-credentials-flow! {})                              ;; error
   (def spotify (create-spotify-client credentials))

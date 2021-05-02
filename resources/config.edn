@@ -1,16 +1,14 @@
 ;; available profiles: :dev, :prod
-{:secrets #include "secrets.edn"
- :port #profile {:dev 8000
-                 :prod #long #env PORT}
- :spotify {:client-id #profile {:dev #ref [:secrets :spotify :client-id]
-                                :prod #env SPOTIFY_CLIENT_ID}
-           :client-secret #profile {:dev #ref [:secrets :spotify :client-secret]
-                                    :prod #env SPOTIFY_CLIENT_SECRET}
-           :redirect-uri #profile {:dev "http://localhost:8000/auth/spotify-callback"
-                                   :prod #env SPOTIFY_REDIRECT_URI}}
- :jwt-secret #profile {:dev "hunter2"
-                       :prod #env JWT_SECRET}
- :logging {:level #profile {:dev :info
-                            :prod :info}
-           :format #profile {:dev :text
-                             :prod :json}}}
+#merge [{:port       #long #or [#env PORT 8000]
+         :spotify    {:client-id     #env SPOTIFY_CLIENT_ID
+                      :client-secret #env SPOTIFY_CLIENT_SECRET
+                      :redirect-uri  #profile {:dev  "http://localhost:8000/auth/spotify-callback"
+                                               :prod #env SPOTIFY_REDIRECT_URI}}
+         :jwt-secret #env JWT_SECRET
+         :logging    {:level  #profile {:dev  :info
+                                        :prod :info}
+                      :format #profile {:dev  :text
+                                        :prod :json}}}
+        ;; all secret values taken from the environment will usually be empty locally
+        ;; and will be overriden by the dev_secrets configuration.
+        #include "dev_secrets.edn"]
