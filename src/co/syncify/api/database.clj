@@ -1,24 +1,12 @@
 (ns co.syncify.api.database
   (:require [clojure.set :refer [rename-keys]]
-            [crux.api :as crux])
+            [crux.api :as crux]
+            [co.syncify.api.util.keyword :refer [add-ns]])
   (:import [java.util UUID]))
 
-;; TODO: this doesn't really work LOL
-(defn- namespace-kw
-  "Add namespace `ns` to keyword `kw`. If `kw` is already namespaced, simply returns it."
-  [kw ns]
-  (if (qualified-keyword? kw)
-    kw
-    (keyword (str ns) (str kw))))
 
-(comment
-  (namespace-kw :foo :bar)                                  ;; ::bar/foo
-  (namespace-kw :bar/bar :foo)                              ;; :bar/bar
-  (namespace-kw "bar" :bar)                                 ;; ::bar/bar
-  )
-
-(defn- crux->id [model x] (rename-keys x {:crux.db/id (namespace-kw :id model)}))
-(defn- id->crux [model x] (rename-keys x {(namespace-kw :id model) :crux.db/id}))
+(defn- crux->id [model x] (rename-keys x {:crux.db/id (add-ns :id model)}))
+(defn- id->crux [model x] (rename-keys x {(add-ns :id model) :crux.db/id}))
 
 (comment
   (crux->id :user {:crux.db/id "123"}))
@@ -28,7 +16,7 @@
 (defn get-one [crux-node model id]
   (crux->id model (crux/entity (crux/db crux-node) id)))
 
-;; TODO: limit offset attributes
+;; TODO: limit, offset, pick attributes
 (defn get-all [crux-node model]
   (let [result (crux/q (crux/db crux-node)
                        '{:find          [e]
