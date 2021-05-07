@@ -3,19 +3,17 @@
             [taoensso.timbre :as log]
             [org.httpkit.server :refer [run-server]]
             [crux.api :as crux]
-            [co.syncify.api.util.json :as json]
             [co.syncify.api.config :refer [load-config]]
-            [co.syncify.api.modules.spotify :as spotify :refer [create-spotify-client]]
-            [co.syncify.api.database :as db]
+            [co.syncify.api.modules.spotify :refer [create-spotify-client]]
             [co.syncify.api.web.routes :refer [app-handler]]))
 
 (defn ->system-config [profile]
   {:http/server      {:config  (ig/ref :system/config)
                       :handler (ig/ref :http/app-handler)}
-   :http/app-handler {:profile profile
-                      :db/crux (ig/ref :db/crux)
-                      :spotify (ig/ref :spotify/client)
-                      :config  (ig/ref :system/config)}
+   :http/app-handler {:profile   profile
+                      :crux-node (ig/ref :db/crux)
+                      :spotify   (ig/ref :spotify/client)
+                      :config    (ig/ref :system/config)}
    :system/config    {:profile profile}
    :spotify/client   {:config (ig/ref :system/config)}
    :db/crux          {}})
@@ -41,10 +39,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; App handler (ring router) ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defmethod ig/init-key :http/app-handler [_ system]
-  (let [prod? (= :prod (:profile system))]
+(defmethod ig/init-key :http/app-handler [_ {:keys [profile] :as system}]
+  (let [prod? (= :prod profile)]
     ;; Wrap in a function when not in prod.
-    ;; This will recompile the router on every invokation which is a heavy performance penalty but will allow
+    ;; This will recompile the router on every invocation which is a heavy performance penalty but will allow
     ;; to just recompile handler functions without reloading the whole system which should be a better
     ;; developer experience.
     ;; Note this currently only works for synchronous ring handlers.
