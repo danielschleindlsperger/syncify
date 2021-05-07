@@ -6,12 +6,14 @@
             [co.syncify.api.util.json :as json]
             [co.syncify.api.config :refer [load-config]]
             [co.syncify.api.modules.spotify :as spotify :refer [create-spotify-client]]
-            [co.syncify.api.database :as db]))
+            [co.syncify.api.database :as db]
+            [co.syncify.api.web.routes :refer [app-handler]]))
 
 (defn ->system-config [profile]
   {:http/server      {:config  (ig/ref :system/config)
                       :handler (ig/ref :http/app-handler)}
-   :http/app-handler {:db/crux (ig/ref :db/crux)
+   :http/app-handler {:profile profile
+                      :db/crux (ig/ref :db/crux)
                       :spotify (ig/ref :spotify/client)
                       :config  (ig/ref :system/config)}
    :system/config    {:profile profile}
@@ -40,11 +42,15 @@
 ;; App handler (ring router) ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defmethod ig/init-key :http/app-handler [_ system]
-  (fn [req]
-    (let [{:keys [:spotify :db/crux]} system]
-      (let [track (spotify/request spotify :get-track {:id "1VbsSYNXKBpjPvqddk8zjs"})
-            entity (db/put-one! crux :track track)]
-        {:status 200 :body (json/stringify-camel entity) :headers {"Content-Type" "application/json"}}))))
+  (let [prod? (= :prod (:profile system))]
+    ;; Wrap in a function when not in prod.
+    ;; This will recompile the router on every invokation which is a heavy performance penalty but will allow
+    ;; to just recompile handler functions without reloading the whole system which should be a better
+    ;; developer experience.
+    ;; Note this currently only works for synchronous ring handlers.
+    ;; In prod we don't wrap and take advantage of reitit's pre-compiled route tree.
+    (if prod? (app-handler system)
+              (fn [req] ((app-handler system) req)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spotify API client ;;
