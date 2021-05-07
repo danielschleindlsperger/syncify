@@ -25,16 +25,15 @@
   (crux->id (crux/entity (crux/db crux-node) id) model))
 
 ;; TODO: limit, offset, pick attributes
+;; TODO: This will not return results in insertion order. We need to find a way to use the tx-time in an :order-by clause
 (defn get-all [crux-node model]
-  (let [result (crux/q (crux/db crux-node)
+  (let [results (crux/q (crux/db crux-node)
                        '{:find          [e]
                          :in            [type]
                          :full-results? true
                          :where         [[e :type type]]}
-                       model)
-        entities (->> result
-                      (map #(crux->id (first %) model)))]
-    entities))
+                       model)]
+    (map #(crux->id (first %) model) results)))
 
 (defn put-one
   "Construct a transaction to put the entity document in the db.
