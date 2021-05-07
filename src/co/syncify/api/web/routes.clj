@@ -4,6 +4,9 @@
             [reitit.dev.pretty :as pretty]
             [malli.core :as m]
             [malli.error :as me]
+            [muuntaja.core :as muuntaja]
+            [reitit.ring.middleware.muuntaja :refer [format-middleware]]
+            [camel-snake-kebab.core :refer [->kebab-case-keyword ->camelCaseString]]
             [co.syncify.api.modules.spotify :as spotify]
             [co.syncify.api.database :as db]))
 
@@ -55,12 +58,23 @@
      :method-not-allowed (constantly {:status 405 :body "method not allowed"})
      :not-acceptable     (constantly {:status 406 :body "not acceptable"})}))
 
+(def muuntaja-instance
+  (muuntaja/create
+    (-> muuntaja/default-options
+        (assoc-in [:formats "application/json" :encoder-opts :encode-key-fn]
+                  ->camelCaseString)
+        (assoc-in [:formats "application/json" :decoder-opts :decode-key-fn]
+                  ->kebab-case-keyword))))
+
 (defn routes []
   [["/" {:get home-handler}]
    ["/foo" {:get foo-handler}]])
 
 (def ->router #(ring/router (routes)
-                            {:exception pretty/exception}))
+                            {:data {:muuntaja   muuntaja-instance
+                                    :exception  pretty/exception
+                                    :middleware [;; automatic content negotiation and encoding
+                                                 format-middleware]}}))
 
 (defn app-handler [system]
   (validate-system-map! system)
