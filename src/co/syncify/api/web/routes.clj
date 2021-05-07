@@ -11,14 +11,14 @@
                 [:spotify some?]
                 [:crux-node some?]])
 
-(defn conform-system-map!
+(defn validate-system-map!
   "Validates that that the system map conforms to the schema.
    Throws when not."
   [m]
   (let [err (me/humanize (m/explain SystemMap m))]
     (when err (throw (ex-info "System map does not conform to schema" err)))))
 
-(defn inject-system
+(defn wrap-system
   "Ring middleware to inject the system map into the request map.
    This is a simple dependency mechanism that avoids having many higher order functions while
    still retaining the same testability."
@@ -44,10 +44,10 @@
     {:status 200
      :body   (clojure.string/join "\n" (map :name tracks))}))
 
-(def default-middleware [;; query-params & form-params
-                         parameters/parameters-middleware
-                         ;; Multipart upload is missing here
-                         ])
+(def default-middlewares [;; query-params & form-params
+                          parameters/parameters-middleware
+                          ;; Multipart upload is missing here
+                          ])
 
 (defn default-handler []
   (ring/create-default-handler
@@ -63,11 +63,12 @@
                             {:exception pretty/exception}))
 
 (defn app-handler [system]
-  (conform-system-map! system)
+  (validate-system-map! system)
   (let [router (->router)]
     (ring/ring-handler router
                        (default-handler)
-                       {:middleware (conj default-middleware (inject-system system))})))
+                       {:middleware (conj default-middlewares
+                                          (wrap-system system))})))
 
 (comment
   (def app (app-handler {}))
