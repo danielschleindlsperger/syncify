@@ -28,11 +28,10 @@
 ;; TODO: This will not return results in insertion order. We need to find a way to use the tx-time in an :order-by clause
 (defn get-all [crux-node model]
   (let [results (crux/q (crux/db crux-node)
-                       '{:find          [e]
-                         :in            [type]
-                         :full-results? true
-                         :where         [[e :type type]]}
-                       model)]
+                        '{:find  [(pull ?e [*])]
+                          :in    [type]
+                          :where [[?e :type type]]}
+                        model)]
     (map #(crux->id (first %) model) results)))
 
 (defn put-one
