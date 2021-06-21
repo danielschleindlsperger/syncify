@@ -1,5 +1,5 @@
 ;; available profiles: :dev, :prod
-#merge [{:port       #long #or [#env PORT 8000]
+#merge [{:port       #long #or [#env PORT 4321]
          :spotify    {:client-id     #env SPOTIFY_CLIENT_ID
                       :client-secret #env SPOTIFY_CLIENT_SECRET
                       :redirect-uri  #profile {:dev  "http://localhost:8000/auth/spotify-callback"

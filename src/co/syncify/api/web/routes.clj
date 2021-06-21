@@ -9,9 +9,9 @@
             [reitit.ring.middleware.dev :refer [print-request-diffs]]
             [reitit.ring.coercion :as rrc]
             [reitit.swagger :as swagger]
+            [reitit.swagger-ui :as swagger-ui]
             [ring.middleware.session :refer [wrap-session]]
             [ring.middleware.session.cookie :refer [cookie-store]]
-            [camel-snake-kebab.core :refer [->kebab-case-keyword ->camelCaseString]]
             [co.syncify.api.web.middleware.oauth2 :refer [wrap-oauth2]]
             [co.syncify.api.util.string :refer [str->byte-arr]]
             [co.syncify.api.web.handlers :refer [create-room-handler]]
@@ -39,23 +39,38 @@
      :method-not-allowed (constantly {:status 405 :body "method not allowed"})
      :not-acceptable     (constantly {:status 406 :body "not acceptable"})}))
 
-(def muuntaja-instance
-  (muuntaja/create
-    (-> muuntaja/default-options
-        (assoc-in [:formats "application/json" :encoder-opts :encode-key-fn]
-                  ->camelCaseString)
-        (assoc-in [:formats "application/json" :decoder-opts :decode-key-fn]
-                  ->kebab-case-keyword))))
-
 (defn routes []
-  [["/" {:get (swagger/create-swagger-handler)}]
+  [["/swagger/*" {:no-doc true :get (swagger-ui/create-swagger-ui-handler)}]
+   ["/swagger.json" {:no-doc true :get (swagger/create-swagger-handler)}]
    ["/foo" {:get (fn [req] (println (:oauth2/access-tokens req))
                    {:body "fufu"})}]
-   ["/room" {:post create-room-handler}]])
+   ["/room" {:post create-room-handler
+             :get  {:responses {200 {:body any?}}
+                    :handler   (constantly {:body "all rooms, paginated"})}}]
+
+   ;; Commands to interact with the room
+   ;; Only admins can execute these
+   ["/room/:id/playback"
+    ["/skip-current-track" {:post (constantly {:body "TODO"})}]
+    ["/skip-to-track" {:post (constantly {:body "TODO"})}]]
+   ["/room/:id/playlist"
+    ["/add-tracks" {:post (constantly {:body "TODO"})}]]
+
+   ["/room/:id" {:get {:handler (constantly {:body "THE room"})}}
+    ]])
 
 (def ->router #(ring/router (routes)
-                            {:data {:muuntaja  muuntaja-instance
-                                    :exception pretty/exception}}))
+                            {:data {:muuntaja   muuntaja/instance
+                                    :exception  pretty/exception
+                                    :middleware [parameters/parameters-middleware
+                                                 ;; automatic content negotiation and encoding
+                                                 format-middleware
+                                                 ;; TODO: security middlewares
+                                                 ;; Multipart upload is missing here
+                                                 rrc/coerce-exceptions-middleware
+                                                 rrc/coerce-request-middleware
+                                                 rrc/coerce-response-middleware
+                                                 ]}}))
 
 (defmethod print-method java.time.Instant [^java.time.Instant inst writer]
   (doto writer
@@ -74,17 +89,6 @@
                                      [wrap-session {:store       (cookie-store {:key     (str->byte-arr (get-in system [:config :jwt-secret]))
                                                                                 :readers (merge *data-readers* {'java.time.Instant #(java.time.Instant/parse %)})})
                                                     :cookie-name "syncify_session"}]
-                                     ;; query-params & form-params
-                                     parameters/parameters-middleware
-                                     ;; TODO: security middlewares
-                                     ;; Multipart upload is missing here
-                                     ;; automatic content negotiation and encoding
-                                     format-middleware
-                                     rrc/coerce-exceptions-middleware
-                                     rrc/coerce-request-middleware
-                                     rrc/coerce-response-middleware
-
-
                                      [wrap-oauth2 {:spotify
                                                    {:authorize-uri    "https://accounts.spotify.com/authorize"
                                                     :access-token-uri "https://accounts.spotify.com/api/token"
