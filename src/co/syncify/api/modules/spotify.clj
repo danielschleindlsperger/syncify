@@ -88,6 +88,7 @@
                                      route-name
                                      (merge params
                                             {:authorization bearer-token}))
+        ;; TODO req-map can actually be null here (when no matching operation was found), leading to a null pointer exception
         resp @(http/request req-map)]
     (-> resp
         (update :body parse-json)

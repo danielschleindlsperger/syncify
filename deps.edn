@@ -26,6 +26,10 @@
            ;; validation/modelling
            metosin/malli                       {:mvn/version "0.4.0"}
 
+           ;; testing
+           ;; utility for generative testing
+           com.gfredericks/test.chuck          {:mvn/version "0.2.10"}
+
            ;; async
            funcool/promesa                     {:mvn/version "6.0.0"}}
  :paths   ["src" "resources"]
