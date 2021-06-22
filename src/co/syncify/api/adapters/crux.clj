@@ -1,9 +1,10 @@
-(ns co.syncify.api.database
+(ns co.syncify.api.adapters.crux
   (:require [clojure.set :refer [rename-keys]]
             [crux.api :as crux]
+            [crux.node]
             [co.syncify.api.util.keyword :refer [add-ns]]
-            [co.syncify.api.util.string :refer [random-uuid]]))
-
+            [co.syncify.api.util.string :refer [random-uuid]]
+            [co.syncify.api.protocols :refer [RoomDatabase]]))
 
 (defn- crux->id [x typ] (rename-keys x {:crux.db/id (add-ns :id typ)}))
 (defn- id->crux [x typ] (rename-keys x {(add-ns :id typ) :crux.db/id}))
@@ -64,5 +65,11 @@
   (def user (put-one! node :user {:user/name "Foo bar"}))
   (put-one! node :user user)
   (get-all node :user)
-  (get-one node :user (:user/id user))
-  )
+  (get-one node :user (:user/id user)))
+
+;; Implement ports
+
+(extend-protocol RoomDatabase
+  crux.node.CruxNode
+  (get-room [this id]
+    (get-one this :room id)))

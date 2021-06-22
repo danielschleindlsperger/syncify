@@ -1,7 +1,7 @@
-(ns co.syncify.api.modules.spotify-test
+(ns co.syncify.api.adapters.spotify-test
   (:use org.httpkit.fake)
   (:require [clojure.test :refer :all]
-            [co.syncify.api.modules.spotify :as spotify]))
+            [co.syncify.api.adapters.spotify :as spotify]))
 
 (def spotify-rest-api #"https://api.spotify.com/v1*.")
 (def spotify-auth-api #"https://accounts.spotify.com/api*.")

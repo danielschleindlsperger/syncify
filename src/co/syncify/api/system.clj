@@ -3,9 +3,10 @@
             [taoensso.timbre :as log]
             [org.httpkit.server :refer [run-server]]
             [crux.api :as crux]
+            [co.syncify.api.adapters.crux]
             [co.syncify.api.config :refer [load-config]]
-            [co.syncify.api.modules.spotify :refer [create-spotify-client]]
-            [co.syncify.api.web.routes :refer [app-handler]]))
+            [co.syncify.api.adapters.spotify :refer [create-spotify-client]]
+            [co.syncify.api.adapters.web.routes :refer [app-handler]]))
 
 (defn ->system-config [profile]
   {:http/server      {:config  (ig/ref :system/config)
@@ -39,16 +40,17 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; App handler (ring router) ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defmethod ig/init-key :http/app-handler [_ {:keys [profile] :as system}]
-  (let [prod? (= :prod profile)]
+(defmethod ig/init-key :http/app-handler [_ {:keys [profile config] :as system}]
+  (let [prod? (= :prod profile)
+        context (select-keys system [:spotify :crux-node])]
     ;; Wrap in a function when not in prod.
     ;; This will recompile the router on every invocation which is a heavy performance penalty but will allow
     ;; to just recompile handler functions without reloading the whole system which should be a better
     ;; developer experience.
     ;; Note this currently only works for synchronous ring handlers.
     ;; In prod we don't wrap and take advantage of reitit's pre-compiled route tree.
-    (if prod? (app-handler system)
-              (fn [req] ((app-handler system) req)))))
+    (if prod? (app-handler context config)
+              (fn [req] ((app-handler context config) req)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spotify API client ;;

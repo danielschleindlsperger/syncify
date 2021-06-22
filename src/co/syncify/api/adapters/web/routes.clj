@@ -1,10 +1,7 @@
-(ns co.syncify.api.web.routes
+(ns co.syncify.api.adapters.web.routes
   (:require [reitit.ring :as ring]
             [reitit.ring.middleware.parameters :as parameters]
             [reitit.dev.pretty :as pretty]
-            [malli.core :as m]
-            [malli.error :as me]
-            [muuntaja.core :as muuntaja]
             [reitit.ring.middleware.muuntaja :refer [format-middleware]]
             [reitit.ring.middleware.dev :refer [print-request-diffs]]
             [reitit.ring.coercion :as rrc]
@@ -12,26 +9,15 @@
             [reitit.swagger-ui :as swagger-ui]
             [ring.middleware.session :refer [wrap-session]]
             [ring.middleware.session.cookie :refer [cookie-store]]
-            [co.syncify.api.web.middleware.oauth2 :refer [wrap-oauth2]]
+            [ring.util.response :as response]
+            [malli.core :as m]
+            [malli.error :as me]
+            [muuntaja.core :as muuntaja]
+            [co.syncify.api.protocols :refer [get-room]]
+            [co.syncify.api.context :refer [wrap-context]]
             [co.syncify.api.util.string :refer [str->byte-arr]]
-            [co.syncify.api.web.handlers :refer [create-room-handler]]
-            [co.syncify.api.web.dependency-injection :refer [wrap-system]]))
-
-(def SystemMap [:map
-                [:spotify some?]
-                [:crux-node some?]
-                [:config some?]])
-
-(defn validate-system-map!
-  "Validates that that the system map conforms to the schema.
-   Throws when not."
-  [m]
-  (let [err (me/humanize (m/explain SystemMap m))]
-    (when err (throw (ex-info "System map does not conform to schema" err)))))
-
-(def default-middlewares [
-
-                          ])
+            [co.syncify.api.adapters.web.middleware.oauth2 :refer [wrap-oauth2]]
+            [co.syncify.api.adapters.web.handlers :refer [create-room-handler]]))
 
 (defn default-handler []
   (ring/create-default-handler
@@ -50,14 +36,27 @@
 
    ;; Commands to interact with the room
    ;; Only admins can execute these
+
    ["/room/:id/playback"
     ["/skip-current-track" {:post (constantly {:body "TODO"})}]
     ["/skip-to-track" {:post (constantly {:body "TODO"})}]]
-   ["/room/:id/playlist"
-    ["/add-tracks" {:post (constantly {:body "TODO"})}]]
 
-   ["/room/:id" {:get {:handler (constantly {:body "THE room"})}}
-    ]])
+   ["/room/:id/playlist"
+    ["/add-tracks" {:post (constantly {:body "TODO"})}]
+    ["/remove-tracks" {:post (constantly {:body "TODO"})}]]
+
+   ["/room/:id/appoint-admin" {:post (constantly {:body "TODO"})}]
+   ["/room/:id/dismiss-admin" {:post (constantly {:body "TODO"})}]
+
+   ["/room/:id" {:get {;;:coercion   coercion
+                       :parameters {:path [:map [:id int?]]}
+                       :responses  {200 {:body any?}
+                                    404 {:body any?}}
+                       :handler    (fn [req]
+                                     (let [room (get-room (get-in req [:context :crux-node]) (get-in req [:path-params :id]))]
+                                       (if room
+                                         (response/response room)
+                                         (response/not-found "not found"))))}}]])
 
 (def ->router #(ring/router (routes)
                             {:data {:muuntaja   muuntaja/instance
@@ -79,21 +78,20 @@
     (.write (.toString inst))
     (.write "\"")))
 
-(defn app-handler [system]
-  (validate-system-map! system)
+(defn app-handler [context config]
   (let [router (->router)]
     (ring/ring-handler router
                        (default-handler)
                        {:middleware [
-                                     (wrap-system system)
-                                     [wrap-session {:store       (cookie-store {:key     (str->byte-arr (get-in system [:config :jwt-secret]))
+                                     (wrap-context context)
+                                     [wrap-session {:store       (cookie-store {:key     (str->byte-arr (get config :jwt-secret))
                                                                                 :readers (merge *data-readers* {'java.time.Instant #(java.time.Instant/parse %)})})
                                                     :cookie-name "syncify_session"}]
                                      [wrap-oauth2 {:spotify
                                                    {:authorize-uri    "https://accounts.spotify.com/authorize"
                                                     :access-token-uri "https://accounts.spotify.com/api/token"
-                                                    :client-id        (get-in system [:config :spotify :client-id])
-                                                    :client-secret    (get-in system [:config :spotify :client-secret])
+                                                    :client-id        (get-in config [:spotify :client-id])
+                                                    :client-secret    (get-in config [:spotify :client-secret])
                                                     ;:scopes           ["user:email"]
                                                     :launch-uri       "/oauth2/spotify"
                                                     :redirect-uri     "/oauth2/spotify/callback"

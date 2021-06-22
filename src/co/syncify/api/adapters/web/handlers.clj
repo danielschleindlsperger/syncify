@@ -1,12 +1,11 @@
-(ns co.syncify.api.web.handlers
+(ns co.syncify.api.adapters.web.handlers
   (:require [reitit.coercion.malli :refer [coercion]]
             [ring.util.response :as response]
             [malli.core :as m]
             [malli.util :as mu]
             [camel-snake-kebab.core :refer [->camelCaseKeyword]]
-            [co.syncify.api.model.room :refer [SpotifyId Room]]
-            [co.syncify.api.web.dependency-injection :refer [use-system]]
-            [co.syncify.api.modules.spotify :as spotify]))
+            [co.syncify.api.use-cases.create-room :refer [create-room]]
+            [co.syncify.api.model.room :refer [SpotifyId Room]]))
 
 (defn- children-keys->camel-case [m key-fn]
   (update m :children (fn [children]
@@ -36,23 +35,15 @@
       (mu/assoc :room-track-ids [:vector SpotifyId])))
 
 (def create-room-handler
-  {:coercion  coercion
+  {:coercion   coercion
    :parameters {:body (keys->camelCaseKeywords CreateRoomPayload)}
-   :responses {201 {:body any?}}
-   :handler   (fn [req]
-                (let [{s :spotify} (use-system req)
-                      {:keys [roomName roomCoverImage roomTrackIds]} (:body-params req)
-                      ids (clojure.string/join "," (filter (complement empty?) roomTrackIds))
-                      foo (spotify/request s :get-several-tracks {:ids ids})
-                      ;; TODO: create room
-                      id "blsdflkajsdf"
-                      ]
-                  ;; TODO: fetch ALL tracks using the track ids (ideally kind of effectively)
-                  ;; TODO: create room entity
-                  ;; TODO: insert into db
-                  ;; TODO: return it
-                  ;; TODO: test it
-                  (response/created (str "/room/" id))))
+   :responses  {201 {:body any?}}
+   :handler    (fn [req]
+                 (let [{:keys [roomName roomCoverImage roomTrackIds]} (:body-params req)
+                       id (create-room (:context req) {:name             roomName
+                                                       :track-ids        roomTrackIds
+                                                       :room-cover-image roomCoverImage})]
+                   (response/created (str "/room/" id))))
    }
 
   )

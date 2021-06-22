@@ -1,4 +1,4 @@
-(ns co.syncify.api.modules.spotify
+(ns co.syncify.api.adapters.spotify
   "Blabla, we use an OpenAPI specification for the Spotify Web API from https://apis.guru/browse-apis/
    to generate a client using `martian`"
   (:require [clojure.string :as str]
@@ -7,6 +7,7 @@
             [org.httpkit.client :as http]
             [martian.core :as martian]
             [clojure.java.io :as io]
+            [co.syncify.api.protocols :refer [SpotifyTrackApi tracks-by-ids]]
             [co.syncify.api.util.json :refer [parse-json parse-json-as-is]]
             [co.syncify.api.util.string :refer [->base64]])
   (:import [java.time Instant]))
@@ -34,9 +35,6 @@
 (def base-url (get-in openapi-spec ["servers" 0 "url"]))
 
 (def m (martian/bootstrap-openapi base-url openapi-spec))
-
-;; auth-state is an atom of shape {:access-token String :refresh-token String :expires-at java.util.time.Instant}
-(defrecord Spotify [client-id client-secret auth-state])
 
 
 (defn- throw-when-unsuccessful!
@@ -77,10 +75,8 @@
 
 (def explore (partial martian/explore m))
 
-(defn create-spotify-client [{:keys [client-id client-secret]}]
-  (->Spotify client-id client-secret (atom {})))
-
 (defn request [spotify route-name params]
+  "Low level API. Prefer using methods implemented in the Spotify protocols."
   (update-access-token-if-expired! spotify)
   (let [access-token (-> spotify :auth-state deref :access-token)
         bearer-token (str "Bearer " access-token)
@@ -95,15 +91,33 @@
         (throw-when-unsuccessful!)
         :body)))
 
+;; auth-state is an atom of shape {:access-token String :refresh-token String :expires-at java.util.time.Instant}
+(defrecord Spotify [client-id client-secret auth-state]
+
+  SpotifyTrackApi
+
+  (tracks-by-ids [this ids]
+    ;; TODO: load in parallel when more than 50 ids are requested
+    (request this :get-several-tracks {:ids (clojure.string/join "," ids)})))
+
+
+(defn create-spotify-client [{:keys [client-id client-secret]}]
+  (->Spotify client-id client-secret (atom {})))
+
+
 (comment
   (martian/explore m)
   (martian/explore m :get-track)
+  (martian/explore m :get-several-tracks)
 
   (def credentials (-> (slurp (io/resource "dev_secrets.edn")) (read-string) :spotify))
   (client-credentials-flow! credentials)
-  (client-credentials-flow! {})                              ;; error
+  (client-credentials-flow! {})                             ;; error
+
   (def spotify (create-spotify-client credentials))
   (update-access-token-if-expired! spotify)
   (request spotify :get-track {:id "1VbsSYNXKBpjPvqddk8zjs"})
-  (request spotify :get-track {:id "asdf"})                 ;; error
+  (request spotify :get-track {:id "asdf"})                 ;; error: invalid id
+
+  (tracks-by-ids spotify ["1VbsSYNXKBpjPvqddk8zjs"])
   )

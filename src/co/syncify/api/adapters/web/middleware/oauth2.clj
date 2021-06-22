@@ -1,4 +1,4 @@
-(ns co.syncify.api.web.middleware.oauth2
+(ns co.syncify.api.adapters.web.middleware.oauth2
   "This middleware is thieved from https://github.com/weavejester/ring-oauth2 with minor adjustments:
    * Use httpkit client instead of clj-http
    * Use java.time instead of clj-time which in turn uses joda time

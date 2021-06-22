@@ -2,7 +2,7 @@
 #merge [{:port       #long #or [#env PORT 4321]
          :spotify    {:client-id     #env SPOTIFY_CLIENT_ID
                       :client-secret #env SPOTIFY_CLIENT_SECRET
-                      :redirect-uri  #profile {:dev  "http://localhost:8000/auth/spotify-callback"
+                      :redirect-uri  #profile {:dev  "http://localhost:4321/auth/spotify-callback"
                                                :prod #env SPOTIFY_REDIRECT_URI}}
          :jwt-secret #env JWT_SECRET
          :logging    {:level  #profile {:dev  :info
@@ -10,5 +10,5 @@
                       :format #profile {:dev  :text
                                         :prod :json}}}
         ;; all secret values taken from the environment will usually be empty locally
-        ;; and will be overriden by the dev_secrets configuration.
+        ;; and will be overriden by the dev_secrets configuration found in dev/resources.
         #include "dev_secrets.edn"]
