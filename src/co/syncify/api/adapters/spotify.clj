@@ -3,6 +3,7 @@
    to generate a client using `martian`"
   (:require [clojure.string :as str]
             [clojure.walk :as w]
+            [integrant.core :as ig]
             [org.httpkit.sni-client :as sni-client]
             [org.httpkit.client :as http]
             [martian.core :as martian]
@@ -100,9 +101,11 @@
     ;; TODO: load in parallel when more than 50 ids are requested
     (request this :get-several-tracks {:ids (clojure.string/join "," ids)})))
 
-
 (defn create-spotify-client [{:keys [client-id client-secret]}]
   (->Spotify client-id client-secret (atom {})))
+
+(defmethod ig/init-key ::spotify [_ {:keys [config]}]
+  (create-spotify-client (:spotify config)))
 
 
 (comment

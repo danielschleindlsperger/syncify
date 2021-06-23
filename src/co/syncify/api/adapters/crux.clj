@@ -2,6 +2,7 @@
   (:require [clojure.set :refer [rename-keys]]
             [crux.api :as crux]
             [crux.node]
+            [integrant.core :as ig]
             [co.syncify.api.util.keyword :refer [add-ns]]
             [co.syncify.api.util.string :refer [random-uuid]]
             [co.syncify.api.protocols :refer [RoomDatabase]]))
@@ -73,3 +74,7 @@
   crux.node.CruxNode
   (get-room [this id]
     (get-one this :room id)))
+
+(defmethod ig/init-key ::crux [_ {:keys []}]
+  ;; TODO: switch to something with persistence for local development as well as production
+  (crux/start-node {}))

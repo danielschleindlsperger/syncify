@@ -1,5 +1,6 @@
 (ns co.syncify.api.adapters.web.routes
-  (:require [reitit.ring :as ring]
+  (:require [integrant.core :as ig]
+            [reitit.ring :as ring]
             [reitit.ring.middleware.parameters :as parameters]
             [reitit.dev.pretty :as pretty]
             [reitit.ring.middleware.muuntaja :refer [format-middleware]]
@@ -100,3 +101,15 @@
 (comment
   (def app (app-handler {}))
   (app {:uri "/" :request-method :get}))
+
+(defmethod ig/init-key ::app-handler [_ {:keys [profile config] :as system}]
+  (let [prod? (= :prod profile)
+        context (select-keys system [:spotify :crux-node])]
+    ;; Wrap in a function when not in prod.
+    ;; This will recompile the router on every invocation which is a heavy performance penalty but will allow
+    ;; to just recompile handler functions without reloading the whole system which should be a better
+    ;; developer experience.
+    ;; Note this currently only works for synchronous ring handlers.
+    ;; In prod we don't wrap and take advantage of reitit's pre-compiled route tree.
+    (if prod? (app-handler context config)
+              (fn [req] ((app-handler context config) req)))))
