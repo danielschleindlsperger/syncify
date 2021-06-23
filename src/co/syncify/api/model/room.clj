@@ -30,17 +30,16 @@
 
 (def Playlist
   [:map
-   [:playlist-created-at inst?]
-   [:playlist-tracks [:vector Track]]
-   [:playlist-playback PlaybackState]])
+   [:playlist-tracks [:vector Track]]])
 
 (def Room
   [:map
    [:room-id uuid?]
    [:room-name [:string {:min 1 :max 255}]]
    [:room-cover-image {:optional true} uri?]
-   [:room-publicly-listed {:optional true} :boolean]
-   [:room-playlist Playlist]])
+   [:room-private {:optional true} :boolean]
+   [:room-playlist Playlist]
+   [:room-playback PlaybackState]])
 
 (comment
   (m/validate SpotifyId "2DFAFDZBWnmeKF2dxac7Tl")

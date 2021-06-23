@@ -99,7 +99,7 @@
 
   (tracks-by-ids [this ids]
     ;; TODO: load in parallel when more than 50 ids are requested
-    (request this :get-several-tracks {:ids (clojure.string/join "," ids)})))
+    (:tracks (request this :get-several-tracks {:ids (clojure.string/join "," ids)}))))
 
 (defn create-spotify-client [{:keys [client-id client-secret]}]
   (->Spotify client-id client-secret (atom {})))

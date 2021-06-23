@@ -40,10 +40,7 @@
    :responses  {201 {:body any?}}
    :handler    (fn [req]
                  (let [{:keys [roomName roomCoverImage roomTrackIds]} (:body-params req)
-                       id (create-room (:context req) {:name             roomName
-                                                       :track-ids        roomTrackIds
-                                                       :room-cover-image roomCoverImage})]
-                   (response/created (str "/room/" id))))
-   }
-
-  )
+                       room (create-room (:context req) {:name             roomName
+                                                         :track-ids        roomTrackIds
+                                                         :room-cover-image roomCoverImage})]
+                   (response/created (str "/room/" (:room-id room)))))})

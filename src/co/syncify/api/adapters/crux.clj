@@ -3,18 +3,18 @@
             [crux.api :as crux]
             [crux.node]
             [integrant.core :as ig]
-            [co.syncify.api.util.keyword :refer [add-ns]]
             [co.syncify.api.util.string :refer [random-uuid]]
             [co.syncify.api.protocols :refer [RoomDatabase]]))
 
-(defn- crux->id [x typ] (rename-keys x {:crux.db/id (add-ns :id typ)}))
-(defn- id->crux [x typ] (rename-keys x {(add-ns :id typ) :crux.db/id}))
+(defn- type-id [typ] (keyword (str (name typ) "-id")))
+(defn- crux->id [x typ] (rename-keys x {:crux.db/id (type-id typ)}))
+(defn- id->crux [x typ] (rename-keys x {(type-id typ) :crux.db/id}))
 
 (comment
   (crux->id {:crux.db/id "123"} :user))
 
 (defn- ensure-model-id [x typ]
-  (let [id-attr (add-ns :id typ)
+  (let [id-attr (type-id typ)
         curr-id (get x id-attr)]
     (assoc x id-attr (if curr-id curr-id (random-uuid)))))
 
@@ -71,9 +71,16 @@
 ;; Implement ports
 
 (extend-protocol RoomDatabase
+
   crux.node.CruxNode
+
   (get-room [this id]
-    (get-one this :room id)))
+    (prn id)
+    (prn (type id))
+    (get-one this :room id))
+
+  (update-room! [this room]
+    (put-one! this :room room)))
 
 (defmethod ig/init-key ::crux [_ {:keys []}]
   ;; TODO: switch to something with persistence for local development as well as production

@@ -11,9 +11,9 @@
             [ring.middleware.session :refer [wrap-session]]
             [ring.middleware.session.cookie :refer [cookie-store]]
             [ring.util.response :as response]
-            [malli.core :as m]
-            [malli.error :as me]
+            [reitit.coercion.malli :refer [coercion]]
             [muuntaja.core :as muuntaja]
+            [co.syncify.api.model.room :refer [Room]]
             [co.syncify.api.protocols :refer [get-room]]
             [co.syncify.api.context :refer [wrap-context]]
             [co.syncify.api.util.string :refer [str->byte-arr]]
@@ -49,12 +49,15 @@
    ["/room/:id/appoint-admin" {:post (constantly {:body "TODO"})}]
    ["/room/:id/dismiss-admin" {:post (constantly {:body "TODO"})}]
 
-   ["/room/:id" {:get {;;:coercion   coercion
-                       :parameters {:path [:map [:id int?]]}
-                       :responses  {200 {:body any?}
+   ["/room/:id" {:get {:coercion   coercion
+                       :parameters {:path [:map [:id :uuid]]}
+                       :responses  {200 {:body Room}
                                     404 {:body any?}}
                        :handler    (fn [req]
-                                     (let [room (get-room (get-in req [:context :crux-node]) (get-in req [:path-params :id]))]
+                                     (prn (:params req))
+                                     (prn (:path-params req))
+                                     (let [room (get-room (get-in req [:context :crux-node])
+                                                          (java.util.UUID/fromString (get-in req [:path-params :id])))]
                                        (if room
                                          (response/response room)
                                          (response/not-found "not found"))))}}]])
@@ -107,8 +110,8 @@
         context (select-keys system [:spotify :crux-node])]
     ;; Wrap in a function when not in prod.
     ;; This will recompile the router on every invocation which is a heavy performance penalty but will allow
-    ;; to just recompile handler functions without reloading the whole system which should be a better
-    ;; developer experience.
+    ;; to just re-evaluate handler functions without reloading the whole system which should result in a better
+    ;; development experience.
     ;; Note this currently only works for synchronous ring handlers.
     ;; In prod we don't wrap and take advantage of reitit's pre-compiled route tree.
     (if prod? (app-handler context config)
