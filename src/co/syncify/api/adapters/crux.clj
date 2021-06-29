@@ -1,5 +1,6 @@
 (ns co.syncify.api.adapters.crux
   (:require [clojure.set :refer [rename-keys]]
+            [clojure.java.io :as io]
             [crux.api :as crux]
             [crux.node]
             [integrant.core :as ig]
@@ -83,5 +84,12 @@
     (put-one! this :room room)))
 
 (defmethod ig/init-key ::crux [_ {:keys []}]
-  ;; TODO: switch to something with persistence for local development as well as production
-  (crux/start-node {}))
+  ;; TODO: don't hardcode paths, don't even hardcode the kv backend
+  (letfn [(kv-store [dir]
+            {:kv-store {:crux/module 'crux.rocksdb/->kv-store
+                        :db-dir      (io/file dir)
+                        :sync?       true}})]
+    (crux/start-node
+      {:crux/tx-log         (kv-store "data/dev/tx-log")
+       :crux/document-store (kv-store "data/dev/doc-store")
+       :crux/index-store    (kv-store "data/dev/index-store")})))

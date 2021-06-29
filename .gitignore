@@ -14,3 +14,4 @@ node_modules
 .lsp
 dev/resources/dev_secrets.edn
 target/
+data/

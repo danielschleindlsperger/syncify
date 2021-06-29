@@ -21,7 +21,8 @@
            camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.2"}
 
            ;; Database
-           juxt/crux-core                      {:mvn/version "21.04-1.16.0-beta"}
+           juxt/crux-core                      {:mvn/version "21.06-1.17.1-beta"}
+           juxt/crux-rocksdb                   {:mvn/version "21.06-1.17.1-beta"}
 
            ;; validation/modelling
            metosin/malli                       {:mvn/version "0.4.0"}
