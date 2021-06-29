@@ -3,6 +3,7 @@
             [co.syncify.api.adapters.crux]
             [co.syncify.api.config]
             [co.syncify.api.adapters.spotify]
+            [co.syncify.api.adapters.web.web-server]
             [co.syncify.api.adapters.web.routes]))
 
 (def config :co.syncify.api.config/config)
