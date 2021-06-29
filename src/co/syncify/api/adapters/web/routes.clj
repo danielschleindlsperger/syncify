@@ -10,15 +10,13 @@
             [reitit.swagger-ui :as swagger-ui]
             [ring.middleware.session :refer [wrap-session]]
             [ring.middleware.session.cookie :refer [cookie-store]]
-            [ring.util.response :as response]
             [reitit.coercion.malli :refer [coercion]]
             [muuntaja.core :as muuntaja]
             [co.syncify.api.model.room :refer [Room]]
-            [co.syncify.api.protocols :refer [get-room]]
             [co.syncify.api.context :refer [wrap-context]]
             [co.syncify.api.util.string :refer [str->byte-arr]]
             [co.syncify.api.adapters.web.middleware.oauth2 :refer [wrap-oauth2]]
-            [co.syncify.api.adapters.web.handlers :refer [create-room-handler]]))
+            [co.syncify.api.adapters.web.handlers :refer [create-room-handler get-room-handler]]))
 
 (defn default-handler []
   (ring/create-default-handler
@@ -49,18 +47,7 @@
    ["/room/:id/appoint-admin" {:post (constantly {:body "TODO"})}]
    ["/room/:id/dismiss-admin" {:post (constantly {:body "TODO"})}]
 
-   ["/room/:id" {:get {:coercion   coercion
-                       :parameters {:path [:map [:id :uuid]]}
-                       :responses  {200 {:body Room}
-                                    404 {:body any?}}
-                       :handler    (fn [req]
-                                     (prn (:params req))
-                                     (prn (:path-params req))
-                                     (let [room (get-room (get-in req [:context :crux-node])
-                                                          (java.util.UUID/fromString (get-in req [:path-params :id])))]
-                                       (if room
-                                         (response/response room)
-                                         (response/not-found "not found"))))}}]])
+   ["/room/:id" {:get get-room-handler}]])
 
 (def ->router #(ring/router (routes)
                             {:data {:muuntaja   muuntaja/instance

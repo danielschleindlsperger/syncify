@@ -4,6 +4,7 @@
             [malli.core :as m]
             [malli.util :as mu]
             [camel-snake-kebab.core :refer [->camelCaseKeyword]]
+            [co.syncify.api.protocols :refer [get-room]]
             [co.syncify.api.use-cases.create-room :refer [create-room]]
             [co.syncify.api.model.room :refer [SpotifyId Room]]))
 
@@ -44,3 +45,17 @@
                                                          :track-ids        roomTrackIds
                                                          :room-cover-image roomCoverImage})]
                    (response/created (str "/room/" (:room-id room)))))})
+
+(def get-room-handler
+  {:coercion   coercion
+   :parameters {:path [:map [:id :uuid]]}
+   :responses  {200 {:body (keys->camelCaseKeywords Room)}
+                404 {:body any?}}
+   :handler    (fn [req]
+                 (prn (:params req))
+                 (prn (:path-params req))
+                 (let [room (get-room (get-in req [:context :crux-node])
+                                      (java.util.UUID/fromString (get-in req [:path-params :id])))]
+                   (if room
+                     (response/response room)
+                     (response/not-found "not found"))))})
