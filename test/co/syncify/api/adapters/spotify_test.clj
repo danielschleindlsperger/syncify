@@ -13,7 +13,7 @@
 
 (def s (spotify/create-spotify-client credentials))
 
-(deftest authentication
+(deftest ^:kaocha/pending authentication
   (testing "fetches a fresh token from api credentials initially"
     (with-fake-http [spotify-auth-api successful-auth-response
                      spotify-rest-api "{}"]))

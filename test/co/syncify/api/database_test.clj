@@ -24,28 +24,28 @@
       (with-redefs [random-uuid (constantly id)]
         (is [:crux.tx/put {:type         :vampire
                            :crux.db/id   id
-                           :vampire/name "Nosferatu"}]
-            (db/put-one :vampire {:vampire/name "Nosferatu"})))))
+                           :vampire-name "Nosferatu"}]
+            (db/put-one :vampire {:vampire-name "Nosferatu"})))))
 
   (testing "generates a random id for fresh entities"
-    (let [tx-data (db/put-one :vampire {:vampire/name "nosferatu"})]
+    (let [tx-data (db/put-one :vampire {:vampire-name "nosferatu"})]
       (is (uuid? (:crux.db/id (nth tx-data 1))))))
 
   (testing "does not generate random id if one exists"
     (let [id (random-uuid)
-          tx-data (db/put-one :vampire {:vampire/id   id
-                                        :vampire/name "nosferatu"})]
+          tx-data (db/put-one :vampire {:vampire-id   id
+                                        :vampire-name "nosferatu"})]
       (is (= id (:crux.db/id (nth tx-data 1)))))))
 
-(deftest db-crud-put-one!
+(deftest ^:kaocha/pending db-crud-put-one!
   (testing "returns inserted entity"
     ;; TODO
     ))
 
 (deftest db-crud-get-one
   (testing "returns entity by id"
-    (subwait-tx *node* [[:crux.tx/put {:crux.db/id "a-unique-id" :vampire/name "Nosferatu"}]])
-    (is (= {:vampire/id "a-unique-id" :vampire/name "Nosferatu"}
+    (subwait-tx *node* [[:crux.tx/put {:crux.db/id "a-unique-id" :vampire-name "Nosferatu"}]])
+    (is (= {:vampire-id "a-unique-id" :vampire-name "Nosferatu"}
            (db/get-one *node* :vampire "a-unique-id"))))
 
   (testing "returns nil if entity does not exist"
@@ -56,12 +56,12 @@
     (is (= [] (db/get-all *node* :vampire))))
 
   (testing "returns all entities for the model, in insertion order"
-    (subwait-tx *node* [(db/put-one :vampire {:vampire/id :nosferatu :vampire/name "Nosferatu"})
-                        (db/put-one :vampire {:vampire/id :dracula :vampire/name "Dracula"})])
+    (subwait-tx *node* [(db/put-one :vampire {:vampire-id :nosferatu :vampire-name "Nosferatu"})
+                        (db/put-one :vampire {:vampire-id :dracula :vampire-name "Dracula"})])
     (is (= [{:type         :vampire
-             :vampire/id   :dracula
-             :vampire/name "Dracula"}
+             :vampire-id   :dracula
+             :vampire-name "Dracula"}
             {:type         :vampire
-             :vampire/id   :nosferatu
-             :vampire/name "Nosferatu"}]
+             :vampire-id   :nosferatu
+             :vampire-name "Nosferatu"}]
            (db/get-all *node* :vampire)))))
