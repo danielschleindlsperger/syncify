@@ -34,7 +34,12 @@ npm start
 # Clojure API
 
 # Run tests outside the REPL
-clj -M:test:runner
+bin/kaocha
+bin/kaocha --watch
+
+# Tests can also be run using the repl:
+(kaocha.repl/run :unit)
+(kaocha.repl/run-all)
 
 # Build uberjar
 clj -X:uberjar
