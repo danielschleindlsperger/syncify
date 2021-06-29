@@ -3,7 +3,8 @@
             [ring.util.response :as response]
             [malli.core :as m]
             [malli.util :as mu]
-            [camel-snake-kebab.core :refer [->camelCaseKeyword]]
+            [camel-snake-kebab.core :refer [->camelCaseKeyword ->kebab-case-keyword]]
+            [camel-snake-kebab.extras :refer [transform-keys]]
             [co.syncify.api.protocols :refer [get-room]]
             [co.syncify.api.use-cases.create-room :refer [create-room]]
             [co.syncify.api.model.room :refer [SpotifyId Room]]))
@@ -12,6 +13,9 @@
   (update m :children (fn [children]
                         (map (fn [child] (update child 0 key-fn))
                              children))))
+
+(def ->kebab (partial transform-keys ->kebab-case-keyword))
+(def ->camel (partial transform-keys ->camelCaseKeyword))
 
 (defn transform-schema-keys
   "Recursively transforms the keys of each nested map schema using the supplied `key-fn`"
@@ -57,5 +61,5 @@
                  (let [room (get-room (get-in req [:context :crux-node])
                                       (java.util.UUID/fromString (get-in req [:path-params :id])))]
                    (if room
-                     (response/response room)
+                     (response/response (->camel room))
                      (response/not-found "not found"))))})

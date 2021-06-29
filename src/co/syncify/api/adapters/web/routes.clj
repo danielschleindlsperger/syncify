@@ -69,6 +69,12 @@
     (.write (.toString inst))
     (.write "\"")))
 
+(defn test-handler [context _config]
+  (let [router (->router)]
+    (ring/ring-handler router
+                       (default-handler)
+                       {:middleware [(wrap-context context)]})))
+
 (defn app-handler [context config]
   (let [router (->router)]
     (ring/ring-handler router
