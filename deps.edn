@@ -37,9 +37,10 @@
  :aliases {:run-m   {:main-opts ["-m" "co.syncify.api.main"]}
            :dev     {:extra-paths ["dev/src" "dev/resources" "test"]}
            :test    {:extra-paths ["test"]
-                     :extra-deps  {lambdaisland/kaocha         {:mvn/version "1.0.861"}
-                                   org.clojure/test.check      {:mvn/version "1.1.0"}
-                                   http-kit.fake/http-kit.fake {:mvn/version "0.2.2"}}}
+                     :extra-deps  {lambdaisland/kaocha           {:mvn/version "1.0.861"}
+                                   lambdaisland/kaocha-cloverage {:mvn/version "1.0.75"}
+                                   org.clojure/test.check        {:mvn/version "1.1.0"}
+                                   http-kit.fake/http-kit.fake   {:mvn/version "0.2.2"}}}
            :uberjar {:replace-deps {com.github.seancorfield/depstar {:mvn/version "2.0.211"}}
                      :exec-fn      hf.depstar/uberjar
                      :exec-args    {:aot        true

@@ -36,6 +36,8 @@ npm start
 # Run tests outside the REPL
 bin/kaocha
 bin/kaocha --watch
+bin/kaocha --plugin cloverage
+
 
 # Tests can also be run using the repl:
 (kaocha.repl/run :unit)
