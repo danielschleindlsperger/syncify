@@ -6,8 +6,8 @@
             [camel-snake-kebab.core :refer [->camelCaseKeyword ->kebab-case-keyword]]
             [camel-snake-kebab.extras :refer [transform-keys]]
             [co.syncify.api.protocols :refer [get-room]]
-            [co.syncify.api.use-cases.create-room :refer [create-room]]
-            [co.syncify.api.model.room :refer [SpotifyId Room]]))
+            [co.syncify.api.model.room :refer [SpotifyId Room]])
+  (:import (java.util UUID)))
 
 (defn- children-keys->camel-case [m key-fn]
   (update m :children (fn [children]
@@ -36,18 +36,20 @@
 
 (def CreateRoomPayload
   (-> Room
-      (mu/select-keys [:room-name :room-cover-image])
+      (mu/select-keys [:room-name :room-cover-image :room-private])
       (mu/assoc :room-track-ids [:vector SpotifyId])))
 
 (def create-room-handler
   {:coercion   coercion
    :parameters {:body (keys->camelCaseKeywords CreateRoomPayload)}
-   :responses  {201 {:body any?}}
+   :responses  {201 {:body nil?}}
    :handler    (fn [req]
-                 (let [{:keys [roomName roomCoverImage roomTrackIds]} (:body-params req)
-                       room (create-room (:context req) {:name             roomName
-                                                         :track-ids        roomTrackIds
-                                                         :room-cover-image roomCoverImage})]
+                 (let [{:keys [roomName roomCoverImage roomTrackIds roomPrivate]} (:body-params req)
+                       create-room (get-in req [:use-cases :create-room])
+                       room (create-room (:context req) {:name        roomName
+                                                         :track-ids   roomTrackIds
+                                                         :cover-image roomCoverImage
+                                                         :private?    roomPrivate})]
                    (response/created (str "/room/" (:room-id room)))))})
 
 (def get-room-handler
@@ -59,7 +61,7 @@
                  (prn (:params req))
                  (prn (:path-params req))
                  (let [room (get-room (get-in req [:context :crux-node])
-                                      (java.util.UUID/fromString (get-in req [:path-params :id])))]
+                                      (UUID/fromString (get-in req [:path-params :id])))]
                    (if room
                      (response/response (->camel room))
                      (response/not-found "not found"))))})

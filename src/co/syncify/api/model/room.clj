@@ -36,7 +36,8 @@
   [:map
    [:room-id uuid?]
    [:room-name [:string {:min 1 :max 255}]]
-   [:room-cover-image {:optional true} uri?]
+   ;; TODO: Find out why the uri? predicate does not work..
+   [:room-cover-image {:optional true} :string]
    [:room-private {:optional true} :boolean]
    [:room-playlist Playlist]
    [:room-playback PlaybackState]])
