@@ -76,8 +76,6 @@
   crux.node.CruxNode
 
   (get-room [this id]
-    (prn id)
-    (prn (type id))
     (get-one this :room id))
 
   (update-room! [this room]

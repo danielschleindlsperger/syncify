@@ -58,8 +58,6 @@
    :responses  {200 {:body (keys->camelCaseKeywords Room)}
                 404 {:body any?}}
    :handler    (fn [req]
-                 (prn (:params req))
-                 (prn (:path-params req))
                  (let [room (get-room (get-in req [:context :crux-node])
                                       (UUID/fromString (get-in req [:path-params :id])))]
                    (if room
