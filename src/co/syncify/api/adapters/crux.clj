@@ -93,3 +93,7 @@
       {:crux/tx-log         (kv-store "data/dev/tx-log")
        :crux/document-store (kv-store "data/dev/doc-store")
        :crux/index-store    (kv-store "data/dev/index-store")})))
+
+(defmethod ig/halt-key! ::crux [_ crux-node]
+  (when crux-node
+    (.close crux-node)))
