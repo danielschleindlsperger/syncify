@@ -1,4 +1,4 @@
-(ns co.syncify.api.adapters.spotify
+(ns co.syncify.api.spotify.core
   "Blabla, we use an OpenAPI specification for the Spotify Web API from https://apis.guru/browse-apis/
    to generate a client using `martian`"
   (:require [clojure.string :as str]
@@ -8,13 +8,16 @@
             [org.httpkit.client :as http]
             [martian.core :as martian]
             [clojure.java.io :as io]
-            [co.syncify.api.protocols :refer [SpotifyTrackApi tracks-by-ids]]
             [co.syncify.api.util.json :refer [parse-json parse-json-as-is]]
             [co.syncify.api.util.string :refer [->base64]])
   (:import [java.time Instant]))
 
 ;; Enable SNI client
 (alter-var-root #'org.httpkit.client/*default-client* (fn [_] sni-client/default-client))
+
+(defprotocol SpotifyWebApi
+  (tracks-by-ids [this track-ids]))
+
 
 (defn- remove-superfluous-endpoint-str
   "The provided Spotify API spec has a prefix of \"endpoint-\" before every operationId, e.g. endpoint-get-multiple-albums.
@@ -94,9 +97,7 @@
 
 ;; auth-state is an atom of shape {:access-token String :refresh-token String :expires-at java.util.time.Instant}
 (defrecord Spotify [client-id client-secret auth-state]
-
-  SpotifyTrackApi
-
+  SpotifyWebApi
   (tracks-by-ids [this ids]
     ;; TODO: load in parallel when more than 50 ids are requested
     (:tracks (request this :get-several-tracks {:ids (clojure.string/join "," ids)}))))

@@ -1,11 +1,9 @@
-(ns co.syncify.api.adapters.crux
+(ns co.syncify.api.crux.core
   (:require [clojure.set :refer [rename-keys]]
             [clojure.java.io :as io]
             [crux.api :as crux]
-            [crux.node]
             [integrant.core :as ig]
-            [co.syncify.api.util.string :refer [random-uuid]]
-            [co.syncify.api.protocols :refer [RoomDatabase]]))
+            [co.syncify.api.util.string :refer [random-uuid]]))
 
 (defn- type-id [typ] (keyword (str (name typ) "-id")))
 (defn- crux->id [x typ] (rename-keys x {:crux.db/id (type-id typ)}))
@@ -68,18 +66,6 @@
   (put-one! node :user user)
   (get-all node :user)
   (get-one node :user (:user/id user)))
-
-;; Implement ports
-
-(extend-protocol RoomDatabase
-
-  crux.node.CruxNode
-
-  (get-room [this id]
-    (get-one this :room id))
-
-  (update-room! [this room]
-    (put-one! this :room room)))
 
 (defmethod ig/init-key ::crux [_ {:keys []}]
   ;; TODO: don't hardcode paths, don't even hardcode the kv backend

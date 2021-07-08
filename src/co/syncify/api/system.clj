@@ -1,14 +1,15 @@
 (ns co.syncify.api.system
   (:require [integrant.core :as ig]
-            [co.syncify.api.adapters.crux]
+            [co.syncify.api.crux.core]
             [co.syncify.api.config]
-            [co.syncify.api.adapters.spotify]
+            [co.syncify.api.spotify.core]
+            [co.syncify.api.room.adapters]
             [co.syncify.api.adapters.web.web-server]
             [co.syncify.api.adapters.web.routes]))
 
 (def config :co.syncify.api.config/config)
-(def spotify :co.syncify.api.adapters.spotify/spotify)
-(def crux :co.syncify.api.adapters.crux/crux)
+(def spotify :co.syncify.api.spotify.core/spotify)
+(def crux :co.syncify.api.crux.core/crux)
 (def app-handler :co.syncify.api.adapters.web.routes/app-handler)
 (def web-server :co.syncify.api.adapters.web.web-server/http-server)
 

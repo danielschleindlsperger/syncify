@@ -1,6 +1,22 @@
-(ns co.syncify.api.model.room
-  (:require [malli.core :as m]
-            [malli.generator :as mg]))
+(ns co.syncify.api.room.core
+  (:require [co.syncify.api.spotify.core :refer [tracks-by-ids]]
+            [malli.core :as m]
+            [malli.generator :as mg])
+  (:import (java.time Instant)))
+
+;;;;;;;;;;;;;;;
+;; Protocols ;;
+;;;;;;;;;;;;;;;
+
+(defprotocol RoomDatabase
+  (get-room [this id] "Retrieve a single room.")
+  (search-rooms [this cursor-id])
+  (put-room! [this room] "Update or insert the room with all its sub-models."))
+
+;;;;;;;;;;;;
+;; Models ;;
+;;;;;;;;;;;;
+
 
 ;; Convention:
 ;; Ideally we would like to use namespaced keywords for entity attributes, e.g. :user/name.
@@ -55,3 +71,23 @@
                                                          :playback-skipped-ms 0}}})
   (mg/generate Track)
   (mg/generate Room))
+
+
+;;;;;;;;;;;;;;;
+;; Use cases ;;
+;;;;;;;;;;;;;;;
+
+(defn create-room [context {:keys [name track-ids cover-image private?] :as partial-room}]
+  (let [{:keys [spotify crux-node]} context
+        ;; TODO: fetch ALL tracks using the track ids (ideally kind of effectively)
+        tracks (tracks-by-ids spotify (filter (complement empty?) track-ids))
+        new-room {:room-name     name
+                  :room-playlist {:playlist-tracks (map (fn [t] {:track-name        (:name t)
+                                                                 :track-id          (:id t)
+                                                                 :track-duration-ms (:duration-ms t)
+                                                                 :track-artists     (map (fn [a] {:artist-id   (:id a)
+                                                                                                  :artist-name (:name a)}) (:artists t))}) tracks)}
+                  :room-playback {:playback-started-at (Instant/now)
+                                  :playback-skipped-ms 0}}
+        room (put-room! crux-node new-room)]
+    room))

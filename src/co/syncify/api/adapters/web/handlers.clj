@@ -5,8 +5,7 @@
             [malli.util :as mu]
             [camel-snake-kebab.core :refer [->camelCaseKeyword ->kebab-case-keyword]]
             [camel-snake-kebab.extras :refer [transform-keys]]
-            [co.syncify.api.protocols :refer [get-room]]
-            [co.syncify.api.model.room :refer [SpotifyId Room]])
+            [co.syncify.api.room.core :refer [get-room SpotifyId Room]])
   (:import (java.util UUID)))
 
 (defn- children-keys->camel-case [m key-fn]

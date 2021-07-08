@@ -1,7 +1,7 @@
 (ns co.syncify.api.database-test
   (:require [clojure.test :refer :all]
             [crux.api :as crux]
-            [co.syncify.api.adapters.crux :as db]
+            [co.syncify.api.crux.core :as db]
             [co.syncify.api.util.string :refer [random-uuid]]))
 
 (def ^:dynamic *node* nil)

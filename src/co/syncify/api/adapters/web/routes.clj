@@ -12,8 +12,7 @@
             [ring.middleware.session.cookie :refer [cookie-store]]
             [reitit.coercion.malli :refer [coercion]]
             [muuntaja.core :as muuntaja]
-            [co.syncify.api.model.room :refer [Room]]
-            [co.syncify.api.use-cases.room :as room-use-cases]
+            [co.syncify.api.room.core :refer [Room create-room]]
             [co.syncify.api.context :refer [wrap-context]]
             [co.syncify.api.util.string :refer [str->byte-arr]]
             [co.syncify.api.adapters.web.middleware.oauth2 :refer [wrap-oauth2]]
@@ -72,7 +71,7 @@
 
 (defn wrap-use-cases [handler]
   (fn [req]
-    (handler (assoc req :use-cases {:create-room room-use-cases/create-room}))))
+    (handler (assoc req :use-cases {:create-room create-room}))))
 
 (defn test-handler [context _config]
   (let [router (->router)]

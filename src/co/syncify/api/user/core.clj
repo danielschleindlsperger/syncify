@@ -1,6 +1,7 @@
-(ns co.syncify.api.model.user
+(ns co.syncify.api.user.core
   (:require [malli.core :as m]
             [malli.generator :as mg]))
+
 
 ;; TODO: descriptions
 

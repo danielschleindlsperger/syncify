@@ -3,8 +3,8 @@
             [ring.mock.request :as rm]
             [jsonista.core :as json]
             [co.syncify.api.adapters.web.routes :refer [test-handler]]
-            [co.syncify.api.model.room :refer [Room]]
-            [co.syncify.api.protocols :refer [RoomDatabase SpotifyTrackApi]])
+            [co.syncify.api.room.core :refer [Room RoomDatabase]]
+            [co.syncify.api.spotify.core :refer [SpotifyWebApi]])
   (:import (java.util UUID)
            (java.time Instant)))
 
