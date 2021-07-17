@@ -14,6 +14,7 @@
            metosin/reitit                      {:mvn/version "0.5.12"}
            ring/ring-core                      {:mvn/version "1.9.2"}
            ring/ring-headers                   {:mvn/version "0.3.0"}
+           ring/ring-defaults                  {:mvn/version "0.3.3"}
            martian/martian                     {:mvn/version "0.1.16"}
 
            ;; JSON

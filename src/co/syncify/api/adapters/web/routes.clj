@@ -8,6 +8,7 @@
             [reitit.ring.coercion :as rrc]
             [reitit.swagger :as swagger]
             [reitit.swagger-ui :as swagger-ui]
+            [ring.middleware.defaults :as defaults]
             [ring.middleware.session :refer [wrap-session]]
             [ring.middleware.session.cookie :refer [cookie-store]]
             [reitit.coercion.malli :refer [coercion]]
@@ -52,15 +53,7 @@
 (def ->router #(ring/router (routes)
                             {:data {:muuntaja   muuntaja/instance
                                     :exception  pretty/exception
-                                    :middleware [parameters/parameters-middleware
-                                                 ;; automatic content negotiation and encoding
-                                                 format-middleware
-                                                 ;; TODO: security middlewares
-                                                 ;; Multipart upload is missing here
-                                                 rrc/coerce-exceptions-middleware
-                                                 rrc/coerce-request-middleware
-                                                 rrc/coerce-response-middleware
-                                                 ]}}))
+                                    :middleware []}}))
 
 (defmethod print-method java.time.Instant [^java.time.Instant inst writer]
   (doto writer
@@ -83,12 +76,25 @@
   (let [router (->router)]
     (ring/ring-handler router
                        (default-handler)
-                       {:middleware [
+                       {:middleware [[defaults/wrap-defaults (-> defaults/site-defaults
+                                                                 (assoc :proxy true)
+                                                                 (assoc-in [:responses :content-types] false)
+                                                                 (assoc-in [:security :anti-forgery] false)
+                                                                 (dissoc :session))]
+                                     parameters/parameters-middleware
+                                     ;; automatic content negotiation and encoding
+                                     format-middleware
+                                     rrc/coerce-exceptions-middleware
+                                     rrc/coerce-request-middleware
+                                     rrc/coerce-response-middleware
                                      (wrap-context context)
                                      wrap-use-cases
-                                     [wrap-session {:store       (cookie-store {:key     (str->byte-arr (get config :jwt-secret))
-                                                                                :readers (merge *data-readers* {'java.time.Instant #(java.time.Instant/parse %)})})
-                                                    :cookie-name "syncify_session"}]
+                                     [wrap-session {:store        (cookie-store {:key     (str->byte-arr (get config :jwt-secret))
+                                                                                 :readers (merge *data-readers* {'java.time.Instant #(java.time.Instant/parse %)})})
+                                                    :cookie-name  "syncify_session"
+                                                    ;; TODO: secure cookie when running on https
+                                                    ;; TODO: set expiration - can be longer than the Spotify token validity and we can refresh it if needed
+                                                    :cookie-attrs {:http-only true :same-site :lax}}]
                                      [wrap-oauth2 {:spotify
                                                    {:authorize-uri    "https://accounts.spotify.com/authorize"
                                                     :access-token-uri "https://accounts.spotify.com/api/token"
@@ -97,7 +103,8 @@
                                                     ;:scopes           ["user:email"]
                                                     :launch-uri       "/oauth2/spotify"
                                                     :redirect-uri     "/oauth2/spotify/callback"
-                                                    :landing-uri      "/"}}]]})))
+                                                    :landing-uri      "/"
+                                                    :basic-auth?      true}}]]})))
 
 (comment
   (def app (app-handler {}))
