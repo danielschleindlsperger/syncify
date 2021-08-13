@@ -36,7 +36,7 @@
     "easy-peasy": "^4.0.1",
     "framer-motion": "^3.1.1",
     "jsonwebtoken": "^8.5.1",
-    "next": "^10.0.2",
+    "next": "^11.1.0",
     "pg": "^8.5.1",
     "pg-native": "^3.0.0",
     "pusher": "^4.0.1",
