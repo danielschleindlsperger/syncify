@@ -66,7 +66,11 @@ Integration with Vercel.
 
 ### [Plausible.io](https://plausible.io/)
 
-Ethical analytics.
+Ethical analytics. Deprecated in favor of Umami.
+
+### [Umami](https://umami.is)
+
+Ethical, self-hosted analytics.
 
 ## How it works
 

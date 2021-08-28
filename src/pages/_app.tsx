@@ -29,6 +29,13 @@ export default App
 const Analytics = () => (
   <Head>
     <script
+      key="umami"
+      async
+      defer
+      data-website-id="7a68d7ba-2fc4-425a-870a-17e076095219"
+      src="https://umami-analytics.lchthbr.xyz/umami.js"
+    />
+    <script
       key="analytics"
       async
       defer
