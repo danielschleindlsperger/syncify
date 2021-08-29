@@ -10,5 +10,5 @@
   (get-room [this id]
     (get-one this :room id))
 
-  (update-room! [this room]
+  (put-room! [this room]
     (put-one! this :room room)))
