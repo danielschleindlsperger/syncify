@@ -34,7 +34,7 @@ type RejectedVerification = {
 
 type FailedVerification = {
   status: 'failed'
-  error: Error
+  error: any
 }
 
 type VerificationResult = SuccessfulVerification | RejectedVerification | FailedVerification

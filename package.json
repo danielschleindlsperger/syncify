@@ -36,7 +36,7 @@
     "easy-peasy": "^4.0.1",
     "framer-motion": "^3.1.1",
     "jsonwebtoken": "^8.5.1",
-    "next": "^10.0.2",
+    "next": "^11.1.0",
     "pg": "^8.5.1",
     "pg-native": "^3.0.0",
     "pusher": "^4.0.1",
@@ -98,7 +98,7 @@
     "storybook-addon-next-router": "^2.0.0",
     "tailwindcss": "^2.1.1",
     "ts-node": "^9.0.0",
-    "typescript": "^4.1.2",
+    "typescript": "^4.4.2",
     "vercel": "^21.0.0"
   }
 }

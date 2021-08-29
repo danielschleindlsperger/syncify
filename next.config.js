@@ -30,6 +30,19 @@ module.exports = (phase, { defaultConfig }) => {
       ...defaultConfig.env,
       ...env,
     },
+
+    async rewrites() {
+      return phase === PHASE_DEVELOPMENT_SERVER
+        ? {
+            beforeFiles: [
+              {
+                source: '/api/:path*',
+                destination: 'http://localhost:4321/api/:path*',
+              },
+            ],
+          }
+        : {}
+    },
     async redirects() {
       return [
         {
