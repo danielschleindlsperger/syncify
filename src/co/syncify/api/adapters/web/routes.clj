@@ -53,7 +53,12 @@
 (def ->router #(ring/router (routes)
                             {:data {:muuntaja   muuntaja/instance
                                     :exception  pretty/exception
-                                    :middleware []}}))
+                                    :middleware [parameters/parameters-middleware
+                                                 ;;; automatic content negotiation and encoding
+                                                 format-middleware
+                                                 rrc/coerce-exceptions-middleware
+                                                 rrc/coerce-request-middleware
+                                                 rrc/coerce-response-middleware]}}))
 
 (defmethod print-method java.time.Instant [^java.time.Instant inst writer]
   (doto writer
@@ -81,12 +86,6 @@
                                                                  (assoc-in [:responses :content-types] false)
                                                                  (assoc-in [:security :anti-forgery] false)
                                                                  (dissoc :session))]
-                                     parameters/parameters-middleware
-                                     ;; automatic content negotiation and encoding
-                                     format-middleware
-                                     rrc/coerce-exceptions-middleware
-                                     rrc/coerce-request-middleware
-                                     rrc/coerce-response-middleware
                                      (wrap-context context)
                                      wrap-use-cases
                                      [wrap-session {:store        (cookie-store {:key     (str->byte-arr (get config :jwt-secret))
