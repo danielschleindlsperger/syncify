@@ -28,27 +28,35 @@
 (defn routes []
   [["/swagger/*" {:no-doc true :get (swagger-ui/create-swagger-ui-handler)}]
    ["/swagger.json" {:no-doc true :get (swagger/create-swagger-handler)}]
-   ["/foo" {:get (fn [req] (println (:oauth2/access-tokens req))
-                   {:body "fufu"})}]
-   ["/room" {:post create-room-handler
-             :get  {:responses {200 {:body any?}}
-                    :handler   (constantly {:body "all rooms, paginated"})}}]
+   ["/api"
+    ["/config" {:get {:responses {200 {:body any?}}
+                      :handler   (fn [req]
+                                   {:body {:pusher {:key          (get-in req [:context :config :pusher :key])
+                                                    :cluster      (get-in req [:context :config :pusher :cluster])
+                                                    :forceTLS     true
+                                                    :authEndpoint "/api/auth/pusher"}}})}}]
+    ["/foo" {:get (fn [req] (println (:oauth2/access-tokens req))
+                    {:body "fufu"})}]
+    ;; TODO: we actually want the endpoints to be named in singular
+    ["/rooms" {:post create-room-handler
+               :get  {:responses {200 {:body any?}}
+                      :handler   (constantly {:body []})}}]
 
-   ;; Commands to interact with the room
-   ;; Only admins can execute these
+    ;; Commands to interact with the room
+    ;; Only admins can execute these
 
-   ["/room/:id/playback"
-    ["/skip-current-track" {:post (constantly {:body "TODO"})}]
-    ["/skip-to-track" {:post (constantly {:body "TODO"})}]]
+    ["/room/:id/playback"
+     ["/skip-current-track" {:post (constantly {:body "TODO"})}]
+     ["/skip-to-track" {:post (constantly {:body "TODO"})}]]
 
-   ["/room/:id/playlist"
-    ["/add-tracks" {:post (constantly {:body "TODO"})}]
-    ["/remove-tracks" {:post (constantly {:body "TODO"})}]]
+    ["/room/:id/playlist"
+     ["/add-tracks" {:post (constantly {:body "TODO"})}]
+     ["/remove-tracks" {:post (constantly {:body "TODO"})}]]
 
-   ["/room/:id/appoint-admin" {:post (constantly {:body "TODO"})}]
-   ["/room/:id/dismiss-admin" {:post (constantly {:body "TODO"})}]
+    ["/room/:id/appoint-admin" {:post (constantly {:body "TODO"})}]
+    ["/room/:id/dismiss-admin" {:post (constantly {:body "TODO"})}]
 
-   ["/room/:id" {:get get-room-handler}]])
+    ["/room/:id" {:get get-room-handler}]]])
 
 (def ->router #(ring/router (routes)
                             {:data {:muuntaja   muuntaja/instance
@@ -111,7 +119,7 @@
 
 (defmethod ig/init-key ::app-handler [_ {:keys [profile config] :as system}]
   (let [prod? (= :prod profile)
-        context (select-keys system [:spotify :crux-node])]
+        context (select-keys system [:spotify :crux-node :config])]
     ;; Wrap in a function when not in prod.
     ;; This will recompile the router on every invocation which is a heavy performance penalty but will allow
     ;; to just re-evaluate handler functions without reloading the whole system which should result in a better
