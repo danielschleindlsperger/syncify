@@ -26,21 +26,30 @@
      :not-acceptable     (constantly {:status 406 :body "not acceptable"})}))
 
 (defn routes []
+  ;; Auth route: /oauth2/spotify
   [["/swagger/*" {:no-doc true :get (swagger-ui/create-swagger-ui-handler)}]
    ["/swagger.json" {:no-doc true :get (swagger/create-swagger-handler)}]
    ["/api"
+    ["/auth/refresh" {:get {:responses {200 {:body any?}}
+                            :handler   (fn [req]
+                                         (let [tokens (get-in req [:session :oauth2/access-tokens :spotify])]
+                                           (if tokens
+                                             {:status 200
+                                              :body   {:id           "some-id"
+                                                       :name         "Hans"
+                                                       :access_token (:access-token tokens)}}
+                                             {:status 401
+                                              :body   {:msg "No valid token found. Please login first."}})))}}]
     ["/config" {:get {:responses {200 {:body any?}}
                       :handler   (fn [req]
                                    {:body {:pusher {:key          (get-in req [:context :config :pusher :key])
                                                     :cluster      (get-in req [:context :config :pusher :cluster])
                                                     :forceTLS     true
                                                     :authEndpoint "/api/auth/pusher"}}})}}]
-    ["/foo" {:get (fn [req] (println (:oauth2/access-tokens req))
-                    {:body "fufu"})}]
     ;; TODO: we actually want the endpoints to be named in singular
     ["/rooms" {:post create-room-handler
                :get  {:responses {200 {:body any?}}
-                      :handler   (constantly {:body []})}}]
+                      :handler   (constantly {:body {:data []}})}}]
 
     ;; Commands to interact with the room
     ;; Only admins can execute these
@@ -110,7 +119,8 @@
                                                     ;:scopes           ["user:email"]
                                                     :launch-uri       "/oauth2/spotify"
                                                     :redirect-uri     "/oauth2/spotify/callback"
-                                                    :landing-uri      "/"
+                                                    ;; TODO
+                                                    :landing-uri      "http://localhost:3000"
                                                     :basic-auth?      true}}]]})))
 
 (comment

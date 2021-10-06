@@ -47,10 +47,10 @@
   (fn [{:keys [session] :or {session {}} :as request}]
     (let [state (random-state)]
       (-> (resp/redirect (authorize-uri profile request state))
-          (assoc :session (assoc session ::state state))))))
+          (assoc :session (assoc session :oauth2/state state))))))
 
 (defn- state-matches? [request]
-  (= (get-in request [:session ::state])
+  (= (get-in request [:session :oauth2/state])
      (get-in request [:query-params "state"])))
 
 (defn- coerce-to-int [n]
@@ -125,11 +125,11 @@
         (let [access-token (get-access-token profile request)]
           (-> (resp/redirect landing-uri)
               (assoc :session (-> session
-                                  (assoc-in [::access-tokens id] access-token)
-                                  (dissoc ::state)))))))))
+                                  (assoc-in [:oauth2/access-tokens id] access-token)
+                                  (dissoc :oauth2/state)))))))))
 
 (defn- assoc-access-tokens [request]
-  (if-let [tokens (-> request :session ::access-tokens)]
+  (if-let [tokens (-> request :session :oauth2/access-tokens)]
     (assoc request :oauth2/access-tokens tokens)
     request))
 

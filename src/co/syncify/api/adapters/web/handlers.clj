@@ -5,6 +5,7 @@
             [malli.util :as mu]
             [camel-snake-kebab.core :refer [->camelCaseKeyword ->kebab-case-keyword]]
             [camel-snake-kebab.extras :refer [transform-keys]]
+            [taoensso.timbre :as timbre]
             [co.syncify.api.room.core :refer [get-room SpotifyId Room]])
   (:import (java.util UUID)))
 
@@ -49,6 +50,7 @@
                                                          :track-ids   roomTrackIds
                                                          :cover-image roomCoverImage
                                                          :private?    roomPrivate})]
+                   (timbre/info (format "created room \"%s\" with id \"%s\"" roomName (:room-id room)))
                    (response/created (str "/room/" (:room-id room)))))})
 
 (def get-room-handler

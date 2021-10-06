@@ -87,7 +87,13 @@ const createRoom = async (data: CreateRoomPayload): Promise<Room> => {
       'Content-Type': 'application/json',
     },
     credentials: 'include',
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      roomName: data.name,
+      // TODO: Can we make this required?
+      roomCoverImage: data.cover_image,
+      roomPrivate: !data.publiclyListed,
+      roomTrackIds: data.trackIds,
+    }),
   })
 
   if (res.status === 422) {

@@ -20,7 +20,7 @@ export const LoginRequired = ({ className, ...props }: React.HTMLAttributes<HTML
       Note: To use Syncify properly you need a Spotify Premium subscription.
     </p>
 
-    <Link href="/api/auth/login" passHref>
+    <Link href="/oauth2/spotify" passHref>
       <Button as="a" variant="primary" className="mt-8">
         Log in with Spotify
       </Button>

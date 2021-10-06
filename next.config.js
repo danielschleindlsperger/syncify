@@ -39,6 +39,10 @@ module.exports = (phase, { defaultConfig }) => {
                 source: '/api/:path*',
                 destination: 'http://localhost:4321/api/:path*',
               },
+              {
+                source: '/oauth2/:path*',
+                destination: 'http://localhost:4321/oauth2/:path*',
+              },
             ],
           }
         : {}
