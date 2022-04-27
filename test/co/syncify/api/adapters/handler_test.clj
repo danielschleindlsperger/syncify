@@ -23,8 +23,8 @@
       (testing "returns existing room"
         (let [db (reify RoomDatabase
                    (get-room [_this _id] room))
-              app (test-handler {:crux-node db} {:jwt-secret "1234567891012131"})
-              req (rm/request :get (str "/room/" (:room-id room)))
+              app (test-handler {:xt-node db} {:jwt-secret "1234567891012131"})
+              req (rm/request :get (str "/api/room/" (:room-id room)))
               resp (app req)]
           (is (= 200 (:status resp)))
           (is (= {"roomId"       (-> room :room-id str),
@@ -40,8 +40,8 @@
       (testing "return 404 if room doesn't exist"
         (let [db (reify RoomDatabase
                    (get-room [_this _id] nil))
-              app (test-handler {:crux-node db} {:jwt-secret "1234567891012131"})
-              req (rm/request :get (str "/room/" (:room-id room)))
+              app (test-handler {:xt-node db} {:jwt-secret "1234567891012131"})
+              req (rm/request :get (str "/api/room/" (:room-id room)))
               resp (app req)]
           (is (= 404 (:status resp))))))
 
@@ -51,7 +51,7 @@
         (let [room-id (UUID/randomUUID)
               calls (atom [])
               app (test-handler {} {:jwt-secret "1234567891012131"})
-              req (-> (rm/request :post "/room")
+              req (-> (rm/request :post "/api/room")
                       (assoc-in [:use-cases :create-room] (fn [ctx input] (swap! calls conj [ctx input])
                                                             {:room-id room-id}))
                       (rm/json-body {"roomName"       "My Room"
@@ -59,8 +59,10 @@
                                      "roomTrackIds"   ["0LJcP6ApERw0OvosstOdZm"]
                                      "roomPrivate"    true}))
               resp (app req)]
+          (clojure.pprint/pprint resp)
           (is (= 201 (:status resp)))
-          (is (= (str "/room/" room-id) (get-in resp [:headers "Location"])))
+          (is (= (str "/api/room/" room-id) (get-in resp [:headers "Location"])))
+          (prn @calls)
           (is (= @calls [[{} {:name        "My Room"
                               :track-ids   ["0LJcP6ApERw0OvosstOdZm"]
                               :cover-image "https://example.com/image.jpg"
@@ -68,6 +70,6 @@
 
       (testing "validates request"
         (let [app (test-handler {} {:jwt-secret "1234567891012131"})
-              req (rm/request :post "/room")
+              req (rm/request :post "/api/room")
               resp (app req)]
           (is (= 400 (:status resp))))))))

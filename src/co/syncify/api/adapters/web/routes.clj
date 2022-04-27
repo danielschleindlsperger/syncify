@@ -46,10 +46,9 @@
                                                     :cluster      (get-in req [:context :config :pusher :cluster])
                                                     :forceTLS     true
                                                     :authEndpoint "/api/auth/pusher"}}})}}]
-    ;; TODO: we actually want the endpoints to be named in singular
-    ["/rooms" {:post create-room-handler
-               :get  {:responses {200 {:body any?}}
-                      :handler   (constantly {:body {:data []}})}}]
+    ["/room" {:post create-room-handler
+              :get  {:responses {200 {:body any?}}
+                     :handler   (constantly {:body {:data []}})}}]
 
     ;; Commands to interact with the room
     ;; Only admins can execute these
@@ -129,7 +128,7 @@
 
 (defmethod ig/init-key ::app-handler [_ {:keys [profile config] :as system}]
   (let [prod? (= :prod profile)
-        context (select-keys system [:spotify :crux-node :config])]
+        context (select-keys system [:spotify :xt-node :config])]
     ;; Wrap in a function when not in prod.
     ;; This will recompile the router on every invocation which is a heavy performance penalty but will allow
     ;; to just re-evaluate handler functions without reloading the whole system which should result in a better

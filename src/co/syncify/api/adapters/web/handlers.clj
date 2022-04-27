@@ -51,7 +51,7 @@
                                                          :cover-image roomCoverImage
                                                          :private?    roomPrivate})]
                    (timbre/info (format "created room \"%s\" with id \"%s\"" roomName (:room-id room)))
-                   (response/created (str "/room/" (:room-id room)))))})
+                   (response/created (str "/api/room/" (:room-id room)))))})
 
 (def get-room-handler
   {:coercion   coercion
@@ -59,7 +59,7 @@
    :responses  {200 {:body (keys->camelCaseKeywords Room)}
                 404 {:body any?}}
    :handler    (fn [req]
-                 (let [room (get-room (get-in req [:context :crux-node])
+                 (let [room (get-room (get-in req [:context :xt-node])
                                       (UUID/fromString (get-in req [:path-params :id])))]
                    (if room
                      (response/response (->camel room))

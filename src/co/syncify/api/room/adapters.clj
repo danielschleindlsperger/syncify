@@ -1,11 +1,11 @@
 (ns co.syncify.api.room.adapters
-  (:require [crux.node]
+  (:require [xtdb.node]
             [co.syncify.api.room.core :refer [RoomDatabase]]
-            [co.syncify.api.crux.core :refer [get-one put-one!]]))
+            [co.syncify.api.xtdb.core :refer [get-one put-one!]]))
 
 (extend-protocol RoomDatabase
 
-  crux.node.CruxNode
+  xtdb.node.XtdbNode
 
   (get-room [this id]
     (get-one this :room id))

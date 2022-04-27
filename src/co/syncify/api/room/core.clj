@@ -78,7 +78,7 @@
 ;;;;;;;;;;;;;;;
 
 (defn create-room [context {:keys [name track-ids cover-image private?] :as partial-room}]
-  (let [{:keys [spotify crux-node]} context
+  (let [{:keys [spotify xt-node]} context
         ;; TODO: fetch ALL tracks using the track ids (ideally kind of effectively)
         tracks (tracks-by-ids spotify (filter (complement empty?) track-ids))
         new-room {:room-name     name
@@ -89,5 +89,5 @@
                                                                                                   :artist-name (:name a)}) (:artists t))}) tracks)}
                   :room-playback {:playback-started-at (Instant/now)
                                   :playback-skipped-ms 0}}
-        room (put-room! crux-node new-room)]
+        room (put-room! xt-node new-room)]
     room))
