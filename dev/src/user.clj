@@ -13,5 +13,7 @@
   (in-ns 'dev)
   :loaded)
 
+(dev)
+
 (comment
   (dev))
