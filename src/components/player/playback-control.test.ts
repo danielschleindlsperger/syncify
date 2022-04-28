@@ -2,17 +2,18 @@ import { Playlist, Room } from '../../types'
 import { playbackInSync, playbackOffset, skipTrack } from './playback-control'
 
 describe('playbackInSync()', () => {
-  const playlist: Playlist = {
-    createdAt: '2020-11-22T18:10:06.431Z',
-    tracks: [
-      // Each track is 10 seconds long
-      { id: 'one', name: 'One', duration_ms: 10000, artists: [] },
-      { id: 'two', name: 'Two', duration_ms: 10000, artists: [] },
-      { id: 'three', name: 'Three', duration_ms: 10000, artists: [] },
-    ],
-    playback: {
+  const room: Pick<Room, 'roomPlaylist' | 'roomPlayback'> = {
+    roomPlayback: {
       playbackStartedAt: '2020-11-22T18:10:06.431Z',
-      skippedMs: 0,
+      playbackSkippedMs: 0,
+    },
+    roomPlaylist: {
+      playlistTracks: [
+        // Each track is 10 seconds long
+        { trackId: 'one', trackName: 'One', trackDurationMs: 10000, trackArtists: [] },
+        { trackId: 'two', trackName: 'Two', trackDurationMs: 10000, trackArtists: [] },
+        { trackId: 'three', trackName: 'Three', trackDurationMs: 10000, trackArtists: [] },
+      ],
     },
   }
 
@@ -24,9 +25,9 @@ describe('playbackInSync()', () => {
 
   it('returns true if the playback is inside acceptable boundary', () => {
     const track = { id: 'two' } as Spotify.Track
-    const now = addSeconds(new Date(playlist.createdAt), 10)
+    const now = addSeconds(new Date(room.roomPlayback.playbackStartedAt), 10)
 
-    const isInSync = playbackInSync(playlist, playbackState(200, track), now)
+    const isInSync = playbackInSync(room, playbackState(200, track), now)
 
     expect(isInSync).toBe(true)
   })
@@ -35,15 +36,15 @@ describe('playbackInSync()', () => {
     // we're on the second track
     const track = { id: 'two' } as Spotify.Track
     // 10 seconds have past since starting the playback
-    const now = addSeconds(new Date(playlist.createdAt), 10)
+    const now = addSeconds(new Date(room.roomPlayback.playbackStartedAt), 10)
 
     // but we've also skipped five seconds (maybe we skipped the first track five seconds before the end)
-    const skippedPlaylist: Playlist = {
-      ...playlist,
-      playback: { ...playlist.playback, skippedMs: 5000 },
+    const roomSkippedPlaylist: Pick<Room, 'roomPlaylist' | 'roomPlayback'> = {
+      ...room,
+      roomPlayback: { ...room.roomPlayback, playbackSkippedMs: 5000 },
     }
 
-    const isInSync = playbackInSync(skippedPlaylist, playbackState(5000, track), now)
+    const isInSync = playbackInSync(roomSkippedPlaylist, playbackState(5000, track), now)
 
     expect(isInSync).toBe(true)
   })
@@ -52,9 +53,9 @@ describe('playbackInSync()', () => {
     // We're still on the first track
     const track = { id: 'one' } as Spotify.Track
     // Even though 10 seconds have already past
-    const now = addSeconds(new Date(playlist.createdAt), 10)
+    const now = addSeconds(new Date(room.roomPlayback.playbackStartedAt), 10)
 
-    const isInSync = playbackInSync(playlist, playbackState(200, track), now)
+    const isInSync = playbackInSync(room, playbackState(200, track), now)
 
     expect(isInSync).toBe(false)
   })
@@ -62,9 +63,9 @@ describe('playbackInSync()', () => {
   it('returns false if the current track is not in the playlist', () => {
     // We're still on the first track
     const track = { id: 'not-in-the-playlist' } as Spotify.Track
-    const now = addSeconds(new Date(playlist.createdAt), 0)
+    const now = addSeconds(new Date(room.roomPlayback.playbackStartedAt), 0)
 
-    const isInSync = playbackInSync(playlist, playbackState(0, track), now)
+    const isInSync = playbackInSync(room, playbackState(0, track), now)
 
     expect(isInSync).toBe(false)
   })
