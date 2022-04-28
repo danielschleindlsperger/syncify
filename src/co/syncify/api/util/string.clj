@@ -8,12 +8,6 @@
 (comment
   (->base64 "asdf"))
 
-(defn random-uuid
-  "(java.util.UUID/randomUUID) extracted as a separated fn to enable easier mocking with with-redefs-fn."
-  []
-  (UUID/randomUUID))
-
-
 (defn str->byte-arr
   "Converts a string to a Java byte array."
   [s]

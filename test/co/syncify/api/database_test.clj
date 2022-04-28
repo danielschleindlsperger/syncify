@@ -1,8 +1,7 @@
 (ns co.syncify.api.database-test
   (:require [clojure.test :refer :all]
             [xtdb.api :as xt]
-            [co.syncify.api.xtdb.core :as db]
-            [co.syncify.api.util.string :refer [random-uuid]]))
+            [co.syncify.api.xtdb.core :as db]))
 
 (def ^:dynamic *node* nil)
 

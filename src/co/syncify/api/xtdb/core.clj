@@ -2,10 +2,9 @@
   (:require [clojure.set :refer [rename-keys]]
             [clojure.java.io :as io]
             [xtdb.api :as xt]
-            [integrant.core :as ig]
-            [co.syncify.api.util.string :refer [random-uuid]]))
+            [integrant.core :as ig]))
 
-(defn- type-id [typ] (keyword (str (name typ) "-id")))
+(defn- type-id [typ] (keywors (str (name typ) "-id")))
 (defn- xt->id [x typ] (rename-keys x {:xt/id (type-id typ)}))
 (defn- id->xt [x typ] (rename-keys x {(type-id typ) :xt/id}))
 
