@@ -20,8 +20,7 @@ export const Playlist = React.memo(({ playlist, ...props }: PlaylistProps) => {
   // Show the current track plus the next 4
   // TODO: make this more dynamic and scrollable, i.e. "load more"
   const items = dropWhile(
-    ({ trackId }) =>
-      currentTrack && trackId !== (currentTrack?.linked_from?.id ?? currentTrack?.id),
+    ({ trackId }) => trackId !== (currentTrack?.linked_from?.id ?? currentTrack?.id),
     playlist.playlistTracks,
   ).slice(0, 5)
 

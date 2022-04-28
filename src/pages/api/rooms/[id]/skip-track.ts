@@ -36,39 +36,41 @@ export default withAuth(async (req: AuthenticatedNowRequest, res: NowResponse) =
 
   // To skip forward we keep track of the total amount of skipped milliseconds during a playback
   // and use that in all offset calculations
-  const skipped = skippedMs(room.playlist, targetTrackId)
+  const skipped = skippedMs(room, targetTrackId)
 
+  // TOOD: Do this on the server-side
   await updateRoom(client, {
     ...room,
-    playlist: {
-      ...room.playlist,
-      playback: {
-        ...room.playlist.playback,
-        skippedMs: room.playlist.playback.skippedMs + skipped,
-      },
-    },
+    // playlist: {
+    //   ...room.playlist,
+    //   playback: {
+    //     ...room.playlist.playback,
+    //     skippedMs: room.playlist.playback.skippedMs + skipped,
+    //   },
+    // },
   })
 
   // TODO: payload is not needed anymore
   // Notify the track change to all connected clients
-  await pusher.trigger(`presence-${room.id}`, TrackChanged, {})
-  log.info(`Skipped a track in room "${roomId}".`, { roomId, roomName: room.name })
+  await pusher.trigger(`presence-${room.roomId}`, TrackChanged, {})
+  log.info(`Skipped a track in room "${roomId}".`, { roomId, roomName: room.roomName })
 
   return res.json({ success: true })
 })
 
-const isRoomAdmin = (room: Pick<Room, 'admins'>, userId: string): boolean =>
-  room.admins.find((a) => a.id === userId) !== undefined
+// const isRoomAdmin = (room: Pick<Room, 'admins'>, userId: string): boolean => false
+// room.admins.find((a) => a.id === userId) !== undefined
+const isRoomAdmin = (..._: any[]): boolean => false
 
 /**
  * Determine the amount of milliseconds skipped forward.
  * When target track id `toTrackId` is omitted, playback is skipped to the next track.
  */
-function skippedMs(playlist: Playlist, toTrackId?: string): number {
-  const { remainingTracks, offset } = playbackOffset(playlist, new Date())
+function skippedMs(room: Pick<Room, 'roomPlaylist' | 'roomPlayback'>, toTrackId?: string): number {
+  const { remainingTracks, offset } = playbackOffset(room, new Date())
   const [currentTrack] = remainingTracks
   const tracksToSkip = toTrackId
-    ? takeWhile((track) => track.id !== toTrackId, remainingTracks)
+    ? takeWhile((track) => track.trackId !== toTrackId, remainingTracks)
     : [currentTrack]
-  return tracksToSkip.reduce((acc, track) => acc + track.duration_ms, 0) - offset
+  return tracksToSkip.reduce((acc, track) => acc + track.trackDurationMs, 0) - offset
 }

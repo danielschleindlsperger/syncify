@@ -10,10 +10,11 @@ const ACCEPTABLE_OFFSET_MS = 5000
  * is still in sync (within a margin).
  */
 export function playbackInSync(
-  playlist: Playlist,
+  room: Pick<Room, 'roomPlaylist' | 'roomPlayback'>,
   playbackState: Spotify.PlaybackState,
   now = new Date(),
 ): boolean {
+  const { roomPlaylist, roomPlayback } = room
   const { position, track_window } = playbackState
   const { current_track } = track_window
   const currentTrackId = current_track.linked_from?.id ?? current_track.id
@@ -21,21 +22,21 @@ export function playbackInSync(
   if (!currentTrackId) return false
 
   // Check what the current offset (in millis) should be
-  const start = new Date(playlist.playback.playbackStartedAt)
+  const start = new Date(roomPlayback.playbackStartedAt)
   // TODO: incorporate skippedMs
   const plannedOffset = now.getTime() - start.getTime()
 
   // Check what the actual offset is
   const actualOffset = reduce(
     (offset, t) => {
-      if (t.id === currentTrackId) {
+      if (t.trackId === currentTrackId) {
         // we found the current track
         return reduced<number>(offset + position)
       }
-      return offset + t.duration_ms
+      return offset + t.trackDurationMs
     },
     0,
-    playlist.tracks,
+    roomPlaylist.playlistTracks,
   )
 
   const diff = Math.abs(plannedOffset - actualOffset)
@@ -66,9 +67,9 @@ export const playbackOffset = (
     now.getTime() - Date.parse(roomPlayback.playbackStartedAt) + roomPlayback.playbackSkippedMs
 
   const remainingTracks = dropWhile((t) => {
-    const trackIsOver = offset > t.duration_ms
+    const trackIsOver = offset > t.trackDurationMs
     if (trackIsOver) {
-      offset = offset - t.duration_ms
+      offset = offset - t.trackDurationMs
       return true
     }
     return false

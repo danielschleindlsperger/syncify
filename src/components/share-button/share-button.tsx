@@ -36,7 +36,8 @@ export const ShareButton = (props: React.HTMLAttributes<HTMLElement>) => {
           variant="ghost"
           aria-label="Share this room: copy URL"
           onClick={copyToClipboard}
-          icon={<Share />}
+          // icon={<Share />}
+          icon={<span>SHARE</span>}
         />
       </PopoverTrigger>
       <Portal>

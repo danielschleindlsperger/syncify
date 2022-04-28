@@ -12,7 +12,7 @@ export type Room = Readonly<{
   roomPubliclyListed: boolean
   roomPlaylist: Playlist
   roomPlayback: Playback
-  admins: { id: string }[]
+  // admins: { id: string }[]
 }>
 
 export type Playback = Readonly<{

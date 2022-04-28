@@ -16,7 +16,7 @@ export const Player = ({ className, ...props }: React.HTMLAttributes<HTMLElement
   const isPlaying = usePlayerState((state) => state.isPlaying)
   const { play } = useSpotifyPlayer()
   const room = useRoom().room
-  const playlist = useRoom().room?.playlist
+  const playlist = useRoom().room?.roomPlaylist
   const revalidate = useRoom().revalidate
   const { channel } = useRoomChannel()
 
@@ -25,8 +25,8 @@ export const Player = ({ className, ...props }: React.HTMLAttributes<HTMLElement
   // Keep a rolling window of "is in sync?" measurements
   const [measurements, setMeasurements] = React.useState<boolean[]>([])
   React.useEffect(() => {
-    if (playbackState && playlist) {
-      const inSync = playbackInSync(playlist!, playbackState)
+    if (playbackState && room) {
+      const inSync = playbackInSync(room, playbackState)
       setMeasurements((s) => [...s, inSync].slice(-3))
     }
   }, [playbackState, playlist])
@@ -39,11 +39,11 @@ export const Player = ({ className, ...props }: React.HTMLAttributes<HTMLElement
   // c) it's not in sync for the second time in a row - i.e. it's not a fluke
   // d) the effect only runs once and not for every failure
   React.useEffect(() => {
-    if (!playlist || !play) return
+    if (!room || !play) return
 
     if (equals(measurements, [true, false, false])) {
-      const { remainingTracks, offset } = playbackOffset(playlist)
-      const ids = remainingTracks.map((t) => `spotify:track:${t.id}`)
+      const { remainingTracks, offset } = playbackOffset(room)
+      const ids = remainingTracks.map((t) => `spotify:track:${t.trackId}`)
 
       // eslint-disable-next-line no-console
       console.info('re-syncing playback', { ids, offset })
@@ -56,13 +56,13 @@ export const Player = ({ className, ...props }: React.HTMLAttributes<HTMLElement
   // This runs every time the playlist changes. This means we can skip tracks and add tracks to the
   // playlist simply by updating it.
   React.useEffect(() => {
-    if (play && playlist) {
-      const { remainingTracks, offset } = playbackOffset(playlist)
-      const ids = remainingTracks.map((t) => `spotify:track:${t.id}`)
+    if (play && room) {
+      const { remainingTracks, offset } = playbackOffset(room)
+      const ids = remainingTracks.map((t) => `spotify:track:${t.trackId}`)
 
       play(ids, offset)
     }
-  }, [playlist, play])
+  }, [room, play])
 
   // change track after event
   React.useEffect(() => {

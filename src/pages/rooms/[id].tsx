@@ -62,7 +62,7 @@ export default withPlayerStore(() => {
                   <Playlist playlist={room.roomPlaylist} mt="10%" />
 
                   <div className="grid grid-cols-2 mt-auto">
-                    {/*<Player className="mt-8 col-start-1 col-end-1" />*/}
+                    <Player className="mt-8 col-start-1 col-end-1" />
                   </div>
                 </div>
               </div>

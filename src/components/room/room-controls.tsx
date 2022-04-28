@@ -8,7 +8,8 @@ import { skipTrack } from '../player/playback-control'
 
 type RoomControlsProps = React.HTMLAttributes<HTMLElement> & { room: Room }
 export const RoomControls = ({ room, className, ...props }: RoomControlsProps) => {
-  const { isAdmin } = useAuthorization({ admins: room.admins })
+  // const { isAdmin } = useAuthorization({ admins: room.admins })
+  const isAdmin = false
 
   if (!isAdmin) return null
 

@@ -91,5 +91,5 @@ const UpdateRoomSchema = Yup.object({
 
 export type UpdateRoomPayload = Yup.InferType<typeof UpdateRoomSchema>
 
-const isRoomAdmin = (room: Room, userId: string): boolean =>
-  room.admins.some((admin) => admin.id === userId)
+const isRoomAdmin = (room: Room, userId: string): boolean => false
+// room.admins.some((admin) => admin.id === userId)

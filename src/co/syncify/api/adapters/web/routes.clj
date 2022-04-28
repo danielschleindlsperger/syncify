@@ -116,6 +116,10 @@
                                                     :client-id        (get-in config [:spotify :client-id])
                                                     :client-secret    (get-in config [:spotify :client-secret])
                                                     ;:scopes           ["user:email"]
+                                                    :scopes           ["streaming"
+                                                                       "user-read-email"
+                                                                       "user-read-private"
+                                                                       "playlist-read-private"]
                                                     :launch-uri       "/oauth2/spotify"
                                                     :redirect-uri     "/oauth2/spotify/callback"
                                                     ;; TODO

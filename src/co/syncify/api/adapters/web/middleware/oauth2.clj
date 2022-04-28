@@ -46,6 +46,9 @@
 (defn- make-launch-handler [profile]
   (fn [{:keys [session] :or {session {}} :as request}]
     (let [state (random-state)]
+      (prn profile)
+      (prn (scopes profile))
+      (prn (authorize-uri profile request state))
       (-> (resp/redirect (authorize-uri profile request state))
           (assoc :session (assoc session :oauth2/state state))))))
 
