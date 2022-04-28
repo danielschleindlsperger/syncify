@@ -50,7 +50,7 @@ type UseRoomData = {
 }
 
 const useRoomData = (): UseRoomData => {
-  const { data, error, mutate } = useApiRequest<GetRoomsResponse>('/api/rooms')
+  const { data, error, mutate } = useApiRequest<GetRoomsResponse>('/api/room')
 
   const loadMore = async () => {
     if (data) {

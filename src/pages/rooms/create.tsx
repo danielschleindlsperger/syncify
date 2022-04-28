@@ -12,7 +12,8 @@ export default function CreateRoomPage() {
   const router = useRouter()
 
   const handleCreated = (room: Room) => {
-    router.push(`/rooms/${room.id}`)
+    console.log('created', { room })
+    router.push(`/rooms/${room.roomId}`)
   }
 
   return (

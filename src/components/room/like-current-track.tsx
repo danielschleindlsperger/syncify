@@ -25,11 +25,12 @@ export const LikeCurrentTrack = (props: LikeCurrentTrackProps) => {
 
   return (
     <IconButton
+      {...props}
       variant="ghost"
       aria-label="Like the current track"
       onClick={triggerLike}
-      icon={<Heart className="fill-current" />}
-      {...props}
+      // icon={<Heart className="fill-current"/>}
+      icon={<span style={{ color: 'red' }}>{'<3'}</span>}
     />
   )
 }

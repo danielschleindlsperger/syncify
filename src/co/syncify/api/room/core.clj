@@ -79,8 +79,10 @@
 
 (defn create-room [context {:keys [name track-ids cover-image private?] :as partial-room}]
   (let [{:keys [spotify xt-node]} context
-        ;; TODO: fetch ALL tracks using the track ids (ideally kind of effectively)
-        tracks (tracks-by-ids spotify (filter (complement empty?) track-ids))
+        tracks (tracks-by-ids spotify (->> track-ids
+                                           (filter (complement empty?))
+                                           ;; TODO: fetch ALL tracks using the track ids (ideally kind of effectively)
+                                           (take 50)))
         new-room {:room-name     name
                   :room-playlist {:playlist-tracks (map (fn [t] {:track-name        (:name t)
                                                                  :track-id          (:id t)

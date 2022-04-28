@@ -55,8 +55,15 @@ export type PlaybackOffset = {
  * Given the static playlist of a room determine the remaining tracks (including the current track)
  * as well as the offset in the current track.
  */
-export const playbackOffset = (playlist: Playlist, now = new Date()): PlaybackOffset => {
-  let offset = now.getTime() - Date.parse(playlist.createdAt) + playlist.playback.skippedMs
+export const playbackOffset = (
+  room: Pick<Room, 'roomPlaylist' | 'roomPlayback'>,
+  now = new Date(),
+): PlaybackOffset => {
+  console.log('playbackOffset', { room })
+  const { roomPlaylist, roomPlayback } = room
+  const { playlistTracks } = roomPlaylist
+  let offset =
+    now.getTime() - Date.parse(roomPlayback.playbackStartedAt) + roomPlayback.playbackSkippedMs
 
   const remainingTracks = dropWhile((t) => {
     const trackIsOver = offset > t.duration_ms
@@ -65,7 +72,7 @@ export const playbackOffset = (playlist: Playlist, now = new Date()): PlaybackOf
       return true
     }
     return false
-  }, playlist.tracks)
+  }, playlistTracks)
 
   return { remainingTracks, offset }
 }
@@ -82,7 +89,7 @@ export const skipTrack = async (room: Room, toTrackId?: string) => {
     .filter(([_param, value]) => value !== undefined)
     .map(([param, value]) => `${param}=${value}`)
     .join('&')
-  const url = `/api/rooms/${room.id}/skip-track?${queryString}`
+  const url = `/api/rooms/${room.roomId}/skip-track?${queryString}`
 
   await window.fetch(url.toString(), { method: 'POST' })
 }

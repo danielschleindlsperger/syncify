@@ -42,7 +42,8 @@
 (def create-room-handler
   {:coercion   coercion
    :parameters {:body (keys->camelCaseKeywords CreateRoomPayload)}
-   :responses  {201 {:body nil?}}
+   ;; TODO: type the room id response
+   :responses  {201 {:body any?}}
    :handler    (fn [req]
                  (let [{:keys [roomName roomCoverImage roomTrackIds roomPrivate]} (:body-params req)
                        create-room (get-in req [:use-cases :create-room])

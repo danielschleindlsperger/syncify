@@ -14,23 +14,27 @@ type PlaylistProps = BoxProps & { playlist: Playlist }
 
 export const Playlist = React.memo(({ playlist, ...props }: PlaylistProps) => {
   const { room } = useRoom()
+  console.log('<Playlist />', { room })
   const currentTrack = usePlayerState((s) => s.playbackState?.track_window.current_track)
 
   // Show the current track plus the next 4
   // TODO: make this more dynamic and scrollable, i.e. "load more"
   const items = dropWhile(
-    (t) => t.id !== (currentTrack?.linked_from?.id ?? currentTrack?.id),
-    playlist.tracks,
+    ({ trackId }) =>
+      currentTrack && trackId !== (currentTrack?.linked_from?.id ?? currentTrack?.id),
+    playlist.playlistTracks,
   ).slice(0, 5)
 
-  const tracks = useSpotifyTracks(items.map((item) => item.id))
+  console.log(playlist.playlistTracks, items)
+
+  const tracks = useSpotifyTracks(items.map(({ trackId }) => trackId))
 
   const skipToTrack = async (id: string) => {
     if (!room) return
     await skipTrack(room, id)
   }
 
-  if (playlist.tracks.length === 0) return null
+  if (playlist.playlistTracks.length === 0) return null
 
   return <Playlist2 items={tracks} skipToTrack={skipToTrack} {...props} />
 })
@@ -132,6 +136,8 @@ function useSpotifyTracks(ids: string[]): PlaylistTrack[] {
 
     spotify.setAccessToken(accessToken)
 
+    console.log({ ids })
+
     spotify
       .getTracks(ids)
       .then(({ tracks }) =>
@@ -142,6 +148,10 @@ function useSpotifyTracks(ids: string[]): PlaylistTrack[] {
           coverArt: track.album.images[0]?.url,
         })),
       )
+      .then((tracks) => {
+        console.log('spotify response', tracks)
+        return tracks
+      })
       .then(setTracks)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idCacheKey, accessToken])

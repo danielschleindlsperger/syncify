@@ -81,7 +81,7 @@ export const CreateRoom: React.FC<CreateRoomProps> = ({ onCreated, ...props }) =
 }
 
 const createRoom = async (data: CreateRoomPayload): Promise<Room> => {
-  const res = await fetch('/api/rooms', {
+  const res = await fetch('/api/room', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -100,7 +100,9 @@ const createRoom = async (data: CreateRoomPayload): Promise<Room> => {
     throw new Error(JSON.stringify(await res.json(), null, 2))
   }
 
-  const room: Room = await res.json()
+  const segments = res.headers.get('location')?.split('/') ?? []
+  const roomId = segments[segments.length - 1]
 
-  return room
+  // TODO: Maybe fetch the room from the Location header's URL here and return it?
+  return { roomId } as Room
 }

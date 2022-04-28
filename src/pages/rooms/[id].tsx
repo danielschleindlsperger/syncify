@@ -22,21 +22,22 @@ export default withPlayerStore(() => {
   const { id } = router.query
   if (Array.isArray(id)) throw new Error('id must be a string!')
 
-  const { data: room, error, revalidate } = useApiRequest<Room>(id ? `/api/rooms/${id}` : null, {
+  const { data: room, error, revalidate } = useApiRequest<Room>(id ? `/api/room/${id}` : null, {
     shouldRetryOnError: false,
     revalidateOnFocus: false,
   })
 
   if (error) return <div>Whoopps, something bad happened!</div>
   if (!room) return <LoadingSpinner size="lg" absoluteCentered />
-  const { remainingTracks } = playbackOffset(room.playlist, new Date())
+
+  const { remainingTracks } = playbackOffset(room, new Date())
 
   return (
     <RoomProvider room={room} revalidate={revalidate}>
       <SpotifyPlayerProvider>
         <Head>
-          <title key="title">{room.name} - Syncify</title>
-          {!room.publiclyListed && <meta name="robots" content="noindex, follow" />}
+          <title key="title">{room.roomName} - Syncify</title>
+          {!room.roomPubliclyListed && <meta name="robots" content="noindex, follow" />}
         </Head>
         <div className="h-screen flex flex-col">
           <AuthenticatedOnly>
@@ -54,14 +55,14 @@ export default withPlayerStore(() => {
                 </div>
                 <div className="col-start-2 col-span-2 flex flex-col">
                   <div className="flex items-end col-start-2">
-                    <h1 className="text-4xl font-bold">{room.name}</h1>
+                    <h1 className="text-4xl font-bold">{room.roomName}</h1>
                   </div>
 
                   <UserlistContainer mt={8} />
-                  <Playlist playlist={room.playlist} mt="10%" />
+                  <Playlist playlist={room.roomPlaylist} mt="10%" />
 
                   <div className="grid grid-cols-2 mt-auto">
-                    <Player className="mt-8 col-start-1 col-end-1" />
+                    {/*<Player className="mt-8 col-start-1 col-end-1" />*/}
                   </div>
                 </div>
               </div>
