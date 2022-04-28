@@ -9,9 +9,10 @@
            (java.time Instant)))
 
 (deftest room-handlers
-  (let [room {:room-id       (UUID/randomUUID)
+  (let [playback-started-at "2022-04-28T00:00:00.000Z"
+        room {:room-id       (UUID/randomUUID)
               :room-name     "My Room"
-              :room-playback {:playback-started-at (Instant/now)
+              :room-playback {:playback-started-at (Instant/parse playback-started-at)
                               :playback-skipped-ms 0}
               :room-playlist {:playlist-tracks [{:track-id          "0LJcP6ApERw0OvosstOdZm"
                                                  :track-name        "Who"
@@ -29,7 +30,7 @@
           (is (= 200 (:status resp)))
           (is (= {"roomId"       (-> room :room-id str),
                   "roomName"     "My Room",
-                  "roomPlayback" {"playbackSkippedMs" 0, "playbackStartedAt" (-> room :room-playback :playback-started-at str)},
+                  "roomPlayback" {"playbackSkippedMs" 0, "playbackStartedAt" playback-started-at},
                   "roomPlaylist" {"playlistTracks" [{"trackArtists"    [{"artistId"   "2jYMYP2SVifgmzNRQJx3SJ",
                                                                          "artistName" "Modeselelektor"}],
                                                      "trackDurationMs" 123123,
