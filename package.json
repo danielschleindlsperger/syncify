@@ -35,7 +35,7 @@
     "cookie": "^0.4.1",
     "easy-peasy": "^4.0.1",
     "framer-motion": "^3.1.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "next": "^10.0.2",
     "pg": "^8.5.1",
     "pg-native": "^3.0.0",
